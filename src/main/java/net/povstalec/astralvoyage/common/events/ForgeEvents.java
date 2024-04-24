@@ -1,12 +1,20 @@
 package net.povstalec.astralvoyage.common.events;
 
 import com.sun.jdi.connect.spi.TransportService;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.data.worldgen.DimensionTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.*;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -21,7 +29,7 @@ import net.povstalec.astralvoyage.common.init.WorldGenInit;
 public class ForgeEvents {
     @SubscribeEvent
     public static void onLivingTick(LivingEvent.LivingTickEvent event) {
-        Entity entity = event.getEntity();
+        LivingEntity entity = event.getEntity();
         Level level = entity.level();
 
         if (!level.dimensionTypeId().location().equals(WorldGenInit.SPACESHIP_TYPE.location()))
@@ -35,8 +43,11 @@ public class ForgeEvents {
         }
 
         Vec3 movementVector = entity.getDeltaMovement();
-        entity.setDeltaMovement(movementVector);
-
+        entity.setDeltaMovement(movementVector.x(), movementVector.y()+entity.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).getValue(), movementVector.z());
+        entity.setSwimming(true);
+        if(entity.isShiftKeyDown()){
+            entity.setDeltaMovement(movementVector.x(), movementVector.y()+entity.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).getValue()-0.02, movementVector.z());
+        }
         entity.fallDistance = 0;
     }
 
