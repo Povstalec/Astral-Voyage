@@ -1,14 +1,15 @@
 package net.povstalec.astralvoyage.common.cap;
 
+import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
 
 public class GenericProvider<T extends INBTSerializable<CompoundTag>> implements ICapabilitySerializable<CompoundTag> {
     private final T object;

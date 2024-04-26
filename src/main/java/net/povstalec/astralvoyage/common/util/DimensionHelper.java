@@ -1,16 +1,22 @@
 package net.povstalec.astralvoyage.common.util;
 
-import com.mojang.serialization.DynamicOps;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
+
+import javax.annotation.Nullable;
+
 import com.mojang.serialization.Lifecycle;
-import net.minecraft.core.Holder;
+
+import net.minecraft.Util;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.DimensionTypes;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -19,8 +25,6 @@ import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.BorderChangeListener;
-import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -32,11 +36,6 @@ import net.povstalec.astralvoyage.common.init.WorldGenInit;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
 import net.povstalec.astralvoyage.common.network.packets.UpdateDimensionsPacket;
 import net.povstalec.astralvoyage.common.worldgen.dimension.SpaceshipChunkGenerator;
-
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.function.Supplier;
 
 public class DimensionHelper {
 
@@ -84,7 +83,7 @@ public class DimensionHelper {
 
         // the int in create() here is radius of chunks to watch, 11 is what the server uses when it initializes levels
         final ChunkProgressListener chunkProgressListener = server.progressListenerFactory.create(11);
-        final Executor executor = server.executor;
+        final Executor executor = Util.backgroundExecutor();
         final LevelStorageSource.LevelStorageAccess anvilConverter = server.storageSource;
         final WorldData worldData = server.getWorldData();
         final DerivedLevelData derivedLevelData = new DerivedLevelData(worldData, worldData.overworldData());

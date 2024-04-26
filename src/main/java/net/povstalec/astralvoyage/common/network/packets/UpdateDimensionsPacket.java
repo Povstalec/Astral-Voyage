@@ -1,22 +1,19 @@
 package net.povstalec.astralvoyage.common.network.packets;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.NetworkEvent;
-import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.network.ClientPacketHandler;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public record UpdateDimensionsPacket(Set<ResourceKey<Level>> keys, boolean add)
 {

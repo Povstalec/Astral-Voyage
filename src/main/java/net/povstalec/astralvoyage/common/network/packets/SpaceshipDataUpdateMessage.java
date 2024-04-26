@@ -1,13 +1,13 @@
 package net.povstalec.astralvoyage.common.network.packets;
 
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import net.povstalec.astralvoyage.common.network.ClientPacketHandler;
 import net.povstalec.astralvoyage.common.network.packets.spaceship.SpaceshipData;
-
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class SpaceshipDataUpdateMessage {
 

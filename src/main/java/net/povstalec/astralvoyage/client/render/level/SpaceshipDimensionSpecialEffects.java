@@ -1,6 +1,9 @@
 package net.povstalec.astralvoyage.client.render.level;
 
+import org.joml.Matrix4f;
+
 import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
@@ -9,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.povstalec.astralvoyage.AstralVoyage;
-import org.joml.Matrix4f;
 
 public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
     public static final ResourceLocation SPACESHIP_EFFECTS = new ResourceLocation(AstralVoyage.MODID, "spaceship_effects");
@@ -41,6 +43,7 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
     @Override
     public boolean renderSky(ClientLevel level, int ticks, float partialTick, PoseStack poseStack, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog)
     {
+    	System.out.println("Render");
         return false;
     }
 

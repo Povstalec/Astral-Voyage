@@ -1,5 +1,8 @@
 package net.povstalec.astralvoyage.common.init;
 
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -10,9 +13,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.blocks.SpaceshipGeneratorBlock;
-
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class BlockInit {
 
