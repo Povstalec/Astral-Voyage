@@ -7,14 +7,16 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
-import net.povstalec.astralvoyage.common.network.packets.SpaceshipDataUpdateMessage;
+import net.povstalec.astralvoyage.common.network.packets.SpaceshipTestDataUpdateMessage;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientPacketHandler {
 
-    public static void handleTardisUpdatePacket(SpaceshipDataUpdateMessage mes) {
+    public static void handleTestSpaceshipDataUpdatePacket(SpaceshipTestDataUpdateMessage mes) {
         getLevel().ifPresent(level -> {
-            level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(mes.data::apply);
+            level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> {
+                cap.setString(mes.testString);
+            });
         });
     }
 
