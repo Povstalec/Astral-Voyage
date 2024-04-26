@@ -15,6 +15,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DataPackRegistryEvent;
+import net.povstalec.astralvoyage.client.render.level.SpaceDimensionSpecialEffects;
 import net.povstalec.astralvoyage.client.render.level.SpaceshipDimensionSpecialEffects;
 import net.povstalec.astralvoyage.common.datapack.StellarLocation;
 import net.povstalec.astralvoyage.common.init.BlockInit;
@@ -77,6 +78,7 @@ public class AstralVoyage
 
         @SubscribeEvent
         public static void registerDimensionalEffects(RegisterDimensionSpecialEffectsEvent event){
+        	SpaceDimensionSpecialEffects.registerSkyEffects(event);
             SpaceshipDimensionSpecialEffects.registerSkyEffects(event);
         }
     }

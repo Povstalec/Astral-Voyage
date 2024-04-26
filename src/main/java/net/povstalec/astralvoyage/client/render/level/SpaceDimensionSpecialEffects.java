@@ -1,28 +1,27 @@
 package net.povstalec.astralvoyage.client.render.level;
 
-import java.util.Optional;
-
 import org.joml.Matrix4f;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.math.Axis;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.DimensionSpecialEffectsManager;
 import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.povstalec.astralvoyage.AstralVoyage;
 
-public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
-    public static final ResourceLocation SPACESHIP_EFFECTS = new ResourceLocation(AstralVoyage.MODID, "spaceship_effects");
+public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects {
+    public static final ResourceLocation EARTH_ORBIT_EFFECTS = new ResourceLocation(AstralVoyage.MODID, "earth_orbit");
     
-
-	private Optional<DimensionSpecialEffects> copiedEffects = Optional.empty();
-    
-    public SpaceshipDimensionSpecialEffects(float cloudLevel, boolean hasGround, SkyType skyType,
+    public SpaceDimensionSpecialEffects(float cloudLevel, boolean hasGround, SkyType skyType,
                                             boolean forceBrightLightmap, boolean constantAmbientLight)
     {
         super(cloudLevel, hasGround, skyType, forceBrightLightmap, constantAmbientLight);
@@ -49,10 +48,24 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
     @Override
     public boolean renderSky(ClientLevel level, int ticks, float partialTick, PoseStack poseStack, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog)
     {
-    	if(copiedEffects.isEmpty())
-            this.copiedEffects = Optional.of(DimensionSpecialEffectsManager.getForType(SpaceDimensionSpecialEffects.EARTH_ORBIT_EFFECTS));
+    	poseStack.pushPose();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        poseStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
+        poseStack.mulPose(Axis.XP.rotationDegrees(level.getTimeOfDay(partialTick) * 360.0F));
+        
+        //this.renderStars(level, partialTicks, rain, stack, projectionMatrix, setupFog);
+
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        
+        Matrix4f lastMatrix = poseStack.last().pose();
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        
+        //this.renderCelestials(level, partialTicks, stack, lastMatrix, setupFog, bufferbuilder, rain);
+        BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
+		CelestialRenderer.renderSun(bufferbuilder, lastMatrix, 50.0F);
+        
+        poseStack.popPose();
     	
-    	copiedEffects.get().renderSky(level, ticks, partialTick, poseStack, camera, projectionMatrix, isFoggy, setupFog);
         return true;
     }
 
@@ -64,10 +77,10 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
 
 
 
-    public static class Spaceship extends SpaceshipDimensionSpecialEffects
+    public static class EarthOrbit extends SpaceDimensionSpecialEffects
     {
     	
-        public Spaceship()
+        public EarthOrbit()
         {
             super(Float.NaN, true, DimensionSpecialEffects.SkyType.NONE, false, false);
             // skyRenderer =
@@ -79,6 +92,6 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
 
     public static void registerSkyEffects(RegisterDimensionSpecialEffectsEvent event)
     {
-        event.register(SpaceshipDimensionSpecialEffects.SPACESHIP_EFFECTS, new SpaceshipDimensionSpecialEffects.Spaceship());
+        event.register(SpaceDimensionSpecialEffects.EARTH_ORBIT_EFFECTS, new SpaceDimensionSpecialEffects.EarthOrbit());
     }
 }
