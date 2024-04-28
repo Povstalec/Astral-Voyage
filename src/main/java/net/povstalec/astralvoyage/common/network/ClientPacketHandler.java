@@ -15,7 +15,8 @@ public class ClientPacketHandler {
     public static void handleTestSpaceshipDataUpdatePacket(SpaceshipTestDataUpdateMessage mes) {
         getLevel().ifPresent(level -> {
             level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> {
-                cap.setStellarLocationID(mes.testString);
+                cap.setEffects(mes.effects);
+                cap.setRotation(mes.xAxisRotation, mes.yAxisRotation, mes.zAxisRotation);
             });
         });
     }

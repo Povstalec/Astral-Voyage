@@ -8,15 +8,12 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 
 import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.DimensionSpecialEffectsManager;
@@ -24,7 +21,6 @@ import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.cap.ISpaceshipLevel;
-import net.povstalec.astralvoyage.common.datapack.StellarLocation;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 
 public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
@@ -66,12 +62,21 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
     @Override
     public boolean renderSky(ClientLevel level, int ticks, float partialTick, PoseStack poseStack, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog)
     {
-    	Optional<StellarLocation> stellarLocation = getStellarLocationFromLevel(level);
+    	@NotNull LazyOptional<ISpaceshipLevel> capability = getSpaceShipCapability(level);
+    	Optional<ResourceLocation> effects = getEffectsFromLevel(capability);
+    	float xAxisRotation = getXAxisRotation(capability);
+    	float yAxisRotation = getYAxisRotation(capability);
+    	float zAxisRotation = getZAxisRotation(capability);
     	
-    	if(/*parentEffects.isEmpty() && */stellarLocation.isPresent())
+    	if(/*parentEffects.isEmpty() && */effects.isPresent())
     	{
-    		parentEffects = Optional.of(DimensionSpecialEffectsManager.getForType(stellarLocation.get().getSpecialEffects()));
+    		parentEffects = Optional.of(DimensionSpecialEffectsManager.getForType(effects.get()));
     	}
+    	
+
+        poseStack.mulPose(Axis.YP.rotationDegrees(yAxisRotation));
+        poseStack.mulPose(Axis.XP.rotationDegrees(xAxisRotation));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(zAxisRotation));
     	
     	if(parentEffects.isPresent())
     		parentEffects.get().renderSky(level, ticks, partialTick, poseStack, camera, projectionMatrix, isFoggy, setupFog);
@@ -104,30 +109,53 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
         event.register(SpaceshipDimensionSpecialEffects.SPACESHIP_EFFECTS, new SpaceshipDimensionSpecialEffects.Spaceship());
     }
     
-    public static Optional<StellarLocation> getStellarLocationFromLevel(ClientLevel level)
+    public static @NotNull LazyOptional<ISpaceshipLevel> getSpaceShipCapability(ClientLevel level)
     {
-    	@NotNull LazyOptional<ISpaceshipLevel> capability = level.getCapability(CapabilitiesInit.SPACESHIP);
+    	return level.getCapability(CapabilitiesInit.SPACESHIP);
+    }
+    
+    public static Optional<ResourceLocation> getEffectsFromLevel(@NotNull LazyOptional<ISpaceshipLevel> capability)
+    {
+    	Optional<String> effects = capability.map(cap -> cap.getEffects());
     	
-    	Optional<String> stellarLocationID = capability.map(cap -> cap.getStellarLocationID());
-    	
-    	if(stellarLocationID.isPresent())
+    	if(effects.isPresent())
     	{
-    		if(stellarLocationID.get() != null && ResourceLocation.isValidResourceLocation(stellarLocationID.get()))
+    		if(effects.get() != null && ResourceLocation.isValidResourceLocation(effects.get()))
     		{
-    			Minecraft minecraft = Minecraft.getInstance();
-        		ResourceLocation resourceLocation = new ResourceLocation(stellarLocationID.get());
-    			
-        		ClientPacketListener clientPacketListener = minecraft.getConnection();
-        		RegistryAccess registries = clientPacketListener.registryAccess();
-        		Registry<StellarLocation> stellarLocationRegistry = registries.registryOrThrow(StellarLocation.REGISTRY_KEY);
-        		
-        		if(stellarLocationRegistry.containsKey(resourceLocation))
-        		{
-        			return Optional.of(stellarLocationRegistry.get(resourceLocation));
-        		}
+    			return Optional.of(new ResourceLocation(effects.get()));
     		}
     	}
     	
     	return Optional.empty();
+    }
+    
+    public static float getXAxisRotation(@NotNull LazyOptional<ISpaceshipLevel> capability)
+    {
+    	Optional<Float> rotation = capability.map(cap -> cap.getXAxisRotation());
+    	
+    	if(rotation.isPresent())
+    		return rotation.get();
+    	
+    	return 0;
+    }
+    
+    public static float getYAxisRotation(@NotNull LazyOptional<ISpaceshipLevel> capability)
+    {
+    	Optional<Float> rotation = capability.map(cap -> cap.getYAxisRotation());
+    	
+    	if(rotation.isPresent())
+    		return rotation.get();
+    	
+    	return 0;
+    }
+    
+    public static float getZAxisRotation(@NotNull LazyOptional<ISpaceshipLevel> capability)
+    {
+    	Optional<Float> rotation = capability.map(cap -> cap.getZAxisRotation());
+    	
+    	if(rotation.isPresent())
+    		return rotation.get();
+    	
+    	return 0;
     }
 }

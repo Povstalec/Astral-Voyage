@@ -8,7 +8,11 @@ public interface ISpaceshipLevel extends INBTSerializable<CompoundTag> {
 
     void tick(Level level);
 
-    void clientUpdate(Level level, String id);
-    void setStellarLocationID(String id);
-    String getStellarLocationID();
+    void clientUpdate(Level level);
+    void setEffects(String effects);
+    String getEffects();
+    void setRotation(float xAxisRotation, float yAxisRotation, float zAxisRotation);
+    float getXAxisRotation();
+    float getYAxisRotation();
+    float getZAxisRotation();
 }

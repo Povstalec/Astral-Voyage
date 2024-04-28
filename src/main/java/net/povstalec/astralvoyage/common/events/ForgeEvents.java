@@ -15,6 +15,7 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.povstalec.astralvoyage.AstralVoyage;
+import net.povstalec.astralvoyage.client.render.level.SpaceDimensionSpecialEffects;
 import net.povstalec.astralvoyage.common.cap.GenericProvider;
 import net.povstalec.astralvoyage.common.cap.ISpaceshipLevel;
 import net.povstalec.astralvoyage.common.cap.SpaceshipCapability;
@@ -65,7 +66,18 @@ public class ForgeEvents {
 			capability.ifPresent(cap -> 
 			{
 				if(cap != null)
-					cap.tick(level);
+				{
+					if(level.getGameTime() % 20 == 0){
+						if((level.getGameTime() / 20) % 2 == 0)
+			        		cap.setEffects(SpaceDimensionSpecialEffects.SOL_ORBIT_EFFECTS.toString());
+			        	else
+			        		cap.setEffects(SpaceDimensionSpecialEffects.EARTH_ORBIT_EFFECTS.toString());
+						
+						//cap.tick(level);
+			        }
+					cap.setRotation(level.dimension().hashCode() % 360, 0, 0);
+					cap.clientUpdate(level);
+				}
 			});
 		}
 	}
