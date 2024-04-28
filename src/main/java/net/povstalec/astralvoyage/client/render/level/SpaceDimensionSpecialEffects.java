@@ -1,5 +1,7 @@
 package net.povstalec.astralvoyage.client.render.level;
 
+import javax.annotation.Nullable;
+
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -26,6 +28,12 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects {
                                             boolean forceBrightLightmap, boolean constantAmbientLight)
     {
         super(cloudLevel, hasGround, skyType, forceBrightLightmap, constantAmbientLight);
+    }
+
+    @Nullable
+    public float[] getSunriseColor(float p_108872_, float p_108873_)
+    {
+          return new float[] {0, 0, 0, 0};
     }
 
     @Override

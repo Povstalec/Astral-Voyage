@@ -2,6 +2,8 @@ package net.povstalec.astralvoyage.client.render.level;
 
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 
@@ -35,6 +37,12 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
                                             boolean forceBrightLightmap, boolean constantAmbientLight)
     {
         super(cloudLevel, hasGround, skyType, forceBrightLightmap, constantAmbientLight);
+    }
+
+    @Nullable
+    public float[] getSunriseColor(float p_108872_, float p_108873_)
+    {
+          return new float[] {0, 0, 0, 0};
     }
 
     @Override
@@ -85,7 +93,6 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
         public Spaceship()
         {
             super(Float.NaN, true, DimensionSpecialEffects.SkyType.NONE, false, false);
-            // skyRenderer =
         }
     }
 
