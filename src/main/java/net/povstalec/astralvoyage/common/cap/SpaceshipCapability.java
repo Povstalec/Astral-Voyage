@@ -2,56 +2,53 @@ package net.povstalec.astralvoyage.common.cap;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
+import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
 import net.povstalec.astralvoyage.common.network.packets.SpaceshipTestDataUpdateMessage;
 
-public class SpaceshipCapability implements  ISpaceshipLevel{
-    private final Level level;
-    private String testString = "RenderingSyncing";
+public class SpaceshipCapability implements ISpaceshipLevel{
+    private String stellarLocationID = "";
 
-    public SpaceshipCapability(Level level) {
-        this.level = level;
-    }
-
-
-    @Override
-    public Level getLevel() {
-        return null;
+    public SpaceshipCapability() {
     }
 
     @Override
-    public void tick() {
-        if(this.getLevel().getGameTime() % 20 == 0){
-            clientUpdate();
+    public void tick(Level level) {
+        if(level.getGameTime() % 20 == 0){
+        	
+        	if((level.getGameTime() / 20) % 2 == 0)
+        		clientUpdate(level, AstralVoyage.MODID + ":earth");
+        	else
+                clientUpdate(level, AstralVoyage.MODID + ":sol");
+        		
         }
     }
 
     @Override
-    public void clientUpdate() {
+    public void clientUpdate(Level level, String id) {
         if(level != null && !level.isClientSide)
-            AVNetwork.sendPacketToDimension(this.level.dimension(), new SpaceshipTestDataUpdateMessage(this.testString));
-
+            AVNetwork.sendPacketToDimension(level.dimension(), new SpaceshipTestDataUpdateMessage(id));
     }
 
     @Override
-    public void setString(String string) {
-        this.testString = string;
+    public void setStellarLocationID(String id) {
+        this.stellarLocationID = id;
     }
 
     @Override
-    public String getString() {
-        return testString;
+    public String getStellarLocationID() {
+        return stellarLocationID;
     }
 
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag tag = new CompoundTag();
-        tag.putString("test", testString);
+        tag.putString("test", stellarLocationID);
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        this.testString = nbt.getString("test");
+        this.stellarLocationID = nbt.getString("test");
     }
 }

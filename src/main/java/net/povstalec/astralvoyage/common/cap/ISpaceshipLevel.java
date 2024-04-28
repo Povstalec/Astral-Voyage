@@ -6,10 +6,9 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 public interface ISpaceshipLevel extends INBTSerializable<CompoundTag> {
 
-    Level getLevel();
-    void tick();
+    void tick(Level level);
 
-    void clientUpdate();
-    void setString(String string);
-    String getString();
+    void clientUpdate(Level level, String id);
+    void setStellarLocationID(String id);
+    String getStellarLocationID();
 }

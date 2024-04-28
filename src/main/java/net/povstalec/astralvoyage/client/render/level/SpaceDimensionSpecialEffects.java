@@ -1,6 +1,5 @@
 package net.povstalec.astralvoyage.client.render.level;
 
-import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -21,6 +20,7 @@ import net.povstalec.astralvoyage.AstralVoyage;
 
 public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects {
     public static final ResourceLocation EARTH_ORBIT_EFFECTS = new ResourceLocation(AstralVoyage.MODID, "earth_orbit");
+    public static final ResourceLocation SOL_ORBIT_EFFECTS = new ResourceLocation(AstralVoyage.MODID, "sol_orbit");
     
     public SpaceDimensionSpecialEffects(float cloudLevel, boolean hasGround, SkyType skyType,
                                             boolean forceBrightLightmap, boolean constantAmbientLight)
@@ -49,23 +49,6 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects {
     @Override
     public boolean renderSky(ClientLevel level, int ticks, float partialTick, PoseStack poseStack, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog)
     {
-    	poseStack.pushPose();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        poseStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
-        poseStack.mulPose(Axis.XP.rotationDegrees(level.getTimeOfDay(partialTick) * 360.0F));
-        
-        //this.renderStars(level, partialTicks, rain, stack, projectionMatrix, setupFog);
-
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        
-        Matrix4f lastMatrix = poseStack.last().pose();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        
-        //this.renderCelestials(level, partialTicks, stack, lastMatrix, setupFog, bufferbuilder, rain);
-        BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
-		CelestialRenderer.renderSun(bufferbuilder, lastMatrix, 50.0F);
-        
-        poseStack.popPose();
     	
         return true;
     }
@@ -75,21 +58,73 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects {
     {
         return false;
     }
-
-
-
+    
+    
+    
     public static class EarthOrbit extends SpaceDimensionSpecialEffects
     {
     	
         public EarthOrbit()
         {
             super(Float.NaN, true, DimensionSpecialEffects.SkyType.NONE, false, false);
-            // skyRenderer =
         }
 
         @Override
-        public boolean renderSky(ClientLevel level, int ticks, float partialTick, PoseStack poseStack, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog) {
-            //level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> System.out.print(cap.getString()));
+        public boolean renderSky(ClientLevel level, int ticks, float partialTick, PoseStack poseStack, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog)
+        {
+        	
+        	poseStack.pushPose();
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            poseStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
+            poseStack.mulPose(Axis.XP.rotationDegrees(level.getTimeOfDay(partialTick) * 360.0F));
+            
+            //this.renderStars(level, partialTicks, rain, stack, projectionMatrix, setupFog);
+
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            
+            Matrix4f lastMatrix = poseStack.last().pose();
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            
+            //this.renderCelestials(level, partialTicks, stack, lastMatrix, setupFog, bufferbuilder, rain);
+            BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
+    		CelestialRenderer.renderSun(bufferbuilder, lastMatrix, 50.0F);
+            
+            poseStack.popPose();
+        	
+            return super.renderSky(level, ticks, partialTick, poseStack, camera, projectionMatrix, isFoggy, setupFog);
+        }
+    }
+    
+    public static class SolOrbit extends SpaceDimensionSpecialEffects
+    {
+    	
+        public SolOrbit()
+        {
+            super(Float.NaN, true, DimensionSpecialEffects.SkyType.NONE, false, false);
+        }
+
+        @Override
+        public boolean renderSky(ClientLevel level, int ticks, float partialTick, PoseStack poseStack, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog)
+        {
+        	
+        	poseStack.pushPose();
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            poseStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
+            poseStack.mulPose(Axis.XP.rotationDegrees(level.getTimeOfDay(partialTick) * 360.0F));
+            
+            //this.renderStars(level, partialTicks, rain, stack, projectionMatrix, setupFog);
+
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            
+            Matrix4f lastMatrix = poseStack.last().pose();
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            
+            //this.renderCelestials(level, partialTicks, stack, lastMatrix, setupFog, bufferbuilder, rain);
+            BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
+    		CelestialRenderer.renderSun(bufferbuilder, lastMatrix, 100.0F);
+            
+            poseStack.popPose();
+        	
             return super.renderSky(level, ticks, partialTick, poseStack, camera, projectionMatrix, isFoggy, setupFog);
         }
     }
@@ -100,5 +135,6 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects {
     public static void registerSkyEffects(RegisterDimensionSpecialEffectsEvent event)
     {
         event.register(SpaceDimensionSpecialEffects.EARTH_ORBIT_EFFECTS, new SpaceDimensionSpecialEffects.EarthOrbit());
+        event.register(SpaceDimensionSpecialEffects.SOL_ORBIT_EFFECTS, new SpaceDimensionSpecialEffects.SolOrbit());
     }
 }

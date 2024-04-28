@@ -15,13 +15,15 @@ public class ClientPacketHandler {
     public static void handleTestSpaceshipDataUpdatePacket(SpaceshipTestDataUpdateMessage mes) {
         getLevel().ifPresent(level -> {
             level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> {
-                cap.setString(mes.testString);
+                cap.setStellarLocationID(mes.testString);
             });
         });
     }
 
     public static Optional<Level> getLevel(){
-        return Minecraft.getInstance().level == null ? Optional.empty() : Optional.of(Minecraft.getInstance().level);
+    	Minecraft minecraft = Minecraft.getInstance();
+    	
+        return minecraft.level == null ? Optional.empty() : Optional.of(Minecraft.getInstance().level);
     }
 
 

@@ -3,5 +3,6 @@
 	"texture_layers":
 	[
 		{"texture": "minecraft:environment/sun.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": true}}
-	]
+	],
+	"effects": "astralvoyage:sol_orbit"
 }
