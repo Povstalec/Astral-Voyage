@@ -80,9 +80,13 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects {
         @Override
         public boolean renderSky(ClientLevel level, int ticks, float partialTick, PoseStack poseStack, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog)
         {
-        	
         	poseStack.pushPose();
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+            Matrix4f lastMatrix = poseStack.last().pose();
+            BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            
             poseStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
             poseStack.mulPose(Axis.XP.rotationDegrees(level.getTimeOfDay(partialTick) * 360.0F));
             
@@ -90,12 +94,16 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects {
 
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             
-            Matrix4f lastMatrix = poseStack.last().pose();
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            
             //this.renderCelestials(level, partialTicks, stack, lastMatrix, setupFog, bufferbuilder, rain);
-            BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
     		CelestialRenderer.renderSun(bufferbuilder, lastMatrix, 50.0F);
+            
+            poseStack.popPose();
+            
+            poseStack.pushPose();
+            
+            lastMatrix = poseStack.last().pose();
+            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+    		CelestialRenderer.renderPlanet(bufferbuilder, lastMatrix, 1000.0F);
             
             poseStack.popPose();
         	

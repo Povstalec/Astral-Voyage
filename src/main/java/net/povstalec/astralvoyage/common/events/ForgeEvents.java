@@ -68,9 +68,9 @@ public class ForgeEvents {
 				if(cap != null)
 				{
 					if(level.getGameTime() % 20 == 0){
-						if((level.getGameTime() / 20) % 2 == 0)
-			        		cap.setEffects(SpaceDimensionSpecialEffects.SOL_ORBIT_EFFECTS.toString());
-			        	else
+						//if((level.getGameTime() / 20) % 2 == 0)
+			        	//	cap.setEffects(SpaceDimensionSpecialEffects.SOL_ORBIT_EFFECTS.toString());
+			        	//else
 			        		cap.setEffects(SpaceDimensionSpecialEffects.EARTH_ORBIT_EFFECTS.toString());
 						
 						//cap.tick(level);

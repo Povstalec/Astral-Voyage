@@ -9,10 +9,12 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
 import net.minecraft.resources.ResourceLocation;
+import net.povstalec.astralvoyage.AstralVoyage;
 
 public class CelestialRenderer
 {
     private static final ResourceLocation SUN_LOCATION = new ResourceLocation("textures/environment/sun.png");
+    private static final ResourceLocation PLANET_LOCATION = new ResourceLocation(AstralVoyage.MODID, "textures/environment/planets/earth.png");
 	
 	public static float[] moveSpherical(float offsetX, float offsetY, float r, double theta, double phi)
 	{
@@ -53,6 +55,14 @@ public class CelestialRenderer
 	protected static void renderSun(BufferBuilder bufferbuilder, Matrix4f lastMatrix, float size)
 	{
 		createCelestialObject(bufferbuilder, lastMatrix, SUN_LOCATION, 
+				size, 100.0F, new float[] {0.0F, 0.0F, 1.0F, 1.0F});
+
+		RenderSystem.enableBlend();
+	}
+    
+	protected static void renderPlanet(BufferBuilder bufferbuilder, Matrix4f lastMatrix, float size)
+	{
+		createCelestialObject(bufferbuilder, lastMatrix, PLANET_LOCATION, 
 				size, 100.0F, new float[] {0.0F, 0.0F, 1.0F, 1.0F});
 
 		RenderSystem.enableBlend();

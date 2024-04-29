@@ -62,6 +62,8 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
     @Override
     public boolean renderSky(ClientLevel level, int ticks, float partialTick, PoseStack poseStack, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog)
     {
+    	poseStack.pushPose();
+    	
     	@NotNull LazyOptional<ISpaceshipLevel> capability = getSpaceShipCapability(level);
     	Optional<ResourceLocation> effects = getEffectsFromLevel(capability);
     	float xAxisRotation = getXAxisRotation(capability);
@@ -80,6 +82,8 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
     	
     	if(parentEffects.isPresent())
     		parentEffects.get().renderSky(level, ticks, partialTick, poseStack, camera, projectionMatrix, isFoggy, setupFog);
+    	
+    	poseStack.popPose();
     	
         return true;
     }

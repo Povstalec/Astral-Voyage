@@ -52,19 +52,16 @@ public class SpaceshipCapability implements ISpaceshipLevel{
 		this.zAxisRotation = zAxisRotation;
 	}
 
-	@Override
 	public float getXAxisRotation()
 	{
 		return xAxisRotation;
 	}
 
-	@Override
 	public float getYAxisRotation()
 	{
 		return yAxisRotation;
 	}
 
-	@Override
 	public float getZAxisRotation()
 	{
 		return zAxisRotation;
