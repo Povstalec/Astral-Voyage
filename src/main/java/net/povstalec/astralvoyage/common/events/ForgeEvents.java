@@ -17,7 +17,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.client.render.level.SpaceDimensionSpecialEffects;
 import net.povstalec.astralvoyage.common.cap.GenericProvider;
-import net.povstalec.astralvoyage.common.cap.ISpaceshipLevel;
 import net.povstalec.astralvoyage.common.cap.SpaceshipCapability;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 import net.povstalec.astralvoyage.common.init.WorldGenInit;
@@ -59,10 +58,9 @@ public class ForgeEvents {
 	{
 		Level level = event.level;
 		
-		
 		if(event.haveTime() && level != null)
 		{
-			@NotNull LazyOptional<ISpaceshipLevel> capability = level.getCapability(CapabilitiesInit.SPACESHIP);
+			@NotNull LazyOptional<SpaceshipCapability> capability = level.getCapability(CapabilitiesInit.SPACESHIP);
 			capability.ifPresent(cap -> 
 			{
 				if(cap != null)

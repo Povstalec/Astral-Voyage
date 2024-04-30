@@ -7,15 +7,15 @@ import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.cap.ISpaceshipLevel;
+import net.povstalec.astralvoyage.common.cap.SpaceshipCapability;
 
 @Mod.EventBusSubscriber(modid = AstralVoyage.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CapabilitiesInit {
-    public static final Capability<ISpaceshipLevel> SPACESHIP = CapabilityManager.get(new CapabilityToken<ISpaceshipLevel>() {});
+    public static final Capability<SpaceshipCapability> SPACESHIP = CapabilityManager.get(new CapabilityToken<SpaceshipCapability>() {});
 
     @SubscribeEvent
     public static void register(RegisterCapabilitiesEvent event){
-        event.register(ISpaceshipLevel.class);
+        event.register(SpaceshipCapability.class);
     }
 
 }

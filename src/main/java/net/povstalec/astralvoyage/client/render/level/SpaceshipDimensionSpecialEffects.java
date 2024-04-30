@@ -20,7 +20,7 @@ import net.minecraftforge.client.DimensionSpecialEffectsManager;
 import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.cap.ISpaceshipLevel;
+import net.povstalec.astralvoyage.common.cap.SpaceshipCapability;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 
 public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
@@ -64,7 +64,7 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
     {
     	poseStack.pushPose();
     	
-    	@NotNull LazyOptional<ISpaceshipLevel> capability = getSpaceShipCapability(level);
+    	@NotNull LazyOptional<SpaceshipCapability> capability = getSpaceShipCapability(level);
     	Optional<ResourceLocation> effects = getEffectsFromLevel(capability);
     	float xAxisRotation = getXAxisRotation(capability);
     	float yAxisRotation = getYAxisRotation(capability);
@@ -113,12 +113,12 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
         event.register(SpaceshipDimensionSpecialEffects.SPACESHIP_EFFECTS, new SpaceshipDimensionSpecialEffects.Spaceship());
     }
     
-    public static @NotNull LazyOptional<ISpaceshipLevel> getSpaceShipCapability(ClientLevel level)
+    public static @NotNull LazyOptional<SpaceshipCapability> getSpaceShipCapability(ClientLevel level)
     {
     	return level.getCapability(CapabilitiesInit.SPACESHIP);
     }
     
-    public static Optional<ResourceLocation> getEffectsFromLevel(@NotNull LazyOptional<ISpaceshipLevel> capability)
+    public static Optional<ResourceLocation> getEffectsFromLevel(@NotNull LazyOptional<SpaceshipCapability> capability)
     {
     	Optional<String> effects = capability.map(cap -> cap.getEffects());
     	
@@ -133,7 +133,7 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
     	return Optional.empty();
     }
     
-    public static float getXAxisRotation(@NotNull LazyOptional<ISpaceshipLevel> capability)
+    public static float getXAxisRotation(@NotNull LazyOptional<SpaceshipCapability> capability)
     {
     	Optional<Float> rotation = capability.map(cap -> cap.getXAxisRotation());
     	
@@ -143,7 +143,7 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
     	return 0;
     }
     
-    public static float getYAxisRotation(@NotNull LazyOptional<ISpaceshipLevel> capability)
+    public static float getYAxisRotation(@NotNull LazyOptional<SpaceshipCapability> capability)
     {
     	Optional<Float> rotation = capability.map(cap -> cap.getYAxisRotation());
     	
@@ -153,7 +153,7 @@ public class SpaceshipDimensionSpecialEffects extends DimensionSpecialEffects {
     	return 0;
     }
     
-    public static float getZAxisRotation(@NotNull LazyOptional<ISpaceshipLevel> capability)
+    public static float getZAxisRotation(@NotNull LazyOptional<SpaceshipCapability> capability)
     {
     	Optional<Float> rotation = capability.map(cap -> cap.getZAxisRotation());
     	

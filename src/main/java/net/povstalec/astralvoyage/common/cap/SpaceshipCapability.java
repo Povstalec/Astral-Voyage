@@ -2,29 +2,29 @@ package net.povstalec.astralvoyage.common.cap;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
 import net.povstalec.astralvoyage.common.network.packets.SpaceshipTestDataUpdateMessage;
 
-public class SpaceshipCapability implements ISpaceshipLevel{
+public class SpaceshipCapability implements INBTSerializable<CompoundTag>{
 	private static final String EFFECTS = "effects";
 	private static final String X_AXIS_ROTATION = "x_axis_rotation";
 	private static final String Y_AXIS_ROTATION = "y_axis_rotation";
 	private static final String Z_AXIS_ROTATION = "z_axis_rotation";
 	
     private String effects = "";
+    
     private float xAxisRotation = 0;
     private float yAxisRotation = 0;
     private float zAxisRotation = 0;
 
     public SpaceshipCapability() {
     }
-
-    @Override
+    
     public void tick(Level level) {
         
     }
-
-    @Override
+    
     public void clientUpdate(Level level) {
         if(level != null && !level.isClientSide)
         {
@@ -33,18 +33,15 @@ public class SpaceshipCapability implements ISpaceshipLevel{
         	//System.out.println("Sending update");
         }
     }
-
-    @Override
+    
     public void setEffects(String effects) {
         this.effects = effects;
     }
-
-    @Override
+    
     public String getEffects() {
         return effects;
     }
-
-	@Override
+    
 	public void setRotation(float xAxisRotation, float yAxisRotation, float zAxisRotation)
 	{
 		this.xAxisRotation = xAxisRotation;
