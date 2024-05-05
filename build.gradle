@@ -58,6 +58,10 @@ minecraft {
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
     runs {
+        all {
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+        }
         // applies to all the run configs below
         configureEach {
             workingDirectory project.file('run')
@@ -112,6 +116,19 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
+        }
+    }
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
     // Put repositories for dependencies here
     // ForgeGradle automatically adds the Forge maven and Maven Central for you
 
@@ -129,6 +146,14 @@ dependencies {
     // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    compileOnly fg.deobf("maven.modrinth:stellarview:oPPCUpHD")
+	runtimeOnly fg.deobf("maven.modrinth:stellarview:oPPCUpHD")
+    
+    runtimeOnly fg.deobf("curse.maven:botarium-704113:5118353")
+    runtimeOnly fg.deobf("curse.maven:resourceful-lib-570073:5210240")
+    runtimeOnly fg.deobf("curse.maven:resourceful-config-714059:5020441")
+	runtimeOnly fg.deobf("curse.maven:ad-astra-635042:5116766")
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

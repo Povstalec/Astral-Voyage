@@ -1,0 +1,20 @@
+{
+	"dimension": "minecraft:overworld",
+	"name": "stellar_location.astralvoyage.earth",
+	"parent":
+	{
+		"parent_object": "astralvoyage:sol",
+		"orbit":
+		{
+			"distance": 147280000.0,
+			"orbit_days": 96.0,
+			"orbit_start": 0.0,
+			"orbit_inclination": 0.0,
+			"rotation": 0.0
+		}
+	},
+	"texture_layers":
+	[
+		{"texture": "astralvoyage:textures/environment/planets/earth.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": true}}
+	]
+}

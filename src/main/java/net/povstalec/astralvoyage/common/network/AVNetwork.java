@@ -10,7 +10,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.network.packets.SpaceshipTestDataUpdateMessage;
+import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.UpdateDimensionsPacket;
 
 public class AVNetwork {
@@ -21,7 +21,7 @@ public class AVNetwork {
 
     public static void registerPackets(){
         INSTANCE.registerMessage(id(), UpdateDimensionsPacket.class, UpdateDimensionsPacket::write, UpdateDimensionsPacket::read, UpdateDimensionsPacket::handle);
-        INSTANCE.registerMessage(id(), SpaceshipTestDataUpdateMessage.class, SpaceshipTestDataUpdateMessage::write, SpaceshipTestDataUpdateMessage::read, SpaceshipTestDataUpdateMessage::handle);
+        INSTANCE.registerMessage(id(), SpaceObjectUpdateMessage.class, SpaceObjectUpdateMessage::write, SpaceObjectUpdateMessage::read, SpaceObjectUpdateMessage::handle);
     }
 
     public static void sendPacketToAll(Object message){

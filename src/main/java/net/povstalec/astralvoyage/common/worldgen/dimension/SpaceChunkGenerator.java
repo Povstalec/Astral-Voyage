@@ -31,17 +31,17 @@ import net.minecraft.world.level.levelgen.SingleThreadedRandomSource;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.povstalec.astralvoyage.common.init.WorldGenInit;
 
-public class SpaceshipChunkGenerator extends ChunkGenerator {
+public class SpaceChunkGenerator extends ChunkGenerator {
 
-    public static final Codec<SpaceshipChunkGenerator> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final Codec<SpaceChunkGenerator> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             RegistryOps.retrieveRegistryLookup(Registries.BIOME).forGetter(gen -> gen.biomeReg)
-            ).apply(instance, SpaceshipChunkGenerator::new));
+            ).apply(instance, SpaceChunkGenerator::new));
 
     public final HolderLookup.RegistryLookup<Biome> biomeReg;
     public final RandomSource random;
 
-    public SpaceshipChunkGenerator(HolderLookup.RegistryLookup<Biome> biomeReg) {
-        super(new FixedBiomeSource(biomeReg.getOrThrow(WorldGenInit.SPACESHIP_BIOME)));
+    public SpaceChunkGenerator(HolderLookup.RegistryLookup<Biome> biomeReg) {
+        super(new FixedBiomeSource(biomeReg.getOrThrow(WorldGenInit.SPACE_BIOME)));
         this.biomeReg = biomeReg;
         this.random = new SingleThreadedRandomSource(0l);
     }
@@ -59,7 +59,7 @@ public class SpaceshipChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public Codec<SpaceshipChunkGenerator> codec() {
+    public Codec<SpaceChunkGenerator> codec() {
         return CODEC;
     }
 

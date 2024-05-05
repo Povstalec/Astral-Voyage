@@ -15,7 +15,6 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.client.render.level.SpaceDimensionSpecialEffects;
 import net.povstalec.astralvoyage.common.cap.GenericProvider;
 import net.povstalec.astralvoyage.common.cap.SpaceshipCapability;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
@@ -28,7 +27,7 @@ public class ForgeEvents {
         LivingEntity entity = event.getEntity();
         Level level = entity.level();
 
-        if (!level.dimensionTypeId().location().equals(WorldGenInit.SPACESHIP_TYPE.location()))
+        if (!level.dimensionTypeId().location().equals(WorldGenInit.SPACE_TYPE.location()))
             return;
 
         if (entity instanceof Player player) {
@@ -49,7 +48,7 @@ public class ForgeEvents {
 
     @SubscribeEvent
     public static void attachWorldCapabilies(AttachCapabilitiesEvent<Level> event){
-        if(event.getObject().dimensionTypeId().location().equals(WorldGenInit.SPACESHIP_TYPE.location()))
+        if(event.getObject().dimensionTypeId().location().equals(WorldGenInit.SPACE_TYPE.location()))
             event.addCapability(new ResourceLocation(AstralVoyage.MODID, "spaceship"), new GenericProvider<>(CapabilitiesInit.SPACESHIP, new SpaceshipCapability()));
      }
 	
@@ -65,16 +64,11 @@ public class ForgeEvents {
 			{
 				if(cap != null)
 				{
-					if(level.getGameTime() % 20 == 0){
-						//if((level.getGameTime() / 20) % 2 == 0)
-			        	//	cap.setEffects(SpaceDimensionSpecialEffects.SOL_ORBIT_EFFECTS.toString());
-			        	//else
-			        		cap.setEffects(SpaceDimensionSpecialEffects.EARTH_ORBIT_EFFECTS.toString());
-						
-						//cap.tick(level);
-			        }
-					cap.setRotation(level.dimension().hashCode() % 360, 0, 0);
-					cap.clientUpdate(level);
+					if(level.getGameTime() % 20 == 0)
+			        		cap.setSpaceObject(new ResourceLocation(AstralVoyage.MODID, "earth").toString());
+					
+					//cap.setRotation(level.dimension().hashCode() % 360, 0, 0);
+					cap.tick(level);
 				}
 			});
 		}

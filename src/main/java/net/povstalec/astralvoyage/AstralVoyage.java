@@ -16,8 +16,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 import net.povstalec.astralvoyage.client.render.level.SpaceDimensionSpecialEffects;
-import net.povstalec.astralvoyage.client.render.level.SpaceshipDimensionSpecialEffects;
-import net.povstalec.astralvoyage.common.datapack.StellarLocation;
+import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.init.BlockInit;
 import net.povstalec.astralvoyage.common.init.ItemInit;
 import net.povstalec.astralvoyage.common.init.ItemTabsInit;
@@ -47,7 +46,7 @@ public class AstralVoyage
         
         modEventBus.addListener((DataPackRegistryEvent.NewRegistry event) -> 
         {
-            event.dataPackRegistry(StellarLocation.REGISTRY_KEY, StellarLocation.CODEC, StellarLocation.CODEC);
+            event.dataPackRegistry(SpaceObject.REGISTRY_KEY, SpaceObject.CODEC, SpaceObject.CODEC);
         });
         
         MinecraftForge.EVENT_BUS.register(this);
@@ -56,7 +55,6 @@ public class AstralVoyage
     private void commonSetup(final FMLCommonSetupEvent event)
     {
         AVNetwork.registerPackets();
-        WorldGenInit.registerDimensionType();
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -78,8 +76,7 @@ public class AstralVoyage
 
         @SubscribeEvent
         public static void registerDimensionalEffects(RegisterDimensionSpecialEffectsEvent event){
-        	SpaceDimensionSpecialEffects.registerSkyEffects(event);
-            SpaceshipDimensionSpecialEffects.registerSkyEffects(event);
+            SpaceDimensionSpecialEffects.registerSkyEffects(event);
         }
     }
 }

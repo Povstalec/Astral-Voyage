@@ -1,84 +1,96 @@
 package net.povstalec.astralvoyage.common.cap;
 
+import org.joml.Vector3f;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
-import net.povstalec.astralvoyage.common.network.packets.SpaceshipTestDataUpdateMessage;
+import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
 
-public class SpaceshipCapability implements INBTSerializable<CompoundTag>{
-	private static final String EFFECTS = "effects";
+public class SpaceshipCapability implements INBTSerializable<CompoundTag>
+{
+	private static final String LOCATION = "space_object";
 	private static final String X_AXIS_ROTATION = "x_axis_rotation";
 	private static final String Y_AXIS_ROTATION = "y_axis_rotation";
 	private static final String Z_AXIS_ROTATION = "z_axis_rotation";
 	
-    private String effects = "";
-    
-    private float xAxisRotation = 0;
-    private float yAxisRotation = 0;
-    private float zAxisRotation = 0;
+    private String spaceObjectString = "";
 
-    public SpaceshipCapability() {
+	private Vector3f galacticPosition = new Vector3f(0, 0, 0);
+	private Vector3f rotation = new Vector3f(0, 0, 0);
+
+    public SpaceshipCapability()
+    {
     }
     
-    public void tick(Level level) {
-        
+    public void tick(Level level)
+    {
+        this.galacticPosition.x -= 0.01F;
+    	clientUpdate(level);
     }
     
-    public void clientUpdate(Level level) {
+    private void clientUpdate(Level level)
+    {
         if(level != null && !level.isClientSide)
         {
             AVNetwork.sendPacketToDimension(level.dimension(),
-            		new SpaceshipTestDataUpdateMessage(effects, xAxisRotation, yAxisRotation, zAxisRotation));
-        	//System.out.println("Sending update");
+            		new SpaceObjectUpdateMessage(spaceObjectString, 
+            				galacticPosition.x, galacticPosition.y, galacticPosition.z, 
+            				rotation.x, rotation.y, rotation.z));
         }
     }
     
-    public void setEffects(String effects) {
-        this.effects = effects;
+    public void setSpaceObject(String spaceObjectString)
+    {
+        this.spaceObjectString = spaceObjectString;
     }
     
-    public String getEffects() {
-        return effects;
+    public String getSpaceObjectString()
+    {
+        return spaceObjectString;
     }
     
 	public void setRotation(float xAxisRotation, float yAxisRotation, float zAxisRotation)
 	{
-		this.xAxisRotation = xAxisRotation;
-		this.yAxisRotation = yAxisRotation;
-		this.zAxisRotation = zAxisRotation;
+		this.rotation.x = xAxisRotation;
+		this.rotation.y = yAxisRotation;
+		this.rotation.z = zAxisRotation;
+	}
+    
+	public void setGalacticPostion(float galacticX, float galacticY, float galacticZ)
+	{
+		this.galacticPosition.x = galacticX;
+		this.galacticPosition.y = galacticY;
+		this.galacticPosition.z = galacticZ;
 	}
 
-	public float getXAxisRotation()
+	public Vector3f getGalacticPosition()
 	{
-		return xAxisRotation;
+		return galacticPosition;
 	}
 
-	public float getYAxisRotation()
+	public Vector3f getRotation()
 	{
-		return yAxisRotation;
-	}
-
-	public float getZAxisRotation()
-	{
-		return zAxisRotation;
+		return rotation;
 	}
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT()
+    {
         CompoundTag tag = new CompoundTag();
-        tag.putString(EFFECTS, effects);
-        tag.putFloat(X_AXIS_ROTATION, xAxisRotation);
-        tag.putFloat(Y_AXIS_ROTATION, yAxisRotation);
-        tag.putFloat(Z_AXIS_ROTATION, zAxisRotation);
+        tag.putString(LOCATION, spaceObjectString);
+        tag.putFloat(X_AXIS_ROTATION, rotation.x);
+        tag.putFloat(Y_AXIS_ROTATION, rotation.y);
+        tag.putFloat(Z_AXIS_ROTATION, rotation.z);
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        this.effects = nbt.getString(EFFECTS);
-        this.xAxisRotation = nbt.getFloat(X_AXIS_ROTATION);
-        this.yAxisRotation = nbt.getFloat(Y_AXIS_ROTATION);
-        this.zAxisRotation = nbt.getFloat(Z_AXIS_ROTATION);
+        this.spaceObjectString = nbt.getString(LOCATION);
+        this.rotation.x = nbt.getFloat(X_AXIS_ROTATION);
+        this.rotation.y = nbt.getFloat(Y_AXIS_ROTATION);
+        this.rotation.z = nbt.getFloat(Z_AXIS_ROTATION);
     }
 }

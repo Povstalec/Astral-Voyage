@@ -35,7 +35,7 @@ import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.init.WorldGenInit;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
 import net.povstalec.astralvoyage.common.network.packets.UpdateDimensionsPacket;
-import net.povstalec.astralvoyage.common.worldgen.dimension.SpaceshipChunkGenerator;
+import net.povstalec.astralvoyage.common.worldgen.dimension.SpaceChunkGenerator;
 
 public class DimensionHelper {
 
@@ -159,8 +159,8 @@ public class DimensionHelper {
     public static LevelStem createSpaceshipStem(MinecraftServer server) {
         RegistryAccess registries = server.registryAccess();
 
-        LevelStem steam = new LevelStem(registries.registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(WorldGenInit.SPACESHIP_TYPE),
-                new SpaceshipChunkGenerator(
+        LevelStem steam = new LevelStem(registries.registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(WorldGenInit.SPACE_TYPE),
+                new SpaceChunkGenerator(
                         registries.registryOrThrow(Registries.BIOME).asLookup()
                 ));
 
