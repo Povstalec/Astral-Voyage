@@ -29,7 +29,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.cap.SpaceshipCapability;
+import net.povstalec.astralvoyage.common.capability.SpaceshipCapability;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 
@@ -94,17 +94,17 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
 		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 		
 		galaxy.setStarBuffer(getGalacticPosition(capability).x, getGalacticPosition(capability).y, getGalacticPosition(capability).z, 0, 0, 0);
-		galaxy.renderStars(level, camera, zAxisRotation, zAxisRotation, poseStack, projectionMatrix, setupFog);
+		galaxy.renderStars(level, camera, partialTick, poseStack, projectionMatrix, setupFog);
 		
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         
         
         
-        /*if(spaceObject.isPresent())
+        if(spaceObject.isPresent())
         {
         	SpaceObjectRenderer.renderSurface(bufferbuilder, poseStack.last().pose(), spaceObject.get());
-        }*/
+        }
 
         RenderSystem.depthMask(true);
         

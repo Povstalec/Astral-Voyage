@@ -75,7 +75,7 @@ public abstract class GalaxyRenderer
 		return this;
 	}
 	
-	protected void renderStars(ClientLevel level, Camera camera, float partialTicks, float rain, PoseStack stack, Matrix4f projectionMatrix, Runnable setupFog/*,
+	protected void renderStars(ClientLevel level, Camera camera, float partialTicks, PoseStack stack, Matrix4f projectionMatrix, Runnable setupFog/*,
 			Vector3f skyAxisRotation, Vector3f axisRotation*/)
 	{
 		stack.pushPose();

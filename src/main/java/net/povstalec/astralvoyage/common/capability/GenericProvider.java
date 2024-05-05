@@ -1,4 +1,4 @@
-package net.povstalec.astralvoyage.common.cap;
+package net.povstalec.astralvoyage.common.capability;
 
 import javax.annotation.Nullable;
 
