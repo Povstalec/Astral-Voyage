@@ -38,8 +38,7 @@ public class ForgeEvents {
         }
 
         Vec3 movementVector = entity.getDeltaMovement();
-        entity.setDeltaMovement(movementVector.x(), movementVector.y()+entity.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).getValue(), movementVector.z());
-        entity.setSwimming(true);
+        entity.setDeltaMovement(movementVector.x(), movementVector.y()+entity.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).getValue()-0.005, movementVector.z());
         if(entity.isShiftKeyDown()){
             entity.setDeltaMovement(movementVector.x(), movementVector.y()+entity.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).getValue()-0.02, movementVector.z());
         }
