@@ -15,8 +15,8 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.cap.GenericProvider;
-import net.povstalec.astralvoyage.common.cap.SpaceshipCapability;
+import net.povstalec.astralvoyage.common.capability.GenericProvider;
+import net.povstalec.astralvoyage.common.capability.SpaceshipCapability;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 import net.povstalec.astralvoyage.common.init.WorldGenInit;
 
@@ -66,7 +66,7 @@ public class ForgeEvents {
 					if(level.getGameTime() % 20 == 0)
 			        		cap.setSpaceObject(new ResourceLocation(AstralVoyage.MODID, "earth").toString());
 					
-					//cap.setRotation(level.dimension().hashCode() % 360, 0, 0);
+					cap.setRotation(0, 0, 0);
 					cap.tick(level);
 				}
 			});
