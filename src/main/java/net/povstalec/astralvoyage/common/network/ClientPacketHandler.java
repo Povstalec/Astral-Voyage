@@ -12,7 +12,7 @@ import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessag
 @OnlyIn(Dist.CLIENT)
 public class ClientPacketHandler {
 
-    public static void handleTestSpaceshipDataUpdatePacket(SpaceObjectUpdateMessage mes) {
+    public static void handleSpaceObjectUpdatePacket(SpaceObjectUpdateMessage mes) {
         getLevel().ifPresent(level -> {
             level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> {
                 cap.setSpaceObject(mes.locationString);

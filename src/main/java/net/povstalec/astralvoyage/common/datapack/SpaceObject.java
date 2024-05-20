@@ -1,16 +1,18 @@
 package net.povstalec.astralvoyage.common.datapack;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.Registry;
+import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.povstalec.astralvoyage.AstralVoyage;
 
@@ -140,4 +142,138 @@ public class SpaceObject
 	{
 		return rotation;
 	}
+
+	public static class Serializable
+	{
+		private static final String OBJECT_KEY = "object_key";
+
+		private static final String DIMENSION = "dimension";
+		private static final String NAME = "name";
+		private static final String PARENT = "parent";
+		private static final String TEXTURE_LAYERS = "texture_layers";
+
+		private final Optional<ResourceKey<SpaceObject>> objectKey;
+		private final Optional<ResourceKey<Level>> dimension;
+		private final Optional<String> name;
+		private final Optional<ResourceKey<SpaceObject>> parent;
+		private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
+
+		public Serializable(ResourceKey<SpaceObject> objectKey, SpaceObject object)
+		{
+			this.objectKey = Optional.of(objectKey);
+			this.dimension = object.getDimension();
+			this.name = Optional.of(object.getTranslationName());
+			this.parent = object.getParent();
+			this.textureLayers = object.getTextureLayers();
+		}
+
+		public Serializable(ResourceKey<Level> dimension, String name, ResourceKey<SpaceObject> parent, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
+		{
+			this.objectKey = Optional.empty();
+			this.dimension = Optional.ofNullable(dimension);
+			this.name = Optional.of(name);
+			this.parent = Optional.of(parent);
+			this.textureLayers = textureLayers;
+		}
+
+		public String getName()
+		{
+			return this.name.get();
+		}
+
+		public ResourceKey<Level> getDimension()
+		{
+			return this.dimension.get();
+		}
+
+		public ResourceKey<SpaceObject> getParent()
+		{
+			return this.parent.get();
+		}
+
+		public List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> getTextureLayers()
+		{
+			return this.textureLayers;
+		}
+
+		public CompoundTag serialize()
+		{
+			CompoundTag objectTag = new CompoundTag();
+
+			if(this.objectKey.isPresent())
+				objectTag.putString(OBJECT_KEY, this.objectKey.get().location().toString());
+			else
+			{
+				objectTag.putString(DIMENSION, this.dimension.get().location().toString());
+				objectTag.putString(NAME, this.name.get());
+				objectTag.putString(PARENT, this.parent.get().location().toString());
+				ListTag textureLayers = new ListTag();
+
+				this.textureLayers.forEach(textureLayer -> {
+					CompoundTag layer = new CompoundTag();
+					CompoundTag textureSettings = new CompoundTag();
+					StringTag rl = StringTag.valueOf(textureLayer.getFirst().toString());
+					IntArrayTag rgba = new IntArrayTag(textureLayer.getSecond().getFirst());
+					textureSettings.put("rgba", rgba);
+					textureSettings.putBoolean("blend", textureLayer.getSecond().getSecond());
+					layer.put("texture", rl);
+					layer.put("texture_settings", textureSettings);
+					textureLayers.add(layer);
+				});
+				objectTag.put(TEXTURE_LAYERS, textureLayers);
+			}
+
+			return objectTag;
+		}
+		
+		public static SpaceObject.Serializable deserialize(MinecraftServer server, Registry<SpaceObject> objectRegistry, CompoundTag objectTag)
+		{
+			if(objectTag.contains(OBJECT_KEY))
+			{
+				ResourceKey<SpaceObject> objectKey = stringToSpaceObjectKey(objectTag.getString(OBJECT_KEY));
+				SpaceObject object = objectRegistry.get(objectKey);
+
+				return new SpaceObject.Serializable(objectKey, object);
+			}
+			else
+			{
+				String name = objectTag.getString(NAME);
+				ResourceKey<Level> dimension = stringToDimension(objectTag.getString(DIMENSION));
+				ResourceKey<SpaceObject> parent = stringToSpaceObjectKey(objectTag.getString(PARENT));
+
+				ListTag layersTag = objectTag.getList(TEXTURE_LAYERS, Tag.TAG_LIST);
+				List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers = new ArrayList<>();
+				layersTag.forEach(layertag -> {
+					CompoundTag layerTag = (CompoundTag) layertag;
+					CompoundTag textureSettingsTag = layerTag.getCompound("texture_settings");
+					Pair<List<Integer>, Boolean> textureSettings = new Pair<>(Arrays.stream(textureSettingsTag.getIntArray("rgba")).boxed().collect(Collectors.toList()), textureSettingsTag.getBoolean("blend"));
+					Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer = new Pair(ResourceLocation.tryParse(layerTag.getString("texture")), textureSettings);
+					textureLayers.add(layer);
+				});
+
+				return new SpaceObject.Serializable(dimension, name, parent, textureLayers);
+			}
+		}
+	}
+
+	public static ResourceKey<SpaceObject> stringToSpaceObjectKey(String solarSystemString) {
+		String[] split = solarSystemString.split(":");
+
+		if (split.length > 1)
+			return ResourceKey.create(SpaceObject.REGISTRY_KEY, new ResourceLocation(split[0], split[1]));
+
+		return null;
+
+	}
+
+	public static ResourceKey<Level> stringToDimension(String dimensionString)
+	{
+		String[] split = dimensionString.split(":");
+
+		if(split.length > 1)
+			return ResourceKey.create(ResourceKey.createRegistryKey(new ResourceLocation("minecraft", "dimension")), new ResourceLocation(split[0], split[1]));
+
+		return null;
+	}
+
 }

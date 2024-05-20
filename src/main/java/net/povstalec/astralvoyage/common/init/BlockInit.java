@@ -3,6 +3,7 @@ package net.povstalec.astralvoyage.common.init;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -13,6 +14,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.blocks.SpaceshipGeneratorBlock;
+import net.povstalec.astralvoyage.common.blocks.SpaceshipMovementBlock;
 
 public class BlockInit {
 
@@ -20,6 +22,9 @@ public class BlockInit {
 
     public static final RegistryObject<SpaceshipGeneratorBlock> SPACESHIP_GENERATOR_BLOCK = registerWithItem("spaceship_generator_block", () -> new SpaceshipGeneratorBlock(BlockBehaviour.Properties.of().forceSolidOn()));
 
+    public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_X_BLOCK = registerWithItem("spaceship_movement_x_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn(), Direction.Axis.X));
+    public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_Y_BLOCK = registerWithItem("spaceship_movement_y_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn(), Direction.Axis.Y));
+    public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_Z_BLOCK = registerWithItem("spaceship_movement_z_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn(), Direction.Axis.Z));
 
 
     public static <T extends Block> RegistryObject<T> registerWithItem(String name, final Supplier<T> block, Function<Item.Properties, Item.Properties> properties){

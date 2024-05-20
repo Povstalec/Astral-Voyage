@@ -70,6 +70,13 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 		this.galacticPosition.z = galacticZ;
 	}
 
+    public void moveGalacticPosition(Vector3f vector)
+    {
+        this.galacticPosition.x += vector.x;
+        this.galacticPosition.y += vector.y;
+        this.galacticPosition.z += vector.z;
+    }
+
 	public Vector3f getGalacticPosition()
 	{
 		return galacticPosition;

@@ -2,41 +2,117 @@ package net.povstalec.astralvoyage.common.data;
 
 import javax.annotation.Nonnull;
 
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.povstalec.astralvoyage.AstralVoyage;
+import net.povstalec.astralvoyage.common.datapack.SpaceObject;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class SpaceObjects extends SavedData
 {
 	private static final String FILE_NAME = AstralVoyage.MODID + "-space_objects";
+
+	private static final String SPACE_OBJECTS = "space_objects";
+
+	private HashMap<String, SpaceObject.Serializable> spaceObjects = new HashMap<>();
 	
 	private MinecraftServer server;
-	
+
+
+	public final void updateData(MinecraftServer server){
+		SpaceObjects.get(server).eraseData(server);
+		SpaceObjects.get(server).generateData(server);
+	}
+
 	//============================================================================================
 	//*************************************Saving and Loading*************************************
 	//============================================================================================
-	
+
+	public void eraseData(MinecraftServer server)
+	{
+		this.spaceObjects.clear();
+		this.setDirty();
+	}
+
+	public void generateData(MinecraftServer server)
+	{
+		registerSpaceObjectFromDataPacks(server);
+	}
+
 	private CompoundTag serialize()
 	{
 		CompoundTag tag = new CompoundTag();
 		
-		//TODO
+		tag.put(SPACE_OBJECTS, serializeSpaceObjects());
 		
 		return tag;
+	}
+
+	private CompoundTag serializeSpaceObjects(){
+		CompoundTag spaceObjectsTag = new CompoundTag();
+
+		this.spaceObjects.forEach((objectID, spaceObject) -> spaceObjectsTag.put(objectID, spaceObject.serialize()));
+
+		return spaceObjectsTag;
 	}
 	
 	private void deserialize(CompoundTag tag)
 	{
-		
+		deserializeSpaceObjects(tag);
+	}
+
+	private void deserializeSpaceObjects(CompoundTag tag){
+		final RegistryAccess registries = server.registryAccess();
+		final Registry<SpaceObject> objectRegistry = registries.registryOrThrow(SpaceObject.REGISTRY_KEY);
+
+		tag.getAllKeys().forEach(objectString -> {
+			SpaceObject.Serializable spaceObject = SpaceObject.Serializable.deserialize(server, objectRegistry, tag.getCompound(objectString));
+
+			this.spaceObjects.put(objectString, spaceObject);
+		});
 	}
 	
 	//============================================================================================
 	//********************************************Data********************************************
 	//============================================================================================
-	
+
+	private void registerSpaceObjectFromDataPacks(MinecraftServer server)
+	{
+		final RegistryAccess registries = server.registryAccess();
+		final Registry<SpaceObject> objectRegistry = registries.registryOrThrow(SpaceObject.REGISTRY_KEY);
+
+		Set<Map.Entry<ResourceKey<SpaceObject>, SpaceObject>> objectSet = objectRegistry.entrySet();
+
+		//Goes through all datapack Solar Systems
+		objectSet.forEach((object) ->
+				addSpaceObjectFromDataPack(server, object.getKey(), object.getValue()));
+		AstralVoyage.LOGGER.info("Datapack Solar Systems registered");
+	}
+
+	private void addSpaceObjectFromDataPack(MinecraftServer server, ResourceKey<SpaceObject> spaceObjectKey, SpaceObject spaceObject)
+	{
+		SpaceObject.Serializable object = new SpaceObject.Serializable(spaceObjectKey, spaceObject);
+		saveSpaceObject(object);
+	}
+
+	private boolean saveSpaceObject(SpaceObject.Serializable spaceObject)
+	{
+		String spaceObjectName = spaceObject.getName();
+
+		this.spaceObjects.put(spaceObjectName, spaceObject);
+
+		return true;
+	}
+
 	public SpaceObjects(MinecraftServer server)
 	{
 		this.server = server;

@@ -19,6 +19,9 @@ public class ItemTabsInit {
                     .title(Component.translatable("creativetab.main"))
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(BlockInit.SPACESHIP_GENERATOR_BLOCK.get());
+                        pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_X_BLOCK.get());
+                        pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_Y_BLOCK.get());
+                        pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_Z_BLOCK.get());
                     })
                     .build());
 

@@ -1,5 +1,8 @@
 package net.povstalec.astralvoyage.common.events;
 
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.event.server.ServerStartingEvent;
+import net.povstalec.astralvoyage.common.data.SpaceObjects;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.resources.ResourceLocation;
@@ -46,10 +49,17 @@ public class ForgeEvents {
     }
 
     @SubscribeEvent
-    public static void attachWorldCapabilies(AttachCapabilitiesEvent<Level> event){
-        if(event.getObject().dimensionTypeId().location().equals(WorldGenInit.SPACE_TYPE.location()))
+    public static void attachWorldCapabilies(AttachCapabilitiesEvent<Level> event) {
+        if (event.getObject().dimensionTypeId().location().equals(WorldGenInit.SPACE_TYPE.location()))
             event.addCapability(new ResourceLocation(AstralVoyage.MODID, "spaceship"), new GenericProvider<>(CapabilitiesInit.SPACESHIP, new SpaceshipCapability()));
-     }
+    }
+
+    @SubscribeEvent
+    public static void onServerStarting(ServerStartingEvent event)
+    {
+        MinecraftServer server = event.getServer();
+        SpaceObjects.get(server).updateData(server);
+    }
 	
 	@SubscribeEvent
 	public static void onLevelTick(TickEvent.LevelTickEvent event)

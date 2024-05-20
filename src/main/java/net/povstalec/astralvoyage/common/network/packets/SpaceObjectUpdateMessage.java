@@ -52,9 +52,7 @@ public class SpaceObjectUpdateMessage {
     }
 
     public static void handle(SpaceObjectUpdateMessage mes, Supplier<NetworkEvent.Context> context){
-        context.get().enqueueWork(() -> ClientPacketHandler.handleTestSpaceshipDataUpdatePacket(mes));
+        context.get().enqueueWork(() -> ClientPacketHandler.handleSpaceObjectUpdatePacket(mes));
         context.get().setPacketHandled(true);
     }
-
-
 }
