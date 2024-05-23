@@ -23,7 +23,10 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     private String spaceObjectString = "";
 
 	private Vector3f galacticPosition = new Vector3f(0, 0, 0);
+	private Vector3f oldGalacticPosition = new Vector3f(0, 0, 0);
+	
 	private Vector3f rotation = new Vector3f(0, 0, 0);
+	private Vector3f oldRotation = new Vector3f(0, 0, 0);
 
     public SpaceshipCapability()
     {
@@ -31,7 +34,12 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     
     public void tick(Level level)
     {
-        //this.galacticPosition.x -= 0.01F;
+    	this.oldGalacticPosition.set(galacticPosition);
+    	this.oldRotation.set(rotation);
+    	
+        this.galacticPosition.x -= 0.001F;
+    	//this.rotation.z += 0.1F;
+    	//this.setRotation(0, 0, 0);
     	clientUpdate(level);
     }
     
@@ -82,9 +90,19 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 		return galacticPosition;
 	}
 
+	public Vector3f getOldGalacticPosition()
+	{
+		return oldGalacticPosition;
+	}
+
 	public Vector3f getRotation()
 	{
 		return rotation;
+	}
+
+	public Vector3f getOldRotation()
+	{
+		return oldRotation;
 	}
 
     @Override

@@ -1,5 +1,7 @@
 package net.povstalec.astralvoyage;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -10,6 +12,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -29,6 +32,10 @@ public class AstralVoyage
 {
     
     public static final String MODID = "astralvoyage";
+
+    public static final String STELLAR_VIEW_MODID = "stellarview";
+    
+    private static Optional<Boolean> isStellarViewsLoaded = Optional.empty();
     
     public static final Logger LOGGER = LogUtils.getLogger();
 
@@ -62,6 +69,14 @@ public class AstralVoyage
     public void onServerStarting(ServerStartingEvent event)
     {
 
+    }
+    
+    public static boolean isStellarViewLoaded()
+    {
+    	if(isStellarViewsLoaded.isEmpty())
+    		isStellarViewsLoaded = Optional.of(ModList.get().isLoaded(STELLAR_VIEW_MODID));
+    	
+    	return isStellarViewsLoaded.get();	
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
