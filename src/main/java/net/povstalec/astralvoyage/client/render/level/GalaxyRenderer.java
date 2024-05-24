@@ -8,19 +8,19 @@ import org.joml.Vector3f;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.BufferBuilder.RenderedBuffer;
-import com.mojang.math.Axis;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Axis;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.stellarview.client.render.level.misc.StellarCoordinates;
 
 public abstract class GalaxyRenderer
@@ -159,7 +159,10 @@ public abstract class GalaxyRenderer
 					
 					double distance = x * x + y * y + z * z;
 					
-					SpaceRenderer.createStar(bufferBuilder, randomsource, x, y, z, distance, 1, 1, randomsource.nextLong());
+					if(AstralVoyage.isStellarViewLoaded())
+						StellarViewRendering.createStar(bufferBuilder, randomsource, x, y, z, distance, 1, 1, randomsource.nextLong());
+					else
+						SpaceRenderer.createStar(bufferBuilder, randomsource, x, y, z, distance, 1, 1, randomsource.nextLong());
 				}
 			}
 			return bufferBuilder.end();

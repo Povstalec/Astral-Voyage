@@ -147,8 +147,8 @@ dependencies {
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    compileOnly fg.deobf("maven.modrinth:stellarview:oPPCUpHD")
-	runtimeOnly fg.deobf("maven.modrinth:stellarview:oPPCUpHD")
+    compileOnly fg.deobf("maven.modrinth:stellarview:vKtT5mnr")
+	runtimeOnly fg.deobf("maven.modrinth:stellarview:vKtT5mnr")
     
     runtimeOnly fg.deobf("curse.maven:botarium-704113:5118353")
     runtimeOnly fg.deobf("curse.maven:resourceful-lib-570073:5210240")
