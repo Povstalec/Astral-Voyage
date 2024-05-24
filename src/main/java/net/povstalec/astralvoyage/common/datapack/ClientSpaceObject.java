@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -15,9 +16,9 @@ public class ClientSpaceObject {
 
     public ResourceKey<SpaceObject> key;
     public Vector3f solarPos;
-    public List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
+    public List<TextureLayerData> textureLayers;
 
-    public ClientSpaceObject(ResourceKey<SpaceObject> key, Vector3f solarPos, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layers)
+    public ClientSpaceObject(ResourceKey<SpaceObject> key, Vector3f solarPos, List<TextureLayerData> layers)
     {
         this.key = key;
         this.solarPos = solarPos;
@@ -32,7 +33,7 @@ public class ClientSpaceObject {
         return solarPos;
     }
 
-    public List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> getTextureLayers() {
+    public List<TextureLayerData> getTextureLayers() {
         return textureLayers;
     }
 
@@ -44,7 +45,7 @@ public class ClientSpaceObject {
         this.solarPos = solarPos;
     }
 
-    public void setTextureLayers(List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers) {
+    public void setTextureLayers(List<TextureLayerData> textureLayers) {
         this.textureLayers = textureLayers;
     }
 
@@ -63,10 +64,10 @@ public class ClientSpaceObject {
         this.textureLayers.forEach(textureLayer -> {
             CompoundTag layer = new CompoundTag();
             CompoundTag textureSettings = new CompoundTag();
-            StringTag rl = StringTag.valueOf(textureLayer.getFirst().toString());
-            IntArrayTag rgba = new IntArrayTag(textureLayer.getSecond().getFirst());
+            StringTag rl = StringTag.valueOf(textureLayer.getLayer().getFirst().toString());
+            IntArrayTag rgba = new IntArrayTag(textureLayer.getLayer().getSecond().getFirst());
             textureSettings.put("rgba", rgba);
-            textureSettings.putBoolean("blend", textureLayer.getSecond().getSecond());
+            textureSettings.putBoolean("blend", textureLayer.getLayer().getSecond().getSecond());
             layer.put("texture", rl);
             layer.put("texture_settings", textureSettings);
             textureLayers.add(layer);
@@ -83,13 +84,13 @@ public class ClientSpaceObject {
         Vector3f solarPosV = new Vector3f(solarPos.getFloat("x"), solarPos.getFloat("y"), solarPos.getFloat("z"));
 
         ListTag layersTag = tag.getList("texture_layers", Tag.TAG_LIST);
-        List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers = new ArrayList<>();
+        List<TextureLayerData> textureLayers = new ArrayList<>();
         layersTag.forEach(layertag -> {
             CompoundTag layerTag = (CompoundTag) layertag;
             CompoundTag textureSettingsTag = layerTag.getCompound("texture_settings");
             Pair<List<Integer>, Boolean> textureSettings = new Pair<>(Arrays.stream(textureSettingsTag.getIntArray("rgba")).boxed().collect(Collectors.toList()), textureSettingsTag.getBoolean("blend"));
             Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer = new Pair(ResourceLocation.tryParse(layerTag.getString("texture")), textureSettings);
-            textureLayers.add(layer);
+            textureLayers.add(new TextureLayerData(layer));
         });
 
         return new ClientSpaceObject(key, solarPosV, textureLayers);

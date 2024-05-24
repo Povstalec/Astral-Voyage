@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
+import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.joml.Vector3f;
 
 import net.minecraft.nbt.CompoundTag;
@@ -178,13 +179,13 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 
             Vector3f solarPos = new Vector3f(solarPosTag.getFloat("x"), solarPosTag.getFloat("y"), solarPosTag.getFloat("z"));
             ListTag layersTag = objectTag.getList("texture_layers", Tag.TAG_LIST);
-            List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers = new ArrayList<>();
+            List<TextureLayerData> textureLayers = new ArrayList<>();
             layersTag.forEach(layertag -> {
                 CompoundTag layerTag = (CompoundTag) layertag;
                 CompoundTag textureSettingsTag = layerTag.getCompound("texture_settings");
                 Pair<List<Integer>, Boolean> textureSettings = new Pair<>(Arrays.stream(textureSettingsTag.getIntArray("rgba")).boxed().collect(Collectors.toList()), textureSettingsTag.getBoolean("blend"));
                 Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer = new Pair(ResourceLocation.tryParse(layerTag.getString("texture")), textureSettings);
-                textureLayers.add(layer);
+                textureLayers.add(new TextureLayerData(layer));
             });
 
             this.renderObjects.add(new ClientSpaceObject(SpaceObject.stringToSpaceObjectKey(objectTag.getString("key")),solarPos, textureLayers));
