@@ -76,7 +76,6 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     	poseStack.pushPose();
     	
     	@NotNull LazyOptional<SpaceshipCapability> capability = getSpaceShipCapability(level);
-    	Optional<SpaceObject> spaceObject = getSpaceObjectFromLevel(capability);
     	
     	float xAxisRotation = getRotation(capability).x;
     	float yAxisRotation = getRotation(capability).y;
@@ -98,13 +97,6 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
 		
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        
-        
-        
-        if(spaceObject.isPresent())
-        {
-        	SpaceObjectRenderer.renderSurface(bufferbuilder, poseStack.last().pose(), spaceObject.get());
-        }
 
         RenderSystem.depthMask(true);
         
@@ -141,26 +133,6 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     public static @NotNull LazyOptional<SpaceshipCapability> getSpaceShipCapability(ClientLevel level)
     {
     	return level.getCapability(CapabilitiesInit.SPACESHIP);
-    }
-    
-    public static Optional<SpaceObject> getSpaceObjectFromLevel(@NotNull LazyOptional<SpaceshipCapability> capability)
-    {
-    	Optional<String> spaceObjectString = capability.map(cap -> cap.getSpaceObjectString());
-    	
-    	if(spaceObjectString.isPresent())
-    	{
-    		if(spaceObjectString.get() != null && ResourceLocation.isValidResourceLocation(spaceObjectString.get()))
-    		{
-    			Minecraft minecraft = Minecraft.getInstance();
-        		ClientPacketListener clientPacketListener = minecraft.getConnection();
-        		RegistryAccess registries = clientPacketListener.registryAccess();
-        		Registry<SpaceObject> spaceObjectRegistry = registries.registryOrThrow(SpaceObject.REGISTRY_KEY);
-        		
-        		return Optional.ofNullable(spaceObjectRegistry.get(new ResourceLocation(spaceObjectString.get())));
-    		}
-    	}
-    	
-    	return Optional.empty();
     }
     
     public static Vector3f getGalacticPosition(@NotNull LazyOptional<SpaceshipCapability> capability)

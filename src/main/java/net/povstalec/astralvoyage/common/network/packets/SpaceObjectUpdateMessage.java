@@ -8,7 +8,9 @@ import net.povstalec.astralvoyage.common.network.ClientPacketHandler;
 
 public class SpaceObjectUpdateMessage {
 	
-    public String locationString;
+    public float solarX;
+    public float solarY;
+    public float solarZ;
     
     public float galacticX;
     public float galacticY;
@@ -18,11 +20,13 @@ public class SpaceObjectUpdateMessage {
     public float yAxisRotation;
     public float zAxisRotation;
 
-    public SpaceObjectUpdateMessage(String locationString, 
+    public SpaceObjectUpdateMessage(float solarX, float solarY, float solarZ,
     		float galacticX, float galacticY, float galacticZ,
     		float xAxisRotation, float yAxisRotation, float zAxisRotation)
     {
-    	this.locationString = locationString;
+    	this.solarX = solarX;
+        this.solarY = solarY;
+        this.solarZ = solarZ;
     	
         this.galacticX = galacticX;
         this.galacticY = galacticY;
@@ -34,7 +38,9 @@ public class SpaceObjectUpdateMessage {
     }
 
     public static void write(SpaceObjectUpdateMessage mes, FriendlyByteBuf buf){
-        buf.writeUtf(mes.locationString);
+        buf.writeFloat(mes.solarX);
+        buf.writeFloat(mes.solarY);
+        buf.writeFloat(mes.solarZ);
         
         buf.writeFloat(mes.galacticX);
         buf.writeFloat(mes.galacticY);
@@ -46,7 +52,7 @@ public class SpaceObjectUpdateMessage {
     }
 
     public static SpaceObjectUpdateMessage read(FriendlyByteBuf buf){
-        return new SpaceObjectUpdateMessage(buf.readUtf(), 
+        return new SpaceObjectUpdateMessage(buf.readFloat(), buf.readFloat(), buf.readFloat(),
         		buf.readFloat(), buf.readFloat(), buf.readFloat(), 
         		buf.readFloat(), buf.readFloat(), buf.readFloat());
     }
