@@ -76,7 +76,6 @@ public class ForgeEvents {
 					if(level.getGameTime() % 20 == 0)
 			        		cap.setSpaceObject(new ResourceLocation(AstralVoyage.MODID, "earth").toString());
 					
-					cap.setRotation(0, 0, 0);
 					cap.tick(level);
 				}
 			});

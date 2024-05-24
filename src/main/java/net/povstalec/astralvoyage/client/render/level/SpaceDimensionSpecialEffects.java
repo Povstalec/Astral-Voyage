@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.minecraftforge.common.util.LazyOptional;
@@ -77,9 +78,12 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     	
     	@NotNull LazyOptional<SpaceshipCapability> capability = getSpaceShipCapability(level);
     	
-    	float xAxisRotation = getRotation(capability).x;
-    	float yAxisRotation = getRotation(capability).y;
-    	float zAxisRotation = getRotation(capability).z;
+    	Vector3f rotation = getRotation(capability);
+    	Vector3f oldRotation = getOldRotation(capability);
+
+    	float xAxisRotation =  Mth.lerp(partialTick, oldRotation.x, rotation.x);
+    	float yAxisRotation = Mth.lerp(partialTick, oldRotation.y, rotation.y);
+    	float zAxisRotation =Mth.lerp(partialTick, oldRotation.z, rotation.z);
     	
         poseStack.mulPose(Axis.YP.rotationDegrees(yAxisRotation));
         poseStack.mulPose(Axis.XP.rotationDegrees(xAxisRotation));
@@ -91,8 +95,15 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
 		RenderSystem.defaultBlendFunc();
 		
 		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-		
-		galaxy.setStarBuffer(getGalacticPosition(capability).x, getGalacticPosition(capability).y, getGalacticPosition(capability).z, 0, 0, 0);
+
+    	Vector3f galacticPosition = getGalacticPosition(capability);
+    	Vector3f oldGalacticPosition = getOldGalacticPosition(capability);
+
+    	float galacticX =  Mth.lerp(partialTick, oldGalacticPosition.x, galacticPosition.x);
+    	float galacticY = Mth.lerp(partialTick, oldGalacticPosition.y, galacticPosition.y);
+    	float galacticZ =Mth.lerp(partialTick, oldGalacticPosition.z, galacticPosition.z);
+
+		galaxy.setStarBuffer(galacticX, galacticY, galacticZ, 0, 0, 0);
 		galaxy.renderStars(level, camera, partialTick, poseStack, projectionMatrix, setupFog);
 		
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -134,7 +145,7 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     {
     	return level.getCapability(CapabilitiesInit.SPACESHIP);
     }
-    
+
     public static Vector3f getGalacticPosition(@NotNull LazyOptional<SpaceshipCapability> capability)
     {
     	Optional<Vector3f> galacticPosition = capability.map(cap -> cap.getGalacticPosition());
@@ -142,6 +153,16 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     	if(galacticPosition.isPresent())
     		return galacticPosition.get();
     	
+    	return new Vector3f(0, 0, 0);
+    }
+
+    public static Vector3f getOldGalacticPosition(@NotNull LazyOptional<SpaceshipCapability> capability)
+    {
+    	Optional<Vector3f> oldGalacticPosition = capability.map(cap -> cap.getOldGalacticPosition());
+
+    	if(oldGalacticPosition.isPresent())
+    		return oldGalacticPosition.get();
+
     	return new Vector3f(0, 0, 0);
     }
     
@@ -152,6 +173,16 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     	if(rotation.isPresent())
     		return rotation.get();
     	
+    	return new Vector3f(0, 0, 0);
+    }
+
+    public static Vector3f getOldRotation(@NotNull LazyOptional<SpaceshipCapability> capability)
+    {
+    	Optional<Vector3f> oldRotation = capability.map(cap -> cap.getOldRotation());
+
+    	if(oldRotation.isPresent())
+    		return oldRotation.get();
+
     	return new Vector3f(0, 0, 0);
     }
 }

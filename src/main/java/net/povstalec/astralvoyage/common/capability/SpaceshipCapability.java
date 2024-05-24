@@ -41,7 +41,10 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 
 	private Vector3f galacticPosition = new Vector3f(0, 0, 0);
     private Vector3f solarPosition = new Vector3f(0, 0, 0);
+	private Vector3f oldGalacticPosition = new Vector3f(0, 0, 0);
+
 	private Vector3f rotation = new Vector3f(0, 0, 0);
+	private Vector3f oldRotation = new Vector3f(0, 0, 0);
 
     private List<ClientSpaceObject> renderObjects = Lists.newLinkedList();
 
@@ -51,7 +54,12 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     
     public void tick(Level level)
     {
-        //this.galacticPosition.x -= 0.01F;
+    	this.oldGalacticPosition.set(galacticPosition);
+    	this.oldRotation.set(rotation);
+
+        this.galacticPosition.x -= 0.001F;
+    	//this.rotation.z += 0.1F;
+    	//this.setRotation(0, 0, 0);
     	clientUpdate(level);
     }
     
@@ -81,7 +89,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         this.solarPosition.y = solarY;
         this.solarPosition.z = solarZ;
     }
-    
+
 	public void setGalacticPostion(float galacticX, float galacticY, float galacticZ)
 	{
 		this.galacticPosition.x = galacticX;
@@ -106,6 +114,11 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 		return galacticPosition;
 	}
 
+	public Vector3f getOldGalacticPosition()
+	{
+		return oldGalacticPosition;
+	}
+
 	public Vector3f getRotation()
 	{
 		return rotation;
@@ -114,6 +127,11 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     public void setRenderObjects(List<ClientSpaceObject> renderObjects) {
         this.renderObjects = renderObjects;
     }
+
+	public Vector3f getOldRotation()
+	{
+		return oldRotation;
+	}
 
     @Override
     public CompoundTag serializeNBT()
@@ -136,7 +154,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
             renderObjects.add(object.serialize());
         });
         tag.put(RENDER_OBJECTS, renderObjects);
-        
+
         return tag;
     }
 
