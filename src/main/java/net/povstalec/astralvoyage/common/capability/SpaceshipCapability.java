@@ -58,7 +58,8 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     	this.oldGalacticPosition.set(galacticPosition);
     	this.oldRotation.set(rotation);
 
-        this.galacticPosition.x -= 0.001F;
+    	solarPosition = new Vector3f(-120000, 0, 0);
+        //this.galacticPosition.x -= 0.001F;
     	//this.rotation.z += 0.1F;
     	//this.setRotation(0, 0, 0);
     	clientUpdate(level);

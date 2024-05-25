@@ -29,11 +29,12 @@ public final class SpaceObjectRenderer
 
 		Vector3f sphericalPos = new Vector3f((float) Math.sqrt(shipToObject.x*shipToObject.x + shipToObject.y*shipToObject.y + shipToObject.z*shipToObject.z), (float) Math.atan2(shipToObject.x, shipToObject.z), (float) Math.atan2(Math.sqrt(shipToObject.x*shipToObject.x + shipToObject.z*shipToObject.z), shipToObject.y));
 		float objectRenderSize = Math.max((size/distance)*SIZE, 0.1F);
-
-		float[] corner00 = placeOnSphere(-objectRenderSize, -objectRenderSize, sphericalPos, rotation);
-		float[] corner10 = placeOnSphere(objectRenderSize, -objectRenderSize, sphericalPos, rotation);
-		float[] corner11 = placeOnSphere(objectRenderSize, objectRenderSize,  sphericalPos, rotation);
-		float[] corner01 = placeOnSphere(-objectRenderSize, objectRenderSize, sphericalPos, rotation);
+		
+		sphericalPos.x = DISTANCE;
+		Vector3f corner00 = placeOnSphere(-objectRenderSize, -objectRenderSize, sphericalPos, rotation);
+		Vector3f corner10 = placeOnSphere(objectRenderSize, -objectRenderSize, sphericalPos, rotation);
+		Vector3f corner11 = placeOnSphere(objectRenderSize, objectRenderSize,  sphericalPos, rotation);
+		Vector3f corner01 = placeOnSphere(-objectRenderSize, objectRenderSize, sphericalPos, rotation);
 
 
 		if(rgba.length < 4)
@@ -47,10 +48,10 @@ public final class SpaceObjectRenderer
 		RenderSystem.setShaderTexture(0, texture);
 		
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferbuilder.vertex(lastMatrix, corner00[0], corner00[1], corner00[2]).uv(0, 0).endVertex();
-        bufferbuilder.vertex(lastMatrix, corner10[0], corner10[1], corner10[2]).uv(1, 0).endVertex();
-        bufferbuilder.vertex(lastMatrix, corner11[0], corner11[1], corner11[2]).uv(1, 1).endVertex();
-        bufferbuilder.vertex(lastMatrix, corner01[0], corner01[1], corner01[2]).uv(0, 1).endVertex();
+        bufferbuilder.vertex(lastMatrix, corner00.x, corner00.y, corner00.z).uv(0, 0).endVertex();
+        bufferbuilder.vertex(lastMatrix, corner10.x, corner10.y, corner10.z).uv(1, 0).endVertex();
+        bufferbuilder.vertex(lastMatrix, corner11.x, corner11.y, corner11.z).uv(1, 1).endVertex();
+        bufferbuilder.vertex(lastMatrix, corner01.x, corner01.y, corner01.z).uv(0, 1).endVertex();
         BufferUploader.drawWithShader(bufferbuilder.end());
         
         if(!blend)
@@ -62,14 +63,12 @@ public final class SpaceObjectRenderer
 	public static void renderSurface(BufferBuilder bufferbuilder, Matrix4f lastMatrix, ClientSpaceObject spaceObject, float distance, Vector3f shipToObject, float rotation)
 	{
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers = TextureLayerData.toPairList(spaceObject.getTextureLayers());
-
+		
 		textureLayers.forEach(layer -> renderSurfaceLayer(bufferbuilder, lastMatrix, spaceObject.getSize(), distance, layer, shipToObject, rotation));
 	}
 
-	public static float[] placeOnSphere(float offsetX, float offsetY, Vector3f sphericalPos, double rotation) {
-		double x = sphericalPos.x*Math.sin(sphericalPos.z)*Math.cos(sphericalPos.y);
-		double y = sphericalPos.x*Math.cos(sphericalPos.z);
-		double z = sphericalPos.x*Math.sin(sphericalPos.z)*Math.cos(sphericalPos.y);
+	public static Vector3f placeOnSphere(float offsetX, float offsetY, Vector3f sphericalPos, double rotation) {
+		Vector3f cartesianCoords = sphericalToCartesian(sphericalPos);
 
 		double polarR = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
 		double polarPhi = Math.atan2(offsetY, offsetX);
@@ -78,10 +77,32 @@ public final class SpaceObjectRenderer
 		double polarX = polarR * Math.cos(polarPhi);
 		double polarY = polarR * Math.sin(polarPhi);
 
-		x += - polarY * Math.cos(sphericalPos.z) * Math.sin(sphericalPos.y) - polarX * Math.cos(sphericalPos.y);
-		y += polarY * Math.sin(sphericalPos.z);
-		z += - polarY * Math.cos(sphericalPos.z) * Math.cos(sphericalPos.y) + polarX * Math.sin(sphericalPos.y);
+		cartesianCoords.x += - polarY * Math.cos(sphericalPos.z) * Math.sin(sphericalPos.y) - polarX * Math.cos(sphericalPos.y);
+		cartesianCoords.y += polarY * Math.sin(sphericalPos.z);
+		cartesianCoords.z += - polarY * Math.cos(sphericalPos.z) * Math.cos(sphericalPos.y) + polarX * Math.sin(sphericalPos.y);
 
-		return new float[]{(float) x, (float) y, (float) ((float) z)};
+		return cartesianCoords;
+	}
+	
+	
+	
+	public static double cartesianX(Vector3f sphericalCoords)
+	{
+		return sphericalCoords.x * Math.sin(sphericalCoords.z) * Math.sin(sphericalCoords.y);
+	}
+	
+	public static double cartesianY(Vector3f sphericalCoords)
+	{
+		return sphericalCoords.x * Math.cos(sphericalCoords.z);
+	}
+	
+	public static double cartesianZ(Vector3f sphericalCoords)
+	{
+		return sphericalCoords.x * Math.sin(sphericalCoords.z) * Math.cos(sphericalCoords.y);
+	}
+	
+	public static Vector3f sphericalToCartesian(Vector3f sphericalCoords)
+	{
+		return new Vector3f((float) cartesianX(sphericalCoords), (float) cartesianY(sphericalCoords), (float) cartesianZ(sphericalCoords));
 	}
 }
