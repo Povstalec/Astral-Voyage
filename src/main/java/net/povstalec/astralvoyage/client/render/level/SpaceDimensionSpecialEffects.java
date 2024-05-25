@@ -111,7 +111,8 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
         renderObjects.forEach(object ->
         {
         	//System.out.println(object.getSolarPos());
-        	SpaceObjectRenderer.renderSurface(bufferbuilder, poseStack.last().pose(), object, getDistanceToObject(capability, object), getVectorToObject(capability, object), getDegreeToObject(capability, object));
+        	Vector3f vectorToObject = getVectorToObject(capability, object);
+        	SpaceObjectRenderer.renderSurface(bufferbuilder, poseStack.last().pose(), object, vectorToObject.length(), vectorToObject, getDegreeToObject(capability, object));
         });
         RenderSystem.depthMask(true);
         
@@ -171,16 +172,6 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     	}
     	
     	return new Vector3f(0, 0, 0);
-    }
-
-    public static float getDistanceToObject(@NotNull LazyOptional<SpaceshipCapability> capability, ClientSpaceObject object)
-    {
-        Vector3f solarPosition = getVectorToObject(capability, object);
-        
-        Vector3f distanceVector = solarPosition;
-
-		//System.out.println("Distance: " + distanceVector.length());
-        return distanceVector.length();
     }
 
     public static List<ClientSpaceObject> getRenderObjects(@NotNull LazyOptional<SpaceshipCapability> capability)
