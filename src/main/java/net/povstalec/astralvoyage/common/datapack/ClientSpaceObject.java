@@ -57,7 +57,7 @@ public class ClientSpaceObject {
     public CompoundTag serialize(){
         CompoundTag tag = new CompoundTag();
 
-        tag.putString("key", this.key.toString());
+        tag.putString("key", this.key.location().toString());
 
         tag.putFloat("size", this.size);
 

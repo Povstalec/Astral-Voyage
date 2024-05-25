@@ -246,7 +246,7 @@ public class SpaceObject
 				objectTag.putFloat(SIZE, this.size.get());
 				if(!childObjects.isEmpty()){
 					ListTag childObjects = new ListTag();
-					this.childObjects.forEach(child -> childObjects.add(StringTag.valueOf(child.toString())));
+					this.childObjects.forEach(child -> childObjects.add(StringTag.valueOf(child.location().toString())));
 					objectTag.put(CHILD_OBJECTS, childObjects);
 				}
 				this.parent.ifPresent(spaceObjectResourceKey -> objectTag.putString(PARENT, spaceObjectResourceKey.location().toString()));
