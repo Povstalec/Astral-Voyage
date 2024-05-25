@@ -1,32 +1,37 @@
 package net.povstalec.astralvoyage.common.datapack;
 
-import com.mojang.datafixers.util.Pair;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ClientSpaceObject {
 
     public ResourceKey<SpaceObject> key;
     public Vector3f solarPos;
+    public float size;
     public List<TextureLayerData> textureLayers;
 
-    public ClientSpaceObject(ResourceKey<SpaceObject> key, Vector3f solarPos, List<TextureLayerData> layers)
+    public ClientSpaceObject(ResourceKey<SpaceObject> key, float size, Vector3f solarPos, List<TextureLayerData> layers)
     {
         this.key = key;
+        this.size = size;
         this.solarPos = solarPos;
         this.textureLayers = layers;
     }
 
     public ResourceKey<SpaceObject> getKey() {
         return key;
+    }
+
+    public float getSize()
+    {
+        return this.size;
     }
 
     public Vector3f getSolarPos() {
@@ -53,6 +58,9 @@ public class ClientSpaceObject {
         CompoundTag tag = new CompoundTag();
 
         tag.putString("key", this.key.toString());
+
+        tag.putFloat("size", this.size);
+
         CompoundTag solarPos = new CompoundTag();
         solarPos.putFloat("x", this.solarPos.x);
         solarPos.putFloat("y", this.solarPos.y);
@@ -61,38 +69,24 @@ public class ClientSpaceObject {
         tag.put("solar_pos", solarPos);
 
         ListTag textureLayers = new ListTag();
-        this.textureLayers.forEach(textureLayer -> {
-            CompoundTag layer = new CompoundTag();
-            CompoundTag textureSettings = new CompoundTag();
-            StringTag rl = StringTag.valueOf(textureLayer.getLayer().getFirst().toString());
-            IntArrayTag rgba = new IntArrayTag(textureLayer.getLayer().getSecond().getFirst());
-            textureSettings.put("rgba", rgba);
-            textureSettings.putBoolean("blend", textureLayer.getLayer().getSecond().getSecond());
-            layer.put("texture", rl);
-            layer.put("texture_settings", textureSettings);
-            textureLayers.add(layer);
-        });
+        this.textureLayers.forEach(textureLayer -> textureLayers.add(TextureLayerData.serialize(textureLayer)));
         tag.put("texture_layers", textureLayers);
 
         return tag;
     }
 
-    public ClientSpaceObject deserialize(CompoundTag tag){
+    public static ClientSpaceObject deserialize(CompoundTag tag){
         ResourceKey<SpaceObject> key = SpaceObject.stringToSpaceObjectKey(tag.getString("key"));
+
+        float size = tag.getFloat("size");
 
         CompoundTag solarPos = (CompoundTag) tag.get("solar_pos");
         Vector3f solarPosV = new Vector3f(solarPos.getFloat("x"), solarPos.getFloat("y"), solarPos.getFloat("z"));
 
         ListTag layersTag = tag.getList("texture_layers", Tag.TAG_LIST);
         List<TextureLayerData> textureLayers = new ArrayList<>();
-        layersTag.forEach(layertag -> {
-            CompoundTag layerTag = (CompoundTag) layertag;
-            CompoundTag textureSettingsTag = layerTag.getCompound("texture_settings");
-            Pair<List<Integer>, Boolean> textureSettings = new Pair<>(Arrays.stream(textureSettingsTag.getIntArray("rgba")).boxed().collect(Collectors.toList()), textureSettingsTag.getBoolean("blend"));
-            Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer = new Pair(ResourceLocation.tryParse(layerTag.getString("texture")), textureSettings);
-            textureLayers.add(new TextureLayerData(layer));
-        });
+        layersTag.forEach(layertag -> textureLayers.add(TextureLayerData.deserialize((CompoundTag) layertag)));
 
-        return new ClientSpaceObject(key, solarPosV, textureLayers);
+        return new ClientSpaceObject(key, size, solarPosV, textureLayers);
     }
 }

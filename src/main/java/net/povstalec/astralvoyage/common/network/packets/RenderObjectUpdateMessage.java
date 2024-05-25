@@ -28,7 +28,8 @@ public class RenderObjectUpdateMessage {
 
     public static void write(RenderObjectUpdateMessage mes, FriendlyByteBuf buf){
         buf.writeCollection(mes.renderObjects, (buffer, object) -> {
-            buffer.writeUtf(object.getKey().toString());
+            buffer.writeResourceKey(object.getKey());
+            buffer.writeFloat(object.getSize());
             buffer.writeVector3f(object.getSolarPos());
             buffer.writeCollection(object.getTextureLayers(), (buff, layer) -> {
                 buff.writeResourceLocation(layer.getLayer().getFirst());
@@ -41,6 +42,7 @@ public class RenderObjectUpdateMessage {
     public static RenderObjectUpdateMessage read(FriendlyByteBuf buf){
         List<ClientSpaceObject> list = buf.readList(buffer -> {
             ResourceKey<SpaceObject> key = buffer.readResourceKey(SpaceObject.REGISTRY_KEY);
+            float size = buffer.readFloat();
             Vector3f solarPos = buffer.readVector3f();
             List<TextureLayerData> layers = buffer.readList(buffe -> {
                 ResourceLocation location = buffe.readResourceLocation();
@@ -50,7 +52,7 @@ public class RenderObjectUpdateMessage {
 
                 return new TextureLayerData(settings);
             });
-            return new ClientSpaceObject(key, solarPos, layers);
+            return new ClientSpaceObject(key, size, solarPos, layers);
         });
         return new RenderObjectUpdateMessage(list);
     }

@@ -1,9 +1,13 @@
 package net.povstalec.astralvoyage.client.render.level;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
+import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -16,14 +20,10 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Axis;
 
 import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -31,7 +31,6 @@ import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.capability.SpaceshipCapability;
-import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 
 public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
@@ -80,6 +79,7 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     	
     	Vector3f rotation = getRotation(capability);
     	Vector3f oldRotation = getOldRotation(capability);
+        List<ClientSpaceObject> renderObjects = getRenderObjects(capability);
 
     	float xAxisRotation =  Mth.lerp(partialTick, oldRotation.x, rotation.x);
     	float yAxisRotation = Mth.lerp(partialTick, oldRotation.y, rotation.y);
@@ -109,6 +109,7 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
 
+        renderObjects.forEach(object -> SpaceObjectRenderer.renderSurface(bufferbuilder, poseStack.last().pose(), object, getDistanceToObject(capability, object), getVectorToObject(capability, object), getDegreeToObject(capability, object)));
         RenderSystem.depthMask(true);
         
     	poseStack.popPose();
@@ -144,6 +145,41 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     public static @NotNull LazyOptional<SpaceshipCapability> getSpaceShipCapability(ClientLevel level)
     {
     	return level.getCapability(CapabilitiesInit.SPACESHIP);
+    }
+
+    public static float getDegreeToObject(@NotNull LazyOptional<SpaceshipCapability> capability, ClientSpaceObject object)
+    {
+        Vector3f shipPos = capability.map(cap -> cap.getSolarPosition()).get();
+        float x = shipPos.x*object.solarPos.x+shipPos.y*object.solarPos.y+shipPos.z*object.solarPos.z;
+        float y = (float) Math.sqrt(shipPos.x*shipPos.x+shipPos.y*shipPos.y+shipPos.z*shipPos.z);
+        float z = (float) Math.sqrt(object.solarPos.x*object.solarPos.x+object.solarPos.y*object.solarPos.y+object.solarPos.z*object.solarPos.z);
+
+        return (float) Math.acos(x/(y*z));
+    }
+
+    public static Vector3f getVectorToObject(@NotNull LazyOptional<SpaceshipCapability> capability, ClientSpaceObject object)
+    {
+        AtomicReference<Vector3f> spaceshipPos = new AtomicReference<>(new Vector3f());
+        capability.ifPresent(ship -> spaceshipPos.set(ship.getSolarPosition()));
+        return object.getSolarPos().sub(spaceshipPos.get());
+    }
+
+    public static float getDistanceToObject(@NotNull LazyOptional<SpaceshipCapability> capability, ClientSpaceObject object)
+    {
+        AtomicReference<Vector3f> spaceshipPos = new AtomicReference<>(new Vector3f());
+        capability.ifPresent(ship -> spaceshipPos.set(ship.getSolarPosition()));
+        return Vector3f.distance(spaceshipPos.get().x, spaceshipPos.get().y, spaceshipPos.get().z, object.getSolarPos().x, object.getSolarPos().y, object.getSolarPos().z);
+    }
+
+    public static List<ClientSpaceObject> getRenderObjects(@NotNull LazyOptional<SpaceshipCapability> capability)
+    {
+        Optional<List<ClientSpaceObject>> renderObjects = capability.map(cap -> cap.getRenderObjects());
+
+        if(renderObjects.isPresent()){
+            return renderObjects.get();
+        }
+
+        return Lists.newArrayList();
     }
 
     public static Vector3f getGalacticPosition(@NotNull LazyOptional<SpaceshipCapability> capability)

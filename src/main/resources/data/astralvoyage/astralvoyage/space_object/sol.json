@@ -1,7 +1,12 @@
 {
 	"name": "stellar_location.astralvoyage.sol",
+	"size": 1400000,
+	"children":
+	[
+		{"child_object": "astralvoyage:earth"}
+	],
 	"texture_layers":
 	[
-		{"texture": "minecraft:environment/sun.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": true}}
+		{"texture": "astralvoyage:textures/environment/sol.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": true}}
 	]
 }

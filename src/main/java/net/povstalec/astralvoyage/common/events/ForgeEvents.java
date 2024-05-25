@@ -1,8 +1,16 @@
 package net.povstalec.astralvoyage.common.events;
 
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.povstalec.astralvoyage.common.data.SpaceObjects;
+import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
+import net.povstalec.astralvoyage.common.datapack.SpaceObject;
+import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.resources.ResourceLocation;
@@ -22,9 +30,32 @@ import net.povstalec.astralvoyage.common.capability.GenericProvider;
 import net.povstalec.astralvoyage.common.capability.SpaceshipCapability;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 import net.povstalec.astralvoyage.common.init.WorldGenInit;
+import org.joml.Vector3f;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mod.EventBusSubscriber(modid = AstralVoyage.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeEvents {
+
+    @SubscribeEvent
+    public static void playerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event)
+    {
+        MinecraftServer server = event.getEntity().getServer();
+        ResourceKey<Level> to = event.getTo();
+        ServerLevel levelTo = server.getLevel(to);
+
+        if(levelTo.dimensionTypeId().location().equals(WorldGenInit.SPACE_TYPE.location()))
+        {
+            List<ClientSpaceObject> list = new ArrayList<>();
+            server.registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).registryKeySet().forEach(key -> {
+                SpaceObject object = server.registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(key);
+                list.add(new ClientSpaceObject(key, object.getSize(), key.equals(SpaceObject.stringToSpaceObjectKey("astralvoyage:earth")) ? new Vector3f(147280000f,  0f, 0f) : new Vector3f(), TextureLayerData.toDataList(object.getTextureLayers())));
+            });
+            levelTo.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> cap.setRenderObjects(list));
+        }
+    }
+
     @SubscribeEvent
     public static void onLivingTick(LivingEvent.LivingTickEvent event) {
         LivingEntity entity = event.getEntity();
@@ -73,9 +104,6 @@ public class ForgeEvents {
 			{
 				if(cap != null)
 				{
-					if(level.getGameTime() % 20 == 0)
-			        		cap.setSpaceObject(new ResourceLocation(AstralVoyage.MODID, "earth").toString());
-					
 					cap.tick(level);
 				}
 			});

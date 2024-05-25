@@ -47,7 +47,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 	private Vector3f rotation = new Vector3f(0, 0, 0);
 	private Vector3f oldRotation = new Vector3f(0, 0, 0);
 
-    private List<ClientSpaceObject> renderObjects = Lists.newLinkedList();
+    private List<ClientSpaceObject> renderObjects = Lists.newArrayList();
 
     public SpaceshipCapability()
     {
@@ -105,12 +105,24 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         this.galacticPosition.z += vector.z;
     }
 
+    public void moveSolarPosition(Vector3f vector)
+    {
+        this.solarPosition.x += vector.x;
+        this.solarPosition.y += vector.y;
+        this.solarPosition.z += vector.z;
+    }
+
     public List<ClientSpaceObject> getRenderObjects()
     {
         return renderObjects;
     }
 
-	public Vector3f getGalacticPosition()
+    public Vector3f getSolarPosition()
+    {
+        return solarPosition;
+    }
+
+    public Vector3f getGalacticPosition()
 	{
 		return galacticPosition;
 	}
@@ -151,9 +163,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         tag.putFloat(Z_AXIS_ROTATION, rotation.z);
 
         ListTag renderObjects = new ListTag();
-        this.renderObjects.forEach(object -> {
-            renderObjects.add(object.serialize());
-        });
+        this.renderObjects.forEach(object -> renderObjects.add(object.serialize()));
         tag.put(RENDER_OBJECTS, renderObjects);
 
         return tag;
@@ -173,22 +183,6 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         this.rotation.y = nbt.getFloat(Y_AXIS_ROTATION);
         this.rotation.z = nbt.getFloat(Z_AXIS_ROTATION);
 
-        nbt.getList(RENDER_OBJECTS, ListTag.TAG_LIST).forEach(tag -> {
-            CompoundTag objectTag = ((CompoundTag) tag);
-            CompoundTag solarPosTag = (CompoundTag) objectTag.get("solar_pos");
-
-            Vector3f solarPos = new Vector3f(solarPosTag.getFloat("x"), solarPosTag.getFloat("y"), solarPosTag.getFloat("z"));
-            ListTag layersTag = objectTag.getList("texture_layers", Tag.TAG_LIST);
-            List<TextureLayerData> textureLayers = new ArrayList<>();
-            layersTag.forEach(layertag -> {
-                CompoundTag layerTag = (CompoundTag) layertag;
-                CompoundTag textureSettingsTag = layerTag.getCompound("texture_settings");
-                Pair<List<Integer>, Boolean> textureSettings = new Pair<>(Arrays.stream(textureSettingsTag.getIntArray("rgba")).boxed().collect(Collectors.toList()), textureSettingsTag.getBoolean("blend"));
-                Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer = new Pair(ResourceLocation.tryParse(layerTag.getString("texture")), textureSettings);
-                textureLayers.add(new TextureLayerData(layer));
-            });
-
-            this.renderObjects.add(new ClientSpaceObject(SpaceObject.stringToSpaceObjectKey(objectTag.getString("key")),solarPos, textureLayers));
-        });
+        nbt.getList(RENDER_OBJECTS, ListTag.TAG_COMPOUND).forEach(tag -> this.renderObjects.add(ClientSpaceObject.deserialize((CompoundTag) tag)));
     }
 }

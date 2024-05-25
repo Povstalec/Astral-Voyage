@@ -1,6 +1,7 @@
 {
 	"dimension": "minecraft:overworld",
 	"name": "stellar_location.astralvoyage.earth",
+	"size": 12760,
 	"parent":
 	{
 		"parent_object": "astralvoyage:sol",
@@ -13,6 +14,7 @@
 			"rotation": 0.0
 		}
 	},
+	"children": [],
 	"texture_layers":
 	[
 		{"texture": "astralvoyage:textures/environment/planets/earth.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": true}}

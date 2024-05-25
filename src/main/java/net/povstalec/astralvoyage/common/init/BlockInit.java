@@ -22,9 +22,13 @@ public class BlockInit {
 
     public static final RegistryObject<SpaceshipGeneratorBlock> SPACESHIP_GENERATOR_BLOCK = registerWithItem("spaceship_generator_block", () -> new SpaceshipGeneratorBlock(BlockBehaviour.Properties.of().forceSolidOn()));
 
-    public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_X_BLOCK = registerWithItem("spaceship_movement_x_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn(), Direction.Axis.X));
-    public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_Y_BLOCK = registerWithItem("spaceship_movement_y_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn(), Direction.Axis.Y));
-    public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_Z_BLOCK = registerWithItem("spaceship_movement_z_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn(), Direction.Axis.Z));
+    public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_GALACTIC_X_BLOCK = registerWithItem("spaceship_movement_galactic_x_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn(), Direction.Axis.X, true));
+    public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_GALACTIC_Y_BLOCK = registerWithItem("spaceship_movement_galactic_y_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn(), Direction.Axis.Y, true));
+    public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_GALACTIC_Z_BLOCK = registerWithItem("spaceship_movement_galactic_z_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn(), Direction.Axis.Z, true));
+
+    public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_SOLAR_X_BLOCK = registerWithItem("spaceship_movement_solar_x_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn(), Direction.Axis.X, false));
+    public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_SOLAR_Y_BLOCK = registerWithItem("spaceship_movement_solar_y_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn(), Direction.Axis.Y, false));
+    public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_SOLAR_Z_BLOCK = registerWithItem("spaceship_movement_solar_z_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn(), Direction.Axis.Z, false));
 
 
     public static <T extends Block> RegistryObject<T> registerWithItem(String name, final Supplier<T> block, Function<Item.Properties, Item.Properties> properties){
