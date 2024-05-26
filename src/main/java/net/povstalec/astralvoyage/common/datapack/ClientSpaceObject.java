@@ -9,19 +9,22 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ClientSpaceObject {
 
     public ResourceKey<SpaceObject> key;
+    public Optional<Vector3f> galPos;
     public Vector3f solarPos;
     public float size;
     public List<TextureLayerData> textureLayers;
 
-    public ClientSpaceObject(ResourceKey<SpaceObject> key, float size, Vector3f solarPos, List<TextureLayerData> layers)
+    public ClientSpaceObject(ResourceKey<SpaceObject> key, float size, Vector3f solarPos, Optional<Vector3f> galPos, List<TextureLayerData> layers)
     {
         this.key = key;
         this.size = size;
         this.solarPos = solarPos;
+        this.galPos = galPos;
         this.textureLayers = layers;
     }
 
@@ -32,6 +35,11 @@ public class ClientSpaceObject {
     public float getSize()
     {
         return this.size;
+    }
+
+    public Optional<Vector3f> getGalacticPos()
+    {
+        return galPos;
     }
 
     public Vector3f getSolarPos() {
@@ -66,11 +74,20 @@ public class ClientSpaceObject {
         solarPos.putFloat("y", this.solarPos.y);
         solarPos.putFloat("z", this.solarPos.z);
 
+        if(galPos.isPresent())
+        {
+            CompoundTag galPos = new CompoundTag();
+            galPos.putFloat("x", this.galPos.get().x);
+            galPos.putFloat("y", this.galPos.get().y);
+            galPos.putFloat("z", this.galPos.get().z);
+            tag.put("galactic_pos", galPos);
+        }
+
         tag.put("solar_pos", solarPos);
 
-        ListTag textureLayers = new ListTag();
-        this.textureLayers.forEach(textureLayer -> textureLayers.add(TextureLayerData.serialize(textureLayer)));
-        tag.put("texture_layers", textureLayers);
+        ListTag textureLayersTag = new ListTag();
+        this.textureLayers.forEach(textureLayer -> textureLayersTag.add(TextureLayerData.serialize(textureLayer)));
+        tag.put("texture_layers", textureLayersTag);
 
         return tag;
     }
@@ -80,13 +97,24 @@ public class ClientSpaceObject {
 
         float size = tag.getFloat("size");
 
-        CompoundTag solarPos = (CompoundTag) tag.get("solar_pos");
+        CompoundTag solarPos = tag.getCompound("solar_pos");
         Vector3f solarPosV = new Vector3f(solarPos.getFloat("x"), solarPos.getFloat("y"), solarPos.getFloat("z"));
 
-        ListTag layersTag = tag.getList("texture_layers", Tag.TAG_LIST);
-        List<TextureLayerData> textureLayers = new ArrayList<>();
-        layersTag.forEach(layertag -> textureLayers.add(TextureLayerData.deserialize((CompoundTag) layertag)));
+        Optional<Vector3f> galPosV = Optional.empty();
+        if(tag.contains("galactic_pos"))
+        {
+            CompoundTag galPos = tag.getCompound("galactic_pos");
+            galPosV = Optional.of(new Vector3f(galPos.getFloat("x"), galPos.getFloat("y"), galPos.getFloat("y")));
+        }
 
-        return new ClientSpaceObject(key, size, solarPosV, textureLayers);
+        ListTag layersTag = tag.getList("texture_layers", Tag.TAG_COMPOUND);
+        List<TextureLayerData> textureLayers = new ArrayList<>();
+        layersTag.forEach(layertag -> {
+            CompoundTag layerTag = (CompoundTag) layertag;
+            TextureLayerData data = TextureLayerData.deserialize(layerTag);
+            textureLayers.add(data);
+        });
+
+        return new ClientSpaceObject(key, size, solarPosV, galPosV, textureLayers);
     }
 }

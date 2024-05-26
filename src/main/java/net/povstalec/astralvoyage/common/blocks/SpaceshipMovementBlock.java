@@ -45,7 +45,7 @@ public class SpaceshipMovementBlock extends Block {
     }
 
     private Vector3f movementDirection(){
-        int x = direction == Direction.Axis.X ? 10000 : 0;
+        int x = direction == Direction.Axis.X ? 1000000 : 0;
         int y = direction == Direction.Axis.Y ? 100 : 0;
         int z = direction == Direction.Axis.Z ? 100 : 0;
 

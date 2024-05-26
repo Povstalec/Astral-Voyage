@@ -8,12 +8,14 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.Util;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.joml.Vector3f;
@@ -24,17 +26,19 @@ public class SpaceObject
 	public static final ResourceKey<Registry<SpaceObject>> REGISTRY_KEY = ResourceKey.createRegistryKey(SPACE_OBJECT_LOCATION);
 	public static final Codec<ResourceKey<SpaceObject>> RESOURCE_KEY_CODEC = ResourceKey.codec(REGISTRY_KEY);
 
+	private static final Codec<Vector3f> GALACTIC_POS = Codec.FLOAT.listOf().comapFlatMap(f -> Util.fixedSize(f, 3).map(vec -> new Vector3f(vec.get(0), vec.get(1), vec.get(2))), (element) -> List.of(element.get(0), element.get(1), element.get(2))).stable();
 	private static final Codec<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> PARENT = Codec.pair(RESOURCE_KEY_CODEC.fieldOf("parent_object").codec(), Codec.unboundedMap(Codec.STRING, Codec.DOUBLE).fieldOf("orbit").codec());
 	private static final Codec<ResourceKey<SpaceObject>> CHILD_OBJECTS = RESOURCE_KEY_CODEC.fieldOf("child_object").codec();
 	private static final Codec<Pair<List<Integer>, Boolean>> TEXTURE_SETTINGS = Codec.pair(Codec.INT.listOf().fieldOf("rgba").codec(), Codec.BOOL.fieldOf("blends").codec());
 	private static final Codec<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> TEXTURE_LAYER = Codec.pair(ResourceLocation.CODEC.fieldOf("texture").codec(), TEXTURE_SETTINGS.fieldOf("texture_settings").codec());
-	
+
 	public static final Codec<SpaceObject> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			// Dimension this Stellar Location is tied to
 			Level.RESOURCE_KEY_CODEC.optionalFieldOf("dimension").forGetter(SpaceObject::getDimension),
 			// Translation name of the Stellar Location
 			Codec.STRING.fieldOf("name").forGetter(SpaceObject::getTranslationName),
 			Codec.FLOAT.fieldOf("size").forGetter(SpaceObject::getSize),
+			GALACTIC_POS.optionalFieldOf("galactic_position").forGetter(SpaceObject::getGalacticPos),
 			CHILD_OBJECTS.listOf().fieldOf("children").forGetter(SpaceObject::getChildObjects),
 			// Parent Stellar Location, probably used for orbits and stuff in the future
 			PARENT.optionalFieldOf("parent").forGetter(SpaceObject::getParentOrbitMap),
@@ -51,6 +55,7 @@ public class SpaceObject
 	private final Optional<ResourceKey<Level>> dimension;
 	private final String translationName;
 	private final float size;
+	private final Optional<Vector3f> galactic_position;
 	private final List<ResourceKey<SpaceObject>> childObjects;
 	private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
 	private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
@@ -64,13 +69,14 @@ public class SpaceObject
 	private Optional<Double> rotation = Optional.empty();
 	
 	public SpaceObject(Optional<ResourceKey<Level>> dimension, String translationName, 
-		float size,List<ResourceKey<SpaceObject>> childObjects, 
+		float size, Optional<Vector3f> galactic_position, List<ResourceKey<SpaceObject>> childObjects,
 		Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, 
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
 	{
 		this.dimension = dimension;
 		this.translationName = translationName;
 		this.size = size;
+		this.galactic_position = galactic_position;
 		this.childObjects = childObjects;
 		this.parentOrbitMap = parentOrbitMap;
 		this.textureLayers = textureLayers;
@@ -99,6 +105,10 @@ public class SpaceObject
 		return this.size;
 	}
 
+	public Optional<Vector3f> getGalacticPos(){
+		return this.galactic_position;
+	}
+
 	public List<ResourceKey<SpaceObject>> getChildObjects()
 	{
 		return this.childObjects;
@@ -118,7 +128,7 @@ public class SpaceObject
 	{
 		return this.textureLayers;
 	}
-	
+
 	private void setupOrbit(Map<String, Double> orbitMap)
 	{
 		if(orbitMap.containsKey(DISTANCE))
@@ -177,6 +187,7 @@ public class SpaceObject
 		private final Optional<ResourceKey<Level>> dimension;
 		private final Optional<String> name;
 		private final Optional<Float> size;
+		private final Optional<Vector3f> galactic_position;
 		private final Optional<ResourceKey<SpaceObject>> parent;
 		private final List<ResourceKey<SpaceObject>> childObjects;
 		private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
@@ -187,17 +198,19 @@ public class SpaceObject
 			this.dimension = object.getDimension();
 			this.name = Optional.of(object.getTranslationName());
 			this.size = Optional.of(object.getSize());
+			this.galactic_position = object.getGalacticPos();
 			this.parent = object.getParent();
 			this.childObjects = object.getChildObjects();
 			this.textureLayers = object.getTextureLayers();
 		}
 
-		public Serializable(ResourceKey<Level> dimension, String name, float size, Optional<ResourceKey<SpaceObject>> parent, List<ResourceKey<SpaceObject>> childObjects, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
+		public Serializable(ResourceKey<Level> dimension, String name, float size, Optional<Vector3f> galactic_position, Optional<ResourceKey<SpaceObject>> parent, List<ResourceKey<SpaceObject>> childObjects, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
 		{
 			this.objectKey = Optional.empty();
 			this.dimension = Optional.ofNullable(dimension);
 			this.name = Optional.of(name);
-			this.size = Optional.ofNullable(size);
+			this.size = Optional.of(size);
+			this.galactic_position = galactic_position;
 			this.parent = parent;
 			this.childObjects = childObjects;
 			this.textureLayers = textureLayers;
@@ -211,6 +224,11 @@ public class SpaceObject
 		public float getSize()
 		{
 			return this.size.get();
+		}
+
+		public Optional<Vector3f> getGalacticPos()
+		{
+			return galactic_position;
 		}
 
 		public ResourceKey<Level> getDimension()
@@ -232,19 +250,29 @@ public class SpaceObject
 		{
 			return this.textureLayers;
 		}
-
 		public CompoundTag serialize()
 		{
 			CompoundTag objectTag = new CompoundTag();
 
-			if(this.objectKey.isPresent())
+			if(this.objectKey.isPresent()) {
 				objectTag.putString(OBJECT_KEY, this.objectKey.get().location().toString());
+			}
 			else
 			{
 				objectTag.putString(DIMENSION, this.dimension.get().location().toString());
 				objectTag.putString(NAME, this.name.get());
 				objectTag.putFloat(SIZE, this.size.get());
-				if(!childObjects.isEmpty()){
+
+				if(galactic_position.isPresent())
+				{
+					CompoundTag galPos = new CompoundTag();
+					galPos.putFloat("x", galactic_position.get().x);
+					galPos.putFloat("y", galactic_position.get().y);
+					galPos.putFloat("z", galactic_position.get().z);
+					objectTag.put("galactic_position", galPos);
+				}
+				if(!childObjects.isEmpty())
+				{
 					ListTag childObjects = new ListTag();
 					this.childObjects.forEach(child -> childObjects.add(StringTag.valueOf(child.location().toString())));
 					objectTag.put(CHILD_OBJECTS, childObjects);
@@ -283,6 +311,12 @@ public class SpaceObject
 				ResourceKey<Level> dimension = stringToDimension(objectTag.getString(DIMENSION));
 				float size = objectTag.getFloat(SIZE);
 
+				Optional<Vector3f> galactic_position = Optional.empty();
+				if(objectTag.contains("galactic_position")) {
+					CompoundTag galPos = objectTag.getCompound("galactic_position");
+					galactic_position = Optional.of(new Vector3f(galPos.getFloat("x"), galPos.getFloat("y"), galPos.getFloat("y")));
+				}
+
 				Optional<ResourceKey<SpaceObject>> parent = Optional.empty();
 				if(objectTag.contains(PARENT))
 					parent = Optional.ofNullable(stringToSpaceObjectKey(objectTag.getString(PARENT)));
@@ -297,7 +331,7 @@ public class SpaceObject
 				List<TextureLayerData> textureLayers = new ArrayList<>();
 				layersTag.forEach(layertag -> textureLayers.add(TextureLayerData.deserialize((CompoundTag) layertag)));
 
-				return new SpaceObject.Serializable(dimension, name, size, parent, childObjects, TextureLayerData.toPairList(textureLayers));
+				return new SpaceObject.Serializable(dimension, name, size, galactic_position, parent, childObjects, TextureLayerData.toPairList(textureLayers));
 			}
 		}
 	}

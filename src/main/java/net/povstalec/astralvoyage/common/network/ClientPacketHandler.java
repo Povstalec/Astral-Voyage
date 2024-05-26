@@ -9,6 +9,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
+import org.joml.Vector3f;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientPacketHandler {
@@ -16,9 +17,7 @@ public class ClientPacketHandler {
     public static void handleSpaceObjectUpdatePacket(SpaceObjectUpdateMessage mes) {
         getLevel().ifPresent(level -> {
             level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> {
-                cap.setSolarPosition(mes.solarX, mes.solarY, mes.solarZ);
-                cap.setGalacticPostion(mes.galacticX, mes.galacticY, mes.galacticZ);
-                cap.setRotation(mes.xAxisRotation, mes.yAxisRotation, mes.zAxisRotation);
+                cap.deserializeNBT(mes.tag);
             });
         });
     }

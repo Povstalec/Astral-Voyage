@@ -17,6 +17,7 @@
 	"children": [],
 	"texture_layers":
 	[
-		{"texture": "astralvoyage:textures/environment/planets/earth.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": true}}
+		{"texture": "astralvoyage:textures/environment/planets/earth.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+		{"texture": "astralvoyage:textures/environment/planets/earth_halo.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends":  true}}
 	]
 }

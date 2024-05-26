@@ -28,7 +28,7 @@ public final class SpaceObjectRenderer
 		boolean blend = layer.getSecond().getSecond();
 
 		Vector3f sphericalPos = new Vector3f((float) Math.sqrt(shipToObject.x*shipToObject.x + shipToObject.y*shipToObject.y + shipToObject.z*shipToObject.z), (float) Math.atan2(shipToObject.x, shipToObject.z), (float) Math.atan2(Math.sqrt(shipToObject.x*shipToObject.x + shipToObject.z*shipToObject.z), shipToObject.y));
-		float objectRenderSize = Math.max((size/distance)*SIZE, 0.1F);
+		float objectRenderSize = Math.min(Math.max((size/distance)*SIZE*6, 0.1F), 360F);
 		
 		sphericalPos.x = DISTANCE;
 		Vector3f corner00 = placeOnSphere(-objectRenderSize, -objectRenderSize, sphericalPos, rotation);
@@ -63,7 +63,7 @@ public final class SpaceObjectRenderer
 	public static void renderSurface(BufferBuilder bufferbuilder, Matrix4f lastMatrix, ClientSpaceObject spaceObject, float distance, Vector3f shipToObject, float rotation)
 	{
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers = TextureLayerData.toPairList(spaceObject.getTextureLayers());
-		
+
 		textureLayers.forEach(layer -> renderSurfaceLayer(bufferbuilder, lastMatrix, spaceObject.getSize(), distance, layer, shipToObject, rotation));
 	}
 
@@ -104,5 +104,10 @@ public final class SpaceObjectRenderer
 	public static Vector3f sphericalToCartesian(Vector3f sphericalCoords)
 	{
 		return new Vector3f((float) cartesianX(sphericalCoords), (float) cartesianY(sphericalCoords), (float) cartesianZ(sphericalCoords));
+	}
+
+	public static Vector3f vectorBodyToBody(Vector3f bodyA, Vector3f bodyB)
+	{
+		return new Vector3f(bodyA.x-bodyB.x, bodyA.y-bodyB.y, bodyA.z-bodyB.z);
 	}
 }

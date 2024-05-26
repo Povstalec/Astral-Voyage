@@ -14,6 +14,7 @@ import org.joml.Vector3f;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,11 @@ public class RenderObjectUpdateMessage {
             buffer.writeResourceKey(object.getKey());
             buffer.writeFloat(object.getSize());
             buffer.writeVector3f(object.getSolarPos());
+            if(object.getGalacticPos().isPresent())
+            {
+                buffer.writeBoolean(true);
+                buffer.writeVector3f(object.getGalacticPos().get());
+            } else buffer.writeBoolean(false);
             buffer.writeCollection(object.getTextureLayers(), (buff, layer) -> {
                 buff.writeResourceLocation(layer.getLayer().getFirst());
                 buff.writeVarIntArray(layer.getLayer().getSecond().getFirst().stream().mapToInt(i->i).toArray());
@@ -44,6 +50,9 @@ public class RenderObjectUpdateMessage {
             ResourceKey<SpaceObject> key = buffer.readResourceKey(SpaceObject.REGISTRY_KEY);
             float size = buffer.readFloat();
             Vector3f solarPos = buffer.readVector3f();
+            Optional<Vector3f> galPos = Optional.empty();
+            if(buffer.readBoolean())
+                galPos = Optional.of(buffer.readVector3f());
             List<TextureLayerData> layers = buffer.readList(buffe -> {
                 ResourceLocation location = buffe.readResourceLocation();
                 int[] rgba = buffe.readVarIntArray();
@@ -52,7 +61,7 @@ public class RenderObjectUpdateMessage {
 
                 return new TextureLayerData(settings);
             });
-            return new ClientSpaceObject(key, size, solarPos, layers);
+            return new ClientSpaceObject(key, size, solarPos, galPos, layers);
         });
         return new RenderObjectUpdateMessage(list);
     }

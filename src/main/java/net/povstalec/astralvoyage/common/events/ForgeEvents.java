@@ -50,7 +50,7 @@ public class ForgeEvents {
             List<ClientSpaceObject> list = new ArrayList<>();
             server.registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).registryKeySet().forEach(key -> {
                 SpaceObject object = server.registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(key);
-                list.add(new ClientSpaceObject(key, object.getSize(), key.equals(SpaceObject.stringToSpaceObjectKey("astralvoyage:earth")) ? new Vector3f(147280000f,  0f, 0f) : new Vector3f(), TextureLayerData.toDataList(object.getTextureLayers())));
+                list.add(new ClientSpaceObject(key, object.getSize(), new Vector3f(object.getDistance().orElse((double) 0).floatValue(), 0, 0), object.getGalacticPos(), TextureLayerData.toDataList(object.getTextureLayers())));
             });
             levelTo.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> cap.setRenderObjects(list));
         }

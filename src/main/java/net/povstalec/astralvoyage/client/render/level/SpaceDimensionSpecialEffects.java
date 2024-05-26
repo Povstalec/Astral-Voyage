@@ -1,10 +1,13 @@
 package net.povstalec.astralvoyage.client.render.level;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
+import com.mojang.datafixers.util.Pair;
+import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -107,16 +110,12 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
 		
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        
-        renderObjects.forEach(object ->
-        {
-        	//System.out.println(object.getSolarPos());
-        	Vector3f vectorToObject = getVectorToObject(capability, object);
-        	SpaceObjectRenderer.renderSurface(bufferbuilder, poseStack.last().pose(), object, vectorToObject.length(), vectorToObject, getDegreeToObject(capability, object));
-        });
+
+        List<ClientSpaceObject> orderedObjects = renderObjects.stream().sorted(Comparator.comparing(obj -> SpaceObjectRenderer.vectorBodyToBody(obj.getSolarPos(), capability.map(SpaceshipCapability::getSolarPosition).get()).length())).toList();
+        Collections.reverse(orderedObjects);
+        orderedObjects.forEach(obj -> SpaceObjectRenderer.renderSurface(bufferbuilder, poseStack.last().pose(), obj, getVectorToObject(capability, obj).length(), getVectorToObject(capability, obj), 0));
         RenderSystem.depthMask(true);
-        
-    	poseStack.popPose();
+        poseStack.popPose();
     	
         return true;
     }
@@ -167,8 +166,10 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     	
     	if(solarPosition.isPresent())
     	{
-    		//System.out.println("Pos: " + solarPosition.get());
-    		return solarPosition.get().sub(object.getSolarPos());
+            float x = solarPosition.get().x-object.getSolarPos().x;
+            float y = solarPosition.get().y-object.getSolarPos().y;
+            float z = solarPosition.get().z-object.getSolarPos().z;
+            return new Vector3f(x, y, z);
     	}
     	
     	return new Vector3f(0, 0, 0);
@@ -176,12 +177,10 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
 
     public static List<ClientSpaceObject> getRenderObjects(@NotNull LazyOptional<SpaceshipCapability> capability)
     {
-        Optional<List<ClientSpaceObject>> renderObjects = capability.map(cap -> cap.getRenderObjects());
+        Optional<List<ClientSpaceObject>> renderObjects = capability.map(SpaceshipCapability::getRenderObjects);
 
-        if(renderObjects.isPresent())
-            return renderObjects.get();
+        return renderObjects.orElseGet(Lists::newArrayList);
 
-        return Lists.newArrayList();
     }
 
     public static Vector3f getGalacticPosition(@NotNull LazyOptional<SpaceshipCapability> capability)
