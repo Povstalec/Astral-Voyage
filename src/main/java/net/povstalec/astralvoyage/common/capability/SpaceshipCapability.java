@@ -1,25 +1,21 @@
 package net.povstalec.astralvoyage.common.capability;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.util.Pair;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
-import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
+import net.povstalec.astralvoyage.common.network.AVNetwork;
+import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.joml.Vector3f;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.povstalec.astralvoyage.common.network.AVNetwork;
-import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 {
@@ -64,7 +60,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
                 if (object.getGalacticPos().isPresent() && object.getGalacticPos().get().equals(this.getGalacticPosition(), 0.0001f))
                     object.getChildObjects().forEach(child -> {
                         SpaceObject childObject = level.getServer().registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(child);
-                        ClientSpaceObject clientChildObject = new ClientSpaceObject(child, childObject.getSize(), new Vector3f(childObject.getDistance().get().floatValue(), 0, 0), Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
+                        ClientSpaceObject clientChildObject = new ClientSpaceObject(child, childObject.getSize(), childObject.getOrbitOffset(), new Vector3f(childObject.getDistance().get().floatValue(), 0, 0), Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
                         if (!childObjects.contains(clientChildObject))
                             childObjects.add(clientChildObject);
                     });

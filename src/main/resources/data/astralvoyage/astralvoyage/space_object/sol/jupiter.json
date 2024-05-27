@@ -1,0 +1,22 @@
+{
+	"name": "stellar_location.astralvoyage.jupiter",
+	"size": 142980,
+	"parent":
+	{
+		"parent_object": "astralvoyage:sol",
+		"orbit":
+		{
+			"distance": 745010000.0,
+			"orbit_days": 1152.0,
+			"orbit_start": 71.0,
+			"orbit_inclination": 1.31,
+			"rotation": 62.0
+		}
+	},
+	"children": [],
+	"texture_layers":
+	[
+		{"texture": "astralvoyage:textures/environment/planets/jupiter.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+		{"texture": "astralvoyage:textures/environment/planets/jupiter_halo.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends":  true}}
+	]
+}

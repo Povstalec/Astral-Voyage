@@ -51,7 +51,7 @@ public class ForgeEvents {
             server.registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).registryKeySet().forEach(key -> {
                 SpaceObject object = server.registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(key);
                 if(object.getGalacticPos().isPresent())
-                    list.add(new ClientSpaceObject(key, object.getSize(), new Vector3f(object.getDistance().orElse((double) 0).floatValue(), 0, 0), object.getGalacticPos(), TextureLayerData.toDataList(object.getTextureLayers())));
+                    list.add(new ClientSpaceObject(key, object.getSize(), object.getOrbitOffset(), new Vector3f(object.getDistance().orElse((double) 0).floatValue(), 0, 0), object.getGalacticPos(), TextureLayerData.toDataList(object.getTextureLayers())));
             });
             levelTo.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> cap.setRenderObjects(list));
         }

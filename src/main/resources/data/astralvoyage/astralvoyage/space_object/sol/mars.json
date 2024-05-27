@@ -1,0 +1,22 @@
+{
+	"name": "stellar_location.astralvoyage.mars",
+	"size": 6779,
+	"parent":
+	{
+		"parent_object": "astralvoyage:sol",
+		"orbit":
+		{
+			"distance": 226380000.0,
+			"orbit_days": 180.0,
+			"orbit_start": 139.0,
+			"orbit_inclination": 3.39,
+			"rotation": 79.0
+		}
+	},
+	"children": [],
+	"texture_layers":
+	[
+		{"texture": "astralvoyage:textures/environment/planets/mars.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+		{"texture": "astralvoyage:textures/environment/planets/mars_halo.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends":  true}}
+	]
+}

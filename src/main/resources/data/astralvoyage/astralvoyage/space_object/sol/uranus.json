@@ -1,0 +1,22 @@
+{
+	"name": "stellar_location.astralvoyage.uranus",
+	"size": 51120,
+	"parent":
+	{
+		"parent_object": "astralvoyage:sol",
+		"orbit":
+		{
+			"distance": 2932900000.0,
+			"orbit_days": 8064.0,
+			"orbit_start": 270.0,
+			"orbit_inclination": 1,
+			"rotation": 36.0
+		}
+	},
+	"children": [],
+	"texture_layers":
+	[
+		{"texture": "astralvoyage:textures/environment/planets/uranus.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+		{"texture": "astralvoyage:textures/environment/planets/uranus_halo.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends":  true}}
+	]
+}

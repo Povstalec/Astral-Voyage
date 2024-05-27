@@ -17,12 +17,14 @@ public class ClientSpaceObject {
     public Optional<Vector3f> galPos;
     public Vector3f solarPos;
     public float size;
+    public Optional<Double> orbitStartAngle;
     public List<TextureLayerData> textureLayers;
 
-    public ClientSpaceObject(ResourceKey<SpaceObject> key, float size, Vector3f solarPos, Optional<Vector3f> galPos, List<TextureLayerData> layers)
+    public ClientSpaceObject(ResourceKey<SpaceObject> key, float size, Optional<Double> orbitStartAngle, Vector3f solarPos, Optional<Vector3f> galPos, List<TextureLayerData> layers)
     {
         this.key = key;
         this.size = size;
+        this.orbitStartAngle = orbitStartAngle;
         this.solarPos = solarPos;
         this.galPos = galPos;
         this.textureLayers = layers;
@@ -40,6 +42,11 @@ public class ClientSpaceObject {
     public Optional<Vector3f> getGalacticPos()
     {
         return galPos;
+    }
+
+    public Optional<Double> getOrbitOffset()
+    {
+        return this.orbitStartAngle;
     }
 
     public Vector3f getSolarPos() {
@@ -69,6 +76,9 @@ public class ClientSpaceObject {
 
         tag.putFloat("size", this.size);
 
+        if(this.orbitStartAngle.isPresent())
+            tag.putDouble("orbit_start_angle", this.orbitStartAngle.get());
+
         CompoundTag solarPos = new CompoundTag();
         solarPos.putFloat("x", this.solarPos.x);
         solarPos.putFloat("y", this.solarPos.y);
@@ -97,6 +107,12 @@ public class ClientSpaceObject {
 
         float size = tag.getFloat("size");
 
+        Optional<Double> orbitStartAngle = Optional.empty();
+        if(tag.contains("orbit_start_angle"))
+            orbitStartAngle = Optional.of(tag.getDouble("orbit_start_angle"));
+
+
+
         CompoundTag solarPos = tag.getCompound("solar_pos");
         Vector3f solarPosV = new Vector3f(solarPos.getFloat("x"), solarPos.getFloat("y"), solarPos.getFloat("z"));
 
@@ -115,6 +131,6 @@ public class ClientSpaceObject {
             textureLayers.add(data);
         });
 
-        return new ClientSpaceObject(key, size, solarPosV, galPosV, textureLayers);
+        return new ClientSpaceObject(key, size, orbitStartAngle, solarPosV, galPosV, textureLayers);
     }
 }
