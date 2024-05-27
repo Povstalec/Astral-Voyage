@@ -18,10 +18,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
 import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SpaceshipCapability implements INBTSerializable<CompoundTag>
@@ -41,7 +38,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     private static final String RENDER_OBJECTS = "render_objects";
 
 	private Vector3f galacticPosition = new Vector3f(0, 0, 0);
-    private Vector3f solarPosition = new Vector3f(0, 0, 0);
+    private Vector3f solarPosition = new Vector3f(147280000, 0, 0);
 	private Vector3f oldGalacticPosition = new Vector3f(0, 0, 0);
     private Vector3f oldSolarPosition = new Vector3f(0, 0, 0);
 
@@ -59,16 +56,21 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     	this.oldGalacticPosition.set(galacticPosition);
         this.oldSolarPosition.set(solarPosition);
     	this.oldRotation.set(rotation);
-
-        this.getRenderObjects().forEach(objects -> {
-            float x = objects.solarPos.x-this.solarPosition.x;
-            float y = objects.solarPos.y-this.solarPosition.y;
-            float z = objects.solarPos.z-this.solarPosition.z;
-            Vector3f distance = new Vector3f(x, y, z);
-            if(distance.length()<objects.getSize()/4)
-                this.solarPosition = oldSolarPosition;
-        });
-
+        if(!level.isClientSide()) {
+            List<ClientSpaceObject> childObjects = new ArrayList<>(this.renderObjects);
+            childObjects.removeIf(cap -> cap.getGalacticPos().isEmpty());
+            this.getRenderObjects().forEach(objects -> {
+                SpaceObject object = level.getServer().registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(objects.getKey());
+                if (object.getGalacticPos().isPresent() && object.getGalacticPos().get().equals(this.getGalacticPosition(), 0.0001f))
+                    object.getChildObjects().forEach(child -> {
+                        SpaceObject childObject = level.getServer().registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(child);
+                        ClientSpaceObject clientChildObject = new ClientSpaceObject(child, childObject.getSize(), new Vector3f(childObject.getDistance().get().floatValue(), 0, 0), Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
+                        if (!childObjects.contains(clientChildObject))
+                            childObjects.add(clientChildObject);
+                    });
+            });
+            this.renderObjects = childObjects;
+        }
     	clientUpdate(level);
     }
     

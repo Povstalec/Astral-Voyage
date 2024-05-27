@@ -21,15 +21,20 @@ public final class SpaceObjectRenderer
 	private static final float DISTANCE = 100F;
 	private static final float SIZE = 100F;
 	
-	private static void renderSurfaceLayer(BufferBuilder bufferbuilder, Matrix4f lastMatrix, float size, float distance, Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer, Vector3f shipToObject, float rotation)
+	private static void renderSurfaceLayer(BufferBuilder bufferbuilder, Matrix4f lastMatrix, float size, float distance, Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer, Vector3f shipToObject, Vector3f galShipToObject, float rotation)
 	{
 		ResourceLocation texture = layer.getFirst();
 		int[] rgba = layer.getSecond().getFirst().stream().mapToInt((integer) -> integer).toArray();
 		boolean blend = layer.getSecond().getSecond();
 
 		Vector3f sphericalPos = new Vector3f((float) Math.sqrt(shipToObject.x*shipToObject.x + shipToObject.y*shipToObject.y + shipToObject.z*shipToObject.z), (float) Math.atan2(shipToObject.x, shipToObject.z), (float) Math.atan2(Math.sqrt(shipToObject.x*shipToObject.x + shipToObject.z*shipToObject.z), shipToObject.y));
-		float objectRenderSize = Math.min(Math.max((size/distance)*SIZE*6, 0.1F), 360F);
-		
+		float objectRenderSize = Math.min(Math.max((size/distance)*SIZE*6, Float.compare(galShipToObject.length(), 0f) == 0 ? 0.1F : 0.5F), 360F);
+		if(Float.compare(galShipToObject.length(), 0F) != 0)
+		{
+			sphericalPos = new Vector3f((float) Math.sqrt(galShipToObject.x * galShipToObject.x + galShipToObject.y * galShipToObject.y + galShipToObject.z * galShipToObject.z), (float) Math.atan2(galShipToObject.x, galShipToObject.z), (float) Math.atan2(Math.sqrt(galShipToObject.x * galShipToObject.x + galShipToObject.z * galShipToObject.z), galShipToObject.y));
+		}
+
+
 		sphericalPos.x = DISTANCE;
 		Vector3f corner00 = placeOnSphere(-objectRenderSize, -objectRenderSize, sphericalPos, rotation);
 		Vector3f corner10 = placeOnSphere(objectRenderSize, -objectRenderSize, sphericalPos, rotation);
@@ -60,11 +65,12 @@ public final class SpaceObjectRenderer
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 	
-	public static void renderSurface(BufferBuilder bufferbuilder, Matrix4f lastMatrix, ClientSpaceObject spaceObject, float distance, Vector3f shipToObject, float rotation)
+	public static void renderSurface(BufferBuilder bufferbuilder, Matrix4f lastMatrix, ClientSpaceObject spaceObject, float distance, Vector3f galShipToObject, Vector3f shipToObject, float rotation)
 	{
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers = TextureLayerData.toPairList(spaceObject.getTextureLayers());
+		float postSize = Float.compare(galShipToObject.length(), 0f) == 0 ? spaceObject.size : 1;
 
-		textureLayers.forEach(layer -> renderSurfaceLayer(bufferbuilder, lastMatrix, spaceObject.getSize(), distance, layer, shipToObject, rotation));
+		textureLayers.forEach(layer -> renderSurfaceLayer(bufferbuilder, lastMatrix, postSize, distance, layer, shipToObject, galShipToObject, rotation));
 	}
 
 	public static Vector3f placeOnSphere(float offsetX, float offsetY, Vector3f sphericalPos, double rotation) {

@@ -1,0 +1,14 @@
+{
+	"name": "stellar_location.astralvoyage.sol",
+	"size": 1400000,
+	"galactic_position": [0, 0, 0],
+	"children":
+	[
+		{"child_object": "astralvoyage:sol/earth"}
+	],
+	"texture_layers":
+	[
+		{"texture": "astralvoyage:textures/environment/stars/sol.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+		{"texture": "astralvoyage:textures/environment/stars/sol_halo.png", "texture_settings":  {"rgba":  [255, 255, 255, 255], "blends":  true}}
+	]
+}
