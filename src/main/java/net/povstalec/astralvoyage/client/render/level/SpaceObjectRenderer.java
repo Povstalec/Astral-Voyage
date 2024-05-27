@@ -2,6 +2,7 @@ package net.povstalec.astralvoyage.client.render.level;
 
 import java.util.List;
 
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
 import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.joml.Matrix4f;
@@ -88,9 +89,7 @@ public final class SpaceObjectRenderer
 
 		return cartesianCoords;
 	}
-	
-	
-	
+
 	public static double cartesianX(Vector3f sphericalCoords)
 	{
 		return sphericalCoords.x * Math.sin(sphericalCoords.z) * Math.sin(sphericalCoords.y);
@@ -114,5 +113,12 @@ public final class SpaceObjectRenderer
 	public static Vector3f vectorBodyToBody(Vector3f bodyA, Vector3f bodyB)
 	{
 		return new Vector3f(bodyA.x-bodyB.x, bodyA.y-bodyB.y, bodyA.z-bodyB.z);
+	}
+
+	//TODO A size calculation function which accounts for planets and stars
+	//Accounting for it being in galactic coordinate space(stars) and solar(planets/moons) as those need different minimal sizes
+	public float fakeSize(float realSize, float solarDistance, float galacticDistance)
+	{
+		return 1F;
 	}
 }
