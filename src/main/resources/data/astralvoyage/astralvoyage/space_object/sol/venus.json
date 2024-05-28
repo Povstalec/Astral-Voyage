@@ -6,7 +6,7 @@
 		"parent_object": "astralvoyage:sol",
 		"orbit":
 		{
-			"distance":  10754000.0,
+			"distance":  107540000.0,
 			"orbit_days": 59.0,
 			"orbit_start": 241.0,
 			"orbit_inclination": 1.85,

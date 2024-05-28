@@ -3,6 +3,8 @@ package net.povstalec.astralvoyage.client.render.level;
 import java.util.List;
 
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.network.NetworkHooks;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
 import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.joml.Matrix4f;
@@ -85,7 +87,7 @@ public final class SpaceObjectRenderer
 
 		cartesianCoords.x += - polarY * Math.cos(sphericalPos.z) * Math.sin(sphericalPos.y) - polarX * Math.cos(sphericalPos.y);
 		cartesianCoords.y += polarY * Math.sin(sphericalPos.z);
-		cartesianCoords.z += - polarY * Math.cos(sphericalPos.z) * Math.cos(sphericalPos.y) + polarX * Math.sin(sphericalPos.y) + orbitOffset;
+		cartesianCoords.z += - polarY * Math.cos(sphericalPos.z) * Math.cos(sphericalPos.y) + polarX * Math.sin(sphericalPos.y) + Math.toRadians(orbitOffset);
 
 		return cartesianCoords;
 	}
