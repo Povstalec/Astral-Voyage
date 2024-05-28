@@ -2,6 +2,7 @@ package net.povstalec.astralvoyage;
 
 import java.util.Optional;
 
+import net.povstalec.astralvoyage.common.init.*;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -20,10 +21,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 import net.povstalec.astralvoyage.client.render.level.SpaceDimensionSpecialEffects;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
-import net.povstalec.astralvoyage.common.init.BlockInit;
-import net.povstalec.astralvoyage.common.init.ItemInit;
-import net.povstalec.astralvoyage.common.init.ItemTabsInit;
-import net.povstalec.astralvoyage.common.init.WorldGenInit;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -47,6 +44,7 @@ public class AstralVoyage
         modEventBus.addListener(this::commonSetup);
 
         BlockInit.register(modEventBus);
+        BlockEntityInit.register(modEventBus);
         ItemInit.register(modEventBus);
         ItemTabsInit.register(modEventBus);
         WorldGenInit.registerWorldgen(modEventBus);
