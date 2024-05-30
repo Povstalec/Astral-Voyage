@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.carver.CarverConfiguration;
 import net.minecraft.world.phys.Vec3;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
@@ -51,7 +52,7 @@ public class SpaceObject
 	private static final String ORBIT_START = "orbit_start";
 	private static final String ORBIT_INCLINATION = "orbit_inclination";
 	private static final String ROTATION = "rotation";
-	
+
 	private final Optional<ResourceKey<Level>> dimension;
 	private final String translationName;
 	private final float size;
