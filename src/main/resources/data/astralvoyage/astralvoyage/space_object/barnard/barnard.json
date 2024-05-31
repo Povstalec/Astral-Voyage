@@ -2,8 +2,14 @@
 	"name": "stellar_location.astralvoyage.barnard",
 	"size": 280000,
 	"galactic_position": [2, 1, 0],
-	"children":
-	[],
+	"children": [],
+	"generation": {
+		"orbiting_object_count": 1,
+		"distance": {
+			"min": 57744800,
+			"max": 63130300
+		}
+	},
 	"texture_layers":
 	[
 		{"texture": "astralvoyage:textures/environment/stars/barnard.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},

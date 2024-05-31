@@ -2,6 +2,7 @@ package net.povstalec.astralvoyage.common.datapack;
 
 import java.util.*;
 
+import net.povstalec.astralvoyage.common.data.SpaceObjects;
 import org.joml.Vector3f;
 
 import com.mojang.datafixers.util.Pair;
@@ -64,7 +65,7 @@ public class SpaceObject
 	private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
 	private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
 
-	private final Optional<ResourceKey<SpaceObject>> parent;
+	private Optional<ResourceKey<SpaceObject>> parent;
 	// Orbital characteristics
 	private Optional<Double> distance = Optional.empty(); // R
 	private Optional<Double> orbitDays = Optional.empty(); // How many days it takes for the planet to complete one orbit
@@ -132,6 +133,11 @@ public class SpaceObject
 	public Optional<ResourceKey<SpaceObject>> getParent()
 	{
 		return this.parent;
+	}
+
+	public void setParent(Optional<ResourceKey<SpaceObject>> parent)
+	{
+		this.parent = parent;
 	}
 	
 	public List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> getTextureLayers()
@@ -274,15 +280,17 @@ public class SpaceObject
 		{
 			CompoundTag objectTag = new CompoundTag();
 
-			if(this.getGeneration().isPresent())
-			{
-				SpaceObject object = new SpaceObject(Optional.empty(), AstralVoyage.MODID+":"+UUID.randomUUID(), 13000, Optional.empty(), new ArrayList<>(), Optional.empty(), Optional.empty(), new ArrayList<>((Collection<? extends Pair<ResourceLocation, Pair<List<Integer>, Boolean>>>) new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures:planets/earth"), new Pair<Object, Boolean>(new int[]{255, 255, 255, 255}, false))));
-				object.setupOrbit(Map.of(DISTANCE, ((double) new Random().nextInt(this.getGeneration().get().getGenerationDistance().getFirst().intValue(), this.getGeneration().get().getGenerationDistance().getSecond().intValue()))));
-
-			}
-
 			if(this.objectKey.isPresent()) {
 				objectTag.putString(OBJECT_KEY, this.objectKey.get().location().toString());
+
+				if(this.generation.isPresent())
+				{
+					CompoundTag generation = new CompoundTag();
+					generation.putShort("count", this.generation.get().getOrbitingObjectCount());
+					generation.putFloat("distance_min", this.generation.get().getGenerationDistance().getFirst());
+					generation.putFloat("distance_max", this.generation.get().getGenerationDistance().getSecond());
+					objectTag.put(GENERATION, generation);
+				}
 			}
 			else
 			{
@@ -322,6 +330,19 @@ public class SpaceObject
 			{
 				ResourceKey<SpaceObject> objectKey = stringToSpaceObjectKey(objectTag.getString(OBJECT_KEY));
 				SpaceObject object = objectRegistry.get(objectKey);
+
+				if(objectTag.contains(GENERATION))
+				{
+					CompoundTag generation = objectTag.getCompound(GENERATION);
+					short amount = generation.getShort("count");
+					float min = generation.getFloat("distance_min");
+					float max = generation.getFloat("distance_max");
+					for(int i = 0; i < amount; i++)
+					{
+						SpaceObject newObject = new SpaceObject(Optional.empty(), AstralVoyage.MODID+":body_"+UUID.randomUUID(), 13000, Optional.empty(), new ArrayList<>(), Optional.empty(), Optional.of(new Pair(objectKey, Map.of(DISTANCE, ((double) new Random().nextInt((int) min, (int) max))))), new ArrayList<>((Collection<? extends Pair<ResourceLocation, Pair<List<Integer>, Boolean>>>) new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures:planets/earth"), new Pair<Object, Boolean>(new int[]{255, 255, 255, 255}, false))));
+						SpaceObjects.get(server).spaceObjects.put(newObject.getTranslationName(), new SpaceObject.Serializable(stringToSpaceObjectKey(newObject.getTranslationName()), newObject));
+					}
+				}
 
 				if(objectTag.contains(PARENT))
 				{
