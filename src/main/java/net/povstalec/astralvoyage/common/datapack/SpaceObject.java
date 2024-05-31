@@ -45,7 +45,7 @@ public class SpaceObject
 			GALACTIC_POS.optionalFieldOf("galactic_position").forGetter(SpaceObject::getGalacticPos),
 			CHILD_OBJECTS.listOf().fieldOf("children").forGetter(SpaceObject::getChildObjects),
 			// Optional info for generating random objects
-			SpaceObject.Generation.CODEC.optionalFieldOf("generation").forGetter(null),
+			SpaceObject.Generation.CODEC.optionalFieldOf("generation").forGetter(SpaceObject::getGeneration),
 			// Parent Stellar Location, probably used for orbits and stuff in the future
 			PARENT.optionalFieldOf("parent").forGetter(SpaceObject::getParentOrbitMap),
 			// Textures and colors
