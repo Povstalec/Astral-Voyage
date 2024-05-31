@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.joml.Vector3f;
+
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -19,7 +21,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 
@@ -43,6 +44,8 @@ public class SpaceObject
 			Codec.FLOAT.fieldOf("size").forGetter(SpaceObject::getSize),
 			GALACTIC_POS.optionalFieldOf("galactic_position").forGetter(SpaceObject::getGalacticPos),
 			CHILD_OBJECTS.listOf().fieldOf("children").forGetter(SpaceObject::getChildObjects),
+			// Optional info for generating random objects
+			SpaceObject.Generation.CODEC.optionalFieldOf("generation").forGetter(null),
 			// Parent Stellar Location, probably used for orbits and stuff in the future
 			PARENT.optionalFieldOf("parent").forGetter(SpaceObject::getParentOrbitMap),
 			// Textures and colors
@@ -60,6 +63,7 @@ public class SpaceObject
 	private final float size;
 	private final Optional<Vector3f> galactic_position;
 	private final List<ResourceKey<SpaceObject>> childObjects;
+	private final Optional<SpaceObject.Generation> generation;
 	private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
 	private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
 
@@ -72,7 +76,7 @@ public class SpaceObject
 	private Optional<Double> rotation = Optional.empty();
 	
 	public SpaceObject(Optional<ResourceKey<Level>> dimension, String translationName, 
-		float size, Optional<Vector3f> galactic_position, List<ResourceKey<SpaceObject>> childObjects,
+		float size, Optional<Vector3f> galactic_position, List<ResourceKey<SpaceObject>> childObjects, Optional<SpaceObject.Generation> generation,
 		Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, 
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
 	{
@@ -81,6 +85,7 @@ public class SpaceObject
 		this.size = size;
 		this.galactic_position = galactic_position;
 		this.childObjects = childObjects;
+		this.generation = generation;
 		this.parentOrbitMap = parentOrbitMap;
 		this.textureLayers = textureLayers;
 		
@@ -115,6 +120,11 @@ public class SpaceObject
 	public List<ResourceKey<SpaceObject>> getChildObjects()
 	{
 		return this.childObjects;
+	}
+
+	public Optional<SpaceObject.Generation> getGeneration()
+	{
+		return this.generation;
 	}
 	
 	private Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> getParentOrbitMap()
@@ -357,6 +367,39 @@ public class SpaceObject
 			return ResourceKey.create(ResourceKey.createRegistryKey(new ResourceLocation("minecraft", "dimension")), new ResourceLocation(split[0], split[1]));
 
 		return null;
+	}
+	
+	
+	
+	public static final class Generation
+	{
+		private static final Codec<Pair<Float, Float>> DISTANCE = Codec.pair(Codec.FLOAT.fieldOf("min").codec(), Codec.FLOAT.fieldOf("max").codec());
+		
+		public static final Codec<SpaceObject.Generation> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				// Dimension this Stellar Location is tied to
+				Codec.SHORT.fieldOf("orbiting_object_count").forGetter(SpaceObject.Generation::getOrbitingObjectCount),
+				// Translation name of the Stellar Location
+				DISTANCE.fieldOf("distance").forGetter(SpaceObject.Generation::getGenerationDistance)
+				).apply(instance, SpaceObject.Generation::new));
+		
+		private short orbitingObjectCount;
+		private Pair<Float, Float> generationDistance;
+		
+		public Generation(short orbitingObjectCount, Pair<Float, Float> generationDistance)
+		{
+			this.orbitingObjectCount = orbitingObjectCount;
+			this.generationDistance = generationDistance;
+		}
+		
+		public short getOrbitingObjectCount()
+		{
+			return this.orbitingObjectCount;
+		}
+		
+		public Pair<Float, Float> getGenerationDistance()
+		{
+			return this.generationDistance;
+		}
 	}
 
 }
