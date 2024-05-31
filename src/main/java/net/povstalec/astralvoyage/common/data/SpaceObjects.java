@@ -2,10 +2,12 @@ package net.povstalec.astralvoyage.common.data;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -13,9 +15,9 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import static net.povstalec.astralvoyage.common.datapack.SpaceObject.stringToSpaceObjectKey;
 
 public class SpaceObjects extends SavedData
 {
@@ -76,9 +78,15 @@ public class SpaceObjects extends SavedData
 
 		tag.getAllKeys().forEach(objectString -> {
 			SpaceObject.Serializable spaceObject = SpaceObject.Serializable.deserialize(server, objectRegistry, tag.getCompound(objectString));
-
+			System.out.print(spaceObject.getName()+spaceObject.getGeneration().isPresent());
+			if(spaceObject.getGeneration().isPresent())
+			{
+				SpaceObject newObject = new SpaceObject(Optional.empty(), AstralVoyage.MODID+":body_"+UUID.randomUUID(), 13000, Optional.empty(), new ArrayList<>(), Optional.empty(), Optional.of(new Pair(stringToSpaceObjectKey(objectString), Map.of("distance", ((double) new Random().nextInt(spaceObject.getGeneration().get().getGenerationDistance().getFirst().intValue(), spaceObject.getGeneration().get().getGenerationDistance().getSecond().intValue()))))), new ArrayList<>((Collection<? extends Pair<ResourceLocation, Pair<List<Integer>, Boolean>>>) new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures:planets/earth"), new Pair<Object, Boolean>(new int[]{255, 255, 255, 255}, false))));
+				this.spaceObjects.put(newObject.getTranslationName(), new SpaceObject.Serializable(stringToSpaceObjectKey(newObject.getTranslationName()), newObject));
+			}
 			this.spaceObjects.put(objectString, spaceObject);
 		});
+
 	}
 	
 	//============================================================================================

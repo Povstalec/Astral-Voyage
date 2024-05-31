@@ -331,19 +331,6 @@ public class SpaceObject
 				ResourceKey<SpaceObject> objectKey = stringToSpaceObjectKey(objectTag.getString(OBJECT_KEY));
 				SpaceObject object = objectRegistry.get(objectKey);
 
-				if(objectTag.contains(GENERATION))
-				{
-					CompoundTag generation = objectTag.getCompound(GENERATION);
-					short amount = generation.getShort("count");
-					float min = generation.getFloat("distance_min");
-					float max = generation.getFloat("distance_max");
-					for(int i = 0; i < amount; i++)
-					{
-						SpaceObject newObject = new SpaceObject(Optional.empty(), AstralVoyage.MODID+":body_"+UUID.randomUUID(), 13000, Optional.empty(), new ArrayList<>(), Optional.empty(), Optional.of(new Pair(objectKey, Map.of(DISTANCE, ((double) new Random().nextInt((int) min, (int) max))))), new ArrayList<>((Collection<? extends Pair<ResourceLocation, Pair<List<Integer>, Boolean>>>) new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures:planets/earth"), new Pair<Object, Boolean>(new int[]{255, 255, 255, 255}, false))));
-						SpaceObjects.get(server).spaceObjects.put(newObject.getTranslationName(), new SpaceObject.Serializable(stringToSpaceObjectKey(newObject.getTranslationName()), newObject));
-					}
-				}
-
 				if(objectTag.contains(PARENT))
 				{
 					SpaceObject parent = server.registryAccess().registryOrThrow(REGISTRY_KEY).get(stringToSpaceObjectKey(objectTag.getString(PARENT)));
@@ -365,6 +352,13 @@ public class SpaceObject
 					galactic_position = Optional.of(new Vector3f(galPos.getFloat("x"), galPos.getFloat("y"), galPos.getFloat("y")));
 				}
 
+				Optional<Generation> generation = Optional.empty();
+				if(objectTag.contains(GENERATION))
+				{
+					CompoundTag generationTag = objectTag.getCompound(GENERATION);
+					generation = Optional.of(new Generation(generationTag.getShort("count"), new Pair(generationTag.getFloat("distance_min"), generationTag.getFloat("distance_max"))));
+				}
+
 				Optional<ResourceKey<SpaceObject>> parent = Optional.empty();
 				if(objectTag.contains(PARENT))
 					parent = Optional.ofNullable(stringToSpaceObjectKey(objectTag.getString(PARENT)));
@@ -379,7 +373,7 @@ public class SpaceObject
 				List<TextureLayerData> textureLayers = new ArrayList<>();
 				layersTag.forEach(layertag -> textureLayers.add(TextureLayerData.deserialize((CompoundTag) layertag)));
 
-				return new SpaceObject.Serializable(dimension, name, size, galactic_position, parent, Optional.empty(), childObjects, TextureLayerData.toPairList(textureLayers));
+				return new SpaceObject.Serializable(dimension, name, size, galactic_position, parent, generation, childObjects, TextureLayerData.toPairList(textureLayers));
 			}
 		}
 	}
