@@ -1,9 +1,6 @@
 package net.povstalec.astralvoyage.common.datapack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.joml.Vector3f;
 
@@ -193,6 +190,7 @@ public class SpaceObject
 		private static final String NAME = "name";
 		private static final String SIZE = "size";
 		private static final String PARENT = "parent";
+		private static final String GENERATION = "generation";
 		private static final String CHILD_OBJECTS = "child_objects";
 		private static final String TEXTURE_LAYERS = "texture_layers";
 
@@ -202,6 +200,7 @@ public class SpaceObject
 		private final Optional<Float> size;
 		private final Optional<Vector3f> galactic_position;
 		private final Optional<ResourceKey<SpaceObject>> parent;
+		private final Optional<SpaceObject.Generation> generation;
 		private final List<ResourceKey<SpaceObject>> childObjects;
 		private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
 
@@ -213,11 +212,12 @@ public class SpaceObject
 			this.size = Optional.of(object.getSize());
 			this.galactic_position = object.getGalacticPos();
 			this.parent = object.getParent();
+			this.generation = object.getGeneration();
 			this.childObjects = object.getChildObjects();
 			this.textureLayers = object.getTextureLayers();
 		}
 
-		public Serializable(ResourceKey<Level> dimension, String name, float size, Optional<Vector3f> galactic_position, Optional<ResourceKey<SpaceObject>> parent, List<ResourceKey<SpaceObject>> childObjects, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
+		public Serializable(ResourceKey<Level> dimension, String name, float size, Optional<Vector3f> galactic_position, Optional<ResourceKey<SpaceObject>> parent, Optional<SpaceObject.Generation> generation, List<ResourceKey<SpaceObject>> childObjects, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
 		{
 			this.objectKey = Optional.empty();
 			this.dimension = Optional.ofNullable(dimension);
@@ -225,6 +225,7 @@ public class SpaceObject
 			this.size = Optional.of(size);
 			this.galactic_position = galactic_position;
 			this.parent = parent;
+			this.generation = generation;
 			this.childObjects = childObjects;
 			this.textureLayers = textureLayers;
 		}
@@ -259,13 +260,26 @@ public class SpaceObject
 			return this.childObjects;
 		}
 
+		public Optional<Generation> getGeneration()
+		{
+			return generation;
+		}
+
 		public List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> getTextureLayers()
 		{
 			return this.textureLayers;
 		}
+
 		public CompoundTag serialize()
 		{
 			CompoundTag objectTag = new CompoundTag();
+
+			if(this.getGeneration().isPresent())
+			{
+				SpaceObject object = new SpaceObject(Optional.empty(), AstralVoyage.MODID+":"+UUID.randomUUID(), 13000, Optional.empty(), new ArrayList<>(), Optional.empty(), Optional.empty(), new ArrayList<>((Collection<? extends Pair<ResourceLocation, Pair<List<Integer>, Boolean>>>) new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures:planets/earth"), new Pair<Object, Boolean>(new int[]{255, 255, 255, 255}, false))));
+				object.setupOrbit(Map.of(DISTANCE, ((double) new Random().nextInt(this.getGeneration().get().getGenerationDistance().getFirst().intValue(), this.getGeneration().get().getGenerationDistance().getSecond().intValue()))));
+
+			}
 
 			if(this.objectKey.isPresent()) {
 				objectTag.putString(OBJECT_KEY, this.objectKey.get().location().toString());
@@ -344,7 +358,7 @@ public class SpaceObject
 				List<TextureLayerData> textureLayers = new ArrayList<>();
 				layersTag.forEach(layertag -> textureLayers.add(TextureLayerData.deserialize((CompoundTag) layertag)));
 
-				return new SpaceObject.Serializable(dimension, name, size, galactic_position, parent, childObjects, TextureLayerData.toPairList(textureLayers));
+				return new SpaceObject.Serializable(dimension, name, size, galactic_position, parent, Optional.empty(), childObjects, TextureLayerData.toPairList(textureLayers));
 			}
 		}
 	}
