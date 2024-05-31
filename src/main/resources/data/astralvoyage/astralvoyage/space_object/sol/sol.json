@@ -1,0 +1,17 @@
+{
+	"name": "stellar_location.astralvoyage.sol",
+	"size": 1400000,
+	"galactic_position": [0, 0, 0],
+	"children":
+	[
+		{"child_object": "astralvoyage:sol/mercury"},{"child_object": "astralvoyage:sol/venus"},
+		{"child_object": "astralvoyage:sol/earth"},{"child_object": "astralvoyage:sol/mars"},
+		{"child_object": "astralvoyage:sol/jupiter"},{"child_object": "astralvoyage:sol/saturn"},
+		{"child_object": "astralvoyage:sol/uranus"},{"child_object": "astralvoyage:sol/neptune"}
+	],
+	"texture_layers":
+	[
+		{"texture": "astralvoyage:textures/environment/stars/sol.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+		{"texture": "astralvoyage:textures/environment/stars/sol_halo.png", "texture_settings":  {"rgba":  [255, 255, 255, 255], "blends":  true}}
+	]
+}

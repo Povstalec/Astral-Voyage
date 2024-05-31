@@ -42,9 +42,10 @@ public class TextureLayerData {
 
     public static TextureLayerData deserialize(CompoundTag tag)
     {
+        ResourceLocation rl = ResourceLocation.tryParse(tag.getString("texture"));
         CompoundTag textureSettingsTag = tag.getCompound("texture_settings");
         Pair<List<Integer>, Boolean> textureSettings = new Pair<>(Arrays.stream(textureSettingsTag.getIntArray("rgba")).boxed().collect(Collectors.toList()), textureSettingsTag.getBoolean("blend"));
-        Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer = new Pair(ResourceLocation.tryParse(tag.getString("texture")), textureSettings);
+        Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer = new Pair<>(rl, textureSettings);
 
         return new TextureLayerData(layer);
     }

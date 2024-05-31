@@ -1,0 +1,22 @@
+{
+	"name": "stellar_location.astralvoyage.neptune",
+	"size": 49530,
+	"parent":
+	{
+		"parent_object": "astralvoyage:sol",
+		"orbit":
+		{
+			"distance": 4472500000.0,
+			"orbit_days": 15840.0,
+			"orbit_start": 311.0,
+			"orbit_inclination": 1.17,
+			"rotation": 1.0
+		}
+	},
+	"children": [],
+	"texture_layers":
+	[
+		{"texture": "astralvoyage:textures/environment/planets/neptune.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+		{"texture": "astralvoyage:textures/environment/planets/neptune_halo.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends":  true}}
+	]
+}

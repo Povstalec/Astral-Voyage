@@ -23,7 +23,7 @@ public class SpaceObjects extends SavedData
 
 	private static final String SPACE_OBJECTS = "space_objects";
 
-	private HashMap<String, SpaceObject.Serializable> spaceObjects = new HashMap<>();
+	public HashMap<String, SpaceObject.Serializable> spaceObjects = new HashMap<>();
 	
 	private MinecraftServer server;
 
@@ -92,10 +92,10 @@ public class SpaceObjects extends SavedData
 
 		Set<Map.Entry<ResourceKey<SpaceObject>, SpaceObject>> objectSet = objectRegistry.entrySet();
 
-		//Goes through all datapack Solar Systems
+		//Goes through all datapack Space Objects
 		objectSet.forEach((object) ->
 				addSpaceObjectFromDataPack(server, object.getKey(), object.getValue()));
-		AstralVoyage.LOGGER.info("Datapack Solar Systems registered");
+		AstralVoyage.LOGGER.info("Datapack Space Objects registered");
 	}
 
 	private void addSpaceObjectFromDataPack(MinecraftServer server, ResourceKey<SpaceObject> spaceObjectKey, SpaceObject spaceObject)

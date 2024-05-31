@@ -1,0 +1,22 @@
+{
+	"name": "stellar_location.astralvoyage.saturn",
+	"size": 120540,
+	"parent":
+	{
+		"parent_object": "astralvoyage:sol",
+		"orbit":
+		{
+			"distance": 1455200000.0,
+			"orbit_days": 2822.0,
+			"orbit_start": 190.0,
+			"orbit_inclination": 2.48,
+			"rotation": 93.0
+		}
+	},
+	"children": [],
+	"texture_layers":
+	[
+		{"texture": "astralvoyage:textures/environment/planets/saturn.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+		{"texture": "astralvoyage:textures/environment/planets/saturn_halo.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends":  true}}
+	]
+}

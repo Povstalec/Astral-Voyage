@@ -1,0 +1,9 @@
+{
+  "astralvoyage.main": "Astral Voyage",
+  "block.astralvoyage.spaceship_generator_block": "Spaceship Generator",
+  "block.astralvoyage.spaceship_movement_block": "Spaceship Movement Block",
+  "tooltip.astralvoyage.movementBlock": "When powered with Redstone, will push the ship into the direction of the facing of the block with speed of 20m/s"
+
+
+
+}

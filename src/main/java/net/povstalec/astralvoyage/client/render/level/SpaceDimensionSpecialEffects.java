@@ -1,10 +1,15 @@
 package net.povstalec.astralvoyage.client.render.level;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.Serializable;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
+import com.mojang.datafixers.util.Pair;
+import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -107,16 +112,13 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
 		
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        
-        renderObjects.forEach(object ->
-        {
-        	//System.out.println(object.getSolarPos());
-        	Vector3f vectorToObject = getVectorToObject(capability, object);
-        	SpaceObjectRenderer.renderSurface(bufferbuilder, poseStack.last().pose(), object, vectorToObject.length(), vectorToObject, getDegreeToObject(capability, object));
+
+        List<ClientSpaceObject> orderedObjects = renderObjects.stream().sorted(reverseComparing(obj -> SpaceObjectRenderer.vectorBodyToBody(obj.getSolarPos(), capability.map(SpaceshipCapability::getSolarPosition).get()).length())).toList();
+        orderedObjects.forEach(obj -> {
+            SpaceObjectRenderer.renderSurface(bufferbuilder, poseStack.last().pose(), obj, getVectorToObject(capability, obj).length(), getGalacticVectorToObject(capability, obj), getVectorToObject(capability, obj), 0);
         });
         RenderSystem.depthMask(true);
-        
-    	poseStack.popPose();
+        poseStack.popPose();
     	
         return true;
     }
@@ -161,14 +163,32 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
         return (float) Math.acos(x/(y*z));
     }
 
+    public static Vector3f getGalacticVectorToObject(@NotNull LazyOptional<SpaceshipCapability> capability, ClientSpaceObject object)
+    {
+        Optional<Vector3f> shipGalacticPosition = capability.map(SpaceshipCapability::getGalacticPosition);
+        Optional<Vector3f> objectGalacticPosition = object.getGalacticPos();
+
+        if(shipGalacticPosition.isPresent() && objectGalacticPosition.isPresent())
+        {
+            float x = objectGalacticPosition.get().x-shipGalacticPosition.get().x;
+            float y = objectGalacticPosition.get().y-shipGalacticPosition.get().y;
+            float z = objectGalacticPosition.get().z-shipGalacticPosition.get().z;
+            return new Vector3f(x, y , z);
+        }
+
+        return new Vector3f(0, 0, 0);
+    }
+
     public static Vector3f getVectorToObject(@NotNull LazyOptional<SpaceshipCapability> capability, ClientSpaceObject object)
     {
     	Optional<Vector3f> solarPosition = capability.map(cap -> cap.getSolarPosition());
     	
     	if(solarPosition.isPresent())
     	{
-    		//System.out.println("Pos: " + solarPosition.get());
-    		return solarPosition.get().sub(object.getSolarPos());
+            float x = solarPosition.get().x-object.getSolarPos().x;
+            float y = solarPosition.get().y-object.getSolarPos().y;
+            float z = solarPosition.get().z-object.getSolarPos().z;
+            return new Vector3f(x, y, z);
     	}
     	
     	return new Vector3f(0, 0, 0);
@@ -176,12 +196,10 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
 
     public static List<ClientSpaceObject> getRenderObjects(@NotNull LazyOptional<SpaceshipCapability> capability)
     {
-        Optional<List<ClientSpaceObject>> renderObjects = capability.map(cap -> cap.getRenderObjects());
+        Optional<List<ClientSpaceObject>> renderObjects = capability.map(SpaceshipCapability::getRenderObjects);
 
-        if(renderObjects.isPresent())
-            return renderObjects.get();
+        return renderObjects.orElseGet(Lists::newArrayList);
 
-        return Lists.newArrayList();
     }
 
     public static Vector3f getGalacticPosition(@NotNull LazyOptional<SpaceshipCapability> capability)
@@ -222,5 +240,13 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     		return oldRotation.get();
 
     	return new Vector3f(0, 0, 0);
+    }
+
+    public static <T, U extends Comparable<? super U>> Comparator<T> reverseComparing(
+            Function<? super T, ? extends U> keyExtractor)
+    {
+        Objects.requireNonNull(keyExtractor);
+        return (Comparator<T> & Serializable)
+                (c1, c2) -> keyExtractor.apply(c2).compareTo(keyExtractor.apply(c1));
     }
 }

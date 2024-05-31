@@ -1,28 +1,21 @@
 package net.povstalec.astralvoyage.common.capability;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.util.Pair;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
-import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
+import net.povstalec.astralvoyage.common.network.AVNetwork;
+import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.joml.Vector3f;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.povstalec.astralvoyage.common.network.AVNetwork;
-import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 {
@@ -41,8 +34,9 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     private static final String RENDER_OBJECTS = "render_objects";
 
 	private Vector3f galacticPosition = new Vector3f(0, 0, 0);
-    private Vector3f solarPosition = new Vector3f(0, 0, 0);
+    private Vector3f solarPosition = new Vector3f(147280000, 0, 0);
 	private Vector3f oldGalacticPosition = new Vector3f(0, 0, 0);
+    private Vector3f oldSolarPosition = new Vector3f(0, 0, 0);
 
 	private Vector3f rotation = new Vector3f(0, 0, 0);
 	private Vector3f oldRotation = new Vector3f(0, 0, 0);
@@ -56,12 +50,23 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     public void tick(Level level)
     {
     	this.oldGalacticPosition.set(galacticPosition);
+        this.oldSolarPosition.set(solarPosition);
     	this.oldRotation.set(rotation);
-
-    	solarPosition = new Vector3f(-120000, 0, 0);
-        //this.galacticPosition.x -= 0.001F;
-    	//this.rotation.z += 0.1F;
-    	//this.setRotation(0, 0, 0);
+        if(!level.isClientSide()) {
+            List<ClientSpaceObject> childObjects = new ArrayList<>(this.renderObjects);
+            childObjects.removeIf(cap -> cap.getGalacticPos().isEmpty());
+            this.getRenderObjects().forEach(objects -> {
+                SpaceObject object = level.getServer().registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(objects.getKey());
+                if (object.getGalacticPos().isPresent() && object.getGalacticPos().get().equals(this.getGalacticPosition(), 0.0001f))
+                    object.getChildObjects().forEach(child -> {
+                        SpaceObject childObject = level.getServer().registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(child);
+                        ClientSpaceObject clientChildObject = new ClientSpaceObject(child, childObject.getSize(), childObject.getOrbitOffset(), new Vector3f(childObject.getDistance().get().floatValue(), 0, 0), Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
+                        if (!childObjects.contains(clientChildObject))
+                            childObjects.add(clientChildObject);
+                    });
+            });
+            this.renderObjects = childObjects;
+        }
     	clientUpdate(level);
     }
     
@@ -70,11 +75,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         if(level != null && !level.isClientSide)
         {
             AVNetwork.sendPacketToDimension(level.dimension(),
-            		new SpaceObjectUpdateMessage(solarPosition.x, solarPosition.y, solarPosition.z,
-            				galacticPosition.x, galacticPosition.y, galacticPosition.z, 
-            				rotation.x, rotation.y, rotation.z));
-            AVNetwork.sendPacketToDimension(level.dimension(),
-                    new RenderObjectUpdateMessage(renderObjects));
+            		new SpaceObjectUpdateMessage(this.serializeNBT()));
         }
     }
     
@@ -164,7 +165,10 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         tag.putFloat(Z_AXIS_ROTATION, rotation.z);
 
         ListTag renderObjects = new ListTag();
-        this.renderObjects.forEach(object -> renderObjects.add(object.serialize()));
+        this.renderObjects.forEach(object -> {
+            CompoundTag objectTag = object.serialize();
+            renderObjects.add(objectTag);
+        });
         tag.put(RENDER_OBJECTS, renderObjects);
 
         return tag;
@@ -184,6 +188,13 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         this.rotation.y = nbt.getFloat(Y_AXIS_ROTATION);
         this.rotation.z = nbt.getFloat(Z_AXIS_ROTATION);
 
-        nbt.getList(RENDER_OBJECTS, ListTag.TAG_COMPOUND).forEach(tag -> this.renderObjects.add(ClientSpaceObject.deserialize((CompoundTag) tag)));
+        ListTag listTag = nbt.getList(RENDER_OBJECTS, Tag.TAG_COMPOUND);
+        List<ClientSpaceObject> renderObjects = new ArrayList<>();
+        listTag.forEach(tag -> {
+           CompoundTag objectTag = (CompoundTag) tag;
+           ClientSpaceObject object = ClientSpaceObject.deserialize(objectTag);
+           renderObjects.add(object);
+        });
+        this.renderObjects = renderObjects;
     }
 }

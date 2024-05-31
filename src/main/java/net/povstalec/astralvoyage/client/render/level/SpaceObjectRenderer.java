@@ -2,6 +2,9 @@ package net.povstalec.astralvoyage.client.render.level;
 
 import java.util.List;
 
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.network.NetworkHooks;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
 import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.joml.Matrix4f;
@@ -21,20 +24,24 @@ public final class SpaceObjectRenderer
 	private static final float DISTANCE = 100F;
 	private static final float SIZE = 100F;
 	
-	private static void renderSurfaceLayer(BufferBuilder bufferbuilder, Matrix4f lastMatrix, float size, float distance, Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer, Vector3f shipToObject, float rotation)
+	private static void renderSurfaceLayer(BufferBuilder bufferbuilder, Matrix4f lastMatrix, float size, float distance, Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer, Vector3f shipToObject, Vector3f galShipToObject, double offset, float rotation)
 	{
 		ResourceLocation texture = layer.getFirst();
 		int[] rgba = layer.getSecond().getFirst().stream().mapToInt((integer) -> integer).toArray();
 		boolean blend = layer.getSecond().getSecond();
 
 		Vector3f sphericalPos = new Vector3f((float) Math.sqrt(shipToObject.x*shipToObject.x + shipToObject.y*shipToObject.y + shipToObject.z*shipToObject.z), (float) Math.atan2(shipToObject.x, shipToObject.z), (float) Math.atan2(Math.sqrt(shipToObject.x*shipToObject.x + shipToObject.z*shipToObject.z), shipToObject.y));
-		float objectRenderSize = Math.max((size/distance)*SIZE, 0.1F);
-		
+		float objectRenderSize = Math.min(Math.max((size/distance)*SIZE*6, Float.compare(galShipToObject.length(), 0f) == 0 ? 0.1F : 0.5F), 360F);
+		if(Float.compare(galShipToObject.length(), 0F) != 0)
+		{
+			sphericalPos = new Vector3f((float) Math.sqrt(galShipToObject.x * galShipToObject.x + galShipToObject.y * galShipToObject.y + galShipToObject.z * galShipToObject.z), (float) Math.atan2(galShipToObject.x, galShipToObject.z), (float) Math.atan2(Math.sqrt(galShipToObject.x * galShipToObject.x + galShipToObject.z * galShipToObject.z), galShipToObject.y));
+		}
+
 		sphericalPos.x = DISTANCE;
-		Vector3f corner00 = placeOnSphere(-objectRenderSize, -objectRenderSize, sphericalPos, rotation);
-		Vector3f corner10 = placeOnSphere(objectRenderSize, -objectRenderSize, sphericalPos, rotation);
-		Vector3f corner11 = placeOnSphere(objectRenderSize, objectRenderSize,  sphericalPos, rotation);
-		Vector3f corner01 = placeOnSphere(-objectRenderSize, objectRenderSize, sphericalPos, rotation);
+		Vector3f corner00 = placeOnSphere(-objectRenderSize, -objectRenderSize, sphericalPos, offset, rotation);
+		Vector3f corner10 = placeOnSphere(objectRenderSize, -objectRenderSize, sphericalPos, offset, rotation);
+		Vector3f corner11 = placeOnSphere(objectRenderSize, objectRenderSize,  sphericalPos, offset, rotation);
+		Vector3f corner01 = placeOnSphere(-objectRenderSize, objectRenderSize, sphericalPos, offset, rotation);
 
 
 		if(rgba.length < 4)
@@ -60,14 +67,15 @@ public final class SpaceObjectRenderer
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 	
-	public static void renderSurface(BufferBuilder bufferbuilder, Matrix4f lastMatrix, ClientSpaceObject spaceObject, float distance, Vector3f shipToObject, float rotation)
+	public static void renderSurface(BufferBuilder bufferbuilder, Matrix4f lastMatrix, ClientSpaceObject spaceObject, float distance, Vector3f galShipToObject, Vector3f shipToObject, float rotation)
 	{
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers = TextureLayerData.toPairList(spaceObject.getTextureLayers());
-		
-		textureLayers.forEach(layer -> renderSurfaceLayer(bufferbuilder, lastMatrix, spaceObject.getSize(), distance, layer, shipToObject, rotation));
+		float postSize = Float.compare(galShipToObject.length(), 0f) == 0 ? spaceObject.size : 1;
+
+		textureLayers.forEach(layer -> renderSurfaceLayer(bufferbuilder, lastMatrix, postSize, distance, layer, shipToObject, galShipToObject, spaceObject.getOrbitOffset().orElse(0D), rotation));
 	}
 
-	public static Vector3f placeOnSphere(float offsetX, float offsetY, Vector3f sphericalPos, double rotation) {
+	public static Vector3f placeOnSphere(float offsetX, float offsetY, Vector3f sphericalPos, double orbitOffset, double rotation) {
 		Vector3f cartesianCoords = sphericalToCartesian(sphericalPos);
 
 		double polarR = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
@@ -79,13 +87,11 @@ public final class SpaceObjectRenderer
 
 		cartesianCoords.x += - polarY * Math.cos(sphericalPos.z) * Math.sin(sphericalPos.y) - polarX * Math.cos(sphericalPos.y);
 		cartesianCoords.y += polarY * Math.sin(sphericalPos.z);
-		cartesianCoords.z += - polarY * Math.cos(sphericalPos.z) * Math.cos(sphericalPos.y) + polarX * Math.sin(sphericalPos.y);
+		cartesianCoords.z += - polarY * Math.cos(sphericalPos.z) * Math.cos(sphericalPos.y) + polarX * Math.sin(sphericalPos.y) + Math.toRadians(orbitOffset);
 
 		return cartesianCoords;
 	}
-	
-	
-	
+
 	public static double cartesianX(Vector3f sphericalCoords)
 	{
 		return sphericalCoords.x * Math.sin(sphericalCoords.z) * Math.sin(sphericalCoords.y);
@@ -104,5 +110,17 @@ public final class SpaceObjectRenderer
 	public static Vector3f sphericalToCartesian(Vector3f sphericalCoords)
 	{
 		return new Vector3f((float) cartesianX(sphericalCoords), (float) cartesianY(sphericalCoords), (float) cartesianZ(sphericalCoords));
+	}
+
+	public static Vector3f vectorBodyToBody(Vector3f bodyA, Vector3f bodyB)
+	{
+		return new Vector3f(bodyA.x-bodyB.x, bodyA.y-bodyB.y, bodyA.z-bodyB.z);
+	}
+
+	//TODO A size calculation function which accounts for planets and stars
+	//Accounting for it being in galactic coordinate space(stars) and solar(planets/moons) as those need different minimal sizes
+	public float fakeSize(float realSize, float solarDistance, float galacticDistance)
+	{
+		return 1F;
 	}
 }

@@ -15,18 +15,12 @@ public class ItemTabsInit {
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, AstralVoyage.MODID);
 
     public static final RegistryObject<CreativeModeTab> MAIN = CREATIVE_MODE_TABS.register("main",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(Items.ACACIA_BOAT))
-                    .title(Component.translatable("creativetab.main"))
+            () -> CreativeModeTab.builder().icon(() -> new ItemStack(Items.AIR))
+                    .title(Component.translatable("astralvoyage.main"))
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(BlockInit.SPACESHIP_GENERATOR_BLOCK.get());
-                        pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_GALACTIC_X_BLOCK.get());
-                        pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_GALACTIC_Y_BLOCK.get());
-                        pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_GALACTIC_Z_BLOCK.get());
-                        pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_SOLAR_X_BLOCK.get());
-                        pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_SOLAR_Y_BLOCK.get());
-                        pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_SOLAR_Z_BLOCK.get());
-                    })
-                    .build());
+                        pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_BLOCK.get());
+                    }).build());
 
 
     public static void register(IEventBus eventBus) {
