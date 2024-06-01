@@ -4,6 +4,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -81,11 +83,20 @@ public class SpaceshipMovementBlock extends BaseEntityBlock {
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockNeighbour, BlockPos neighbourPos, boolean bool) {
         if(!level.isClientSide())
         {
-            state.setValue(POWERED, level.hasNeighborSignal(pos));
-            level.scheduleTick(pos, this, 4);
+            boolean powered = state.getValue(POWERED);
+            if(powered != level.hasNeighborSignal(pos))
+                if(powered)
+                    level.scheduleTick(pos, this, 4);
+                else
+                    level.setBlock(pos, state.cycle(POWERED), 2);
         }
 
+    }
 
+    @Override
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if(state.getValue(POWERED) && !level.hasNeighborSignal(pos))
+            level.setBlock(pos, state.cycle(POWERED), 2);
     }
 
     @Nullable
@@ -100,8 +111,5 @@ public class SpaceshipMovementBlock extends BaseEntityBlock {
         components.add(Component.translatable("tooltip.astralvoyage.movementBlock").withStyle(ChatFormatting.DARK_AQUA));
 
         super.appendHoverText(stack, getter, components, flags);
-
-
-
     }
 }

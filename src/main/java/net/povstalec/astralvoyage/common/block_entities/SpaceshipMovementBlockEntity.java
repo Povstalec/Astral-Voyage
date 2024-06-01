@@ -63,7 +63,7 @@ public class SpaceshipMovementBlockEntity extends BlockEntity {
             level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> {
                 if (entity.getMovementType())
                     cap.moveGalacticPosition(movement.mul(0.01f));
-                else cap.moveSolarPosition(movement);
+                else cap.moveSolarPosition(movement.mul(5000f));
             });
     }
 }

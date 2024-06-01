@@ -14,6 +14,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
+import org.apache.commons.compress.utils.Lists;
 
 import java.util.*;
 
@@ -80,10 +81,7 @@ public class SpaceObjects extends SavedData
 			SpaceObject.Serializable spaceObject = SpaceObject.Serializable.deserialize(server, objectRegistry, tag.getCompound(objectString));
 			System.out.print(spaceObject.getName()+spaceObject.getGeneration().isPresent());
 			if(spaceObject.getGeneration().isPresent())
-			{
-				SpaceObject newObject = new SpaceObject(Optional.empty(), AstralVoyage.MODID+":body_"+UUID.randomUUID(), 13000, Optional.empty(), new ArrayList<>(), Optional.empty(), Optional.of(new Pair(stringToSpaceObjectKey(objectString), Map.of("distance", ((double) new Random().nextInt(spaceObject.getGeneration().get().getGenerationDistance().getFirst().intValue(), spaceObject.getGeneration().get().getGenerationDistance().getSecond().intValue()))))), new ArrayList<>((Collection<? extends Pair<ResourceLocation, Pair<List<Integer>, Boolean>>>) new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures:planets/earth"), new Pair<Object, Boolean>(new int[]{255, 255, 255, 255}, false))));
-				this.spaceObjects.put(newObject.getTranslationName(), new SpaceObject.Serializable(stringToSpaceObjectKey(newObject.getTranslationName()), newObject));
-			}
+			{}
 			this.spaceObjects.put(objectString, spaceObject);
 		});
 
@@ -109,6 +107,11 @@ public class SpaceObjects extends SavedData
 	private void addSpaceObjectFromDataPack(MinecraftServer server, ResourceKey<SpaceObject> spaceObjectKey, SpaceObject spaceObject)
 	{
 		SpaceObject.Serializable object = new SpaceObject.Serializable(spaceObjectKey, spaceObject);
+        if(object.getGeneration().isPresent())
+        {
+            SpaceObject newObject = new SpaceObject(Optional.empty(), AstralVoyage.MODID+":body_"+UUID.randomUUID(), 13000, Optional.empty(), new ArrayList<>(), Optional.empty(), Optional.of(new Pair(spaceObjectKey, Map.of("distance", ((double) new Random().nextInt(spaceObject.getGeneration().get().getGenerationDistance().getFirst().intValue(), spaceObject.getGeneration().get().getGenerationDistance().getSecond().intValue()))))), Collections.singletonList(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/planets/earth"), new Pair<List<Integer>, Boolean>(List.of(255, 255, 255, 255), false))));
+            saveSpaceObject(new SpaceObject.Serializable(stringToSpaceObjectKey(newObject.getTranslationName()), newObject));
+        }
 		saveSpaceObject(object);
 	}
 

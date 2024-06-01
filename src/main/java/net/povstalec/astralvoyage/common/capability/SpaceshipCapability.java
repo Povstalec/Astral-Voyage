@@ -57,7 +57,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
             childObjects.removeIf(cap -> cap.getGalacticPos().isEmpty());
             this.getRenderObjects().forEach(objects -> {
                 SpaceObject object = level.getServer().registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(objects.getKey());
-                if (object.getGalacticPos().isPresent() && object.getGalacticPos().get().equals(this.getGalacticPosition(), 0.0001f))
+                if (object.getGalacticPos().isPresent() && object.getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f))
                     object.getChildObjects().forEach(child -> {
                         SpaceObject childObject = level.getServer().registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(child);
                         ClientSpaceObject clientChildObject = new ClientSpaceObject(child, childObject.getSize(), childObject.getOrbitOffset(), new Vector3f(childObject.getDistance().get().floatValue(), 0, 0), Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
