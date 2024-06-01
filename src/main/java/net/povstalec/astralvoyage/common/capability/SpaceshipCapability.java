@@ -6,6 +6,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.povstalec.astralvoyage.common.data.SpaceObjects;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
@@ -59,8 +60,9 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
                 SpaceObject object = level.getServer().registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(objects.getKey());
                 if (object.getGalacticPos().isPresent() && object.getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f))
                     object.getChildObjects().forEach(child -> {
-                        SpaceObject childObject = level.getServer().registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(child);
-                        ClientSpaceObject clientChildObject = new ClientSpaceObject(child, childObject.getSize(), childObject.getOrbitOffset(), new Vector3f(childObject.getDistance().get().floatValue(), 0, 0), Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
+                        System.out.println(child.toString());
+                        SpaceObject.Serializable  childObject = SpaceObjects.get(level.getServer()).spaceObjects.get(child.toString());
+                        ClientSpaceObject clientChildObject = new ClientSpaceObject(child, childObject.getSize(), Optional.ofNullable(childObject.getOrbitMap().get().getSecond().getOrDefault("orbit_start", 0D)), new Vector3f(childObject.getOrbitMap().get().getSecond().getOrDefault("distance", 147280000d).floatValue(), 0, 0), Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
                         if (!childObjects.contains(clientChildObject))
                             childObjects.add(clientChildObject);
                     });
