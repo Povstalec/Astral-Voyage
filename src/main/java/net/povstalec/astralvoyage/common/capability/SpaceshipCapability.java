@@ -61,7 +61,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
                 if (object.getGalacticPos().isPresent() && object.getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f))
                     object.getChildObjects().forEach(child -> {
                         System.out.println(child.toString());
-                        SpaceObject.Serializable  childObject = SpaceObjects.get(level.getServer()).spaceObjects.get(child.toString());
+                        SpaceObject.Serializable  childObject = SpaceObjects.get(level.getServer()).spaceObjects.get(child.location().toString());
                         ClientSpaceObject clientChildObject = new ClientSpaceObject(child, childObject.getSize(), Optional.ofNullable(childObject.getOrbitMap().get().getSecond().getOrDefault("orbit_start", 0D)), new Vector3f(childObject.getOrbitMap().get().getSecond().getOrDefault("distance", 147280000d).floatValue(), 0, 0), Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
                         if (!childObjects.contains(clientChildObject))
                             childObjects.add(clientChildObject);
