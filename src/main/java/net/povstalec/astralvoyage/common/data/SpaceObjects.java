@@ -114,11 +114,13 @@ public class SpaceObjects extends SavedData
 		SpaceObject.Serializable object = new SpaceObject.Serializable(spaceObjectKey, spaceObject);
 		if(object.getGeneration().isPresent())
 		{
-			SpaceObject.Serializable newObject = new SpaceObject.Serializable(Optional.empty(),
-					AstralVoyage.MODID + ":body_" + UUID.randomUUID(), 13000, Optional.empty(),
+			String id = AstralVoyage.MODID + ":body_" + UUID.randomUUID();
+			SpaceObject.Serializable newObject = new SpaceObject.Serializable(Optional.of(stringToSpaceObjectKey(id)),Optional.empty(),
+					id, 13000, Optional.empty(),
 					Optional.of(new Pair<>(spaceObjectKey, Map.of("distance", ((double) new Random().nextInt(spaceObject.getGeneration().get().getGenerationDistance().getFirst().intValue(), spaceObject.getGeneration().get().getGenerationDistance().getSecond().intValue()))))),
 					Optional.empty(), new ArrayList<>(), Collections.singletonList(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/planets/earth"), new Pair<>(List.of(255, 255, 255, 255), false))));
-			//object.getChildObjects().add(newObject.getKey());
+			object.getChildObjects().add(newObject.getKey());
+			saveSpaceObject(newObject);
 		}
 		saveSpaceObject(object);
 	}

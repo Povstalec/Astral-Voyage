@@ -223,9 +223,9 @@ public class SpaceObject
 			this.textureLayers = object.getTextureLayers();
 		}
 
-		public Serializable(Optional<ResourceKey<Level>> dimension, String name, float size, Optional<Vector3f> galactic_position, Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, Optional<SpaceObject.Generation> generation, List<ResourceKey<SpaceObject>> childObjects, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
+		public Serializable(Optional<ResourceKey<SpaceObject>> id,Optional<ResourceKey<Level>> dimension, String name, float size, Optional<Vector3f> galactic_position, Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, Optional<SpaceObject.Generation> generation, List<ResourceKey<SpaceObject>> childObjects, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
 		{
-			this.objectKey = Optional.empty();
+			this.objectKey = id;
 			this.dimension = dimension;
 			this.name = Optional.of(name);
 			this.size = Optional.of(size);
