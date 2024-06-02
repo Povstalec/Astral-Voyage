@@ -60,7 +60,7 @@ public class SpaceObject
 	private final String translationName;
 	private final float size;
 	private final Optional<Vector3f> galactic_position;
-	public List<ResourceKey<SpaceObject>> childObjects;
+	private final List<ResourceKey<SpaceObject>> childObjects;
 	private final Optional<SpaceObject.Generation> generation;
 	private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
 	private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
@@ -207,7 +207,7 @@ public class SpaceObject
 		private final Optional<Vector3f> galactic_position;
 		private final Optional<SpaceObject.Generation> generation;
         private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
-		public List<ResourceKey<SpaceObject>> childObjects;
+		private final List<ResourceKey<SpaceObject>> childObjects;
 		private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
 
 		public Serializable(ResourceKey<SpaceObject> objectKey, SpaceObject object)
@@ -223,10 +223,10 @@ public class SpaceObject
 			this.textureLayers = object.getTextureLayers();
 		}
 
-		public Serializable(ResourceKey<Level> dimension, String name, float size, Optional<Vector3f> galactic_position, Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, Optional<SpaceObject.Generation> generation, List<ResourceKey<SpaceObject>> childObjects, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
+		public Serializable(Optional<ResourceKey<Level>> dimension, String name, float size, Optional<Vector3f> galactic_position, Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, Optional<SpaceObject.Generation> generation, List<ResourceKey<SpaceObject>> childObjects, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
 		{
 			this.objectKey = Optional.empty();
-			this.dimension = Optional.ofNullable(dimension);
+			this.dimension = dimension;
 			this.name = Optional.of(name);
 			this.size = Optional.of(size);
 			this.galactic_position = galactic_position;
@@ -407,7 +407,7 @@ public class SpaceObject
 				List<TextureLayerData> textureLayers = new ArrayList<>();
 				layersTag.forEach(layertag -> textureLayers.add(TextureLayerData.deserialize((CompoundTag) layertag)));
 
-				return new SpaceObject.Serializable(dimension, name, size, galactic_position, parentOrbitMap, generation, childObjects, TextureLayerData.toPairList(textureLayers));
+				return new SpaceObject.Serializable(Optional.ofNullable(dimension), name, size, galactic_position, parentOrbitMap, generation, childObjects, TextureLayerData.toPairList(textureLayers));
 			}
 		}
 	}
@@ -419,7 +419,6 @@ public class SpaceObject
 			return ResourceKey.create(SpaceObject.REGISTRY_KEY, new ResourceLocation(split[0], split[1]));
 
 		return null;
-
 	}
 
 	public static ResourceKey<Level> stringToDimension(String dimensionString)
