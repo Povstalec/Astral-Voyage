@@ -407,7 +407,7 @@ public class SpaceObject
 				List<TextureLayerData> textureLayers = new ArrayList<>();
 				layersTag.forEach(layertag -> textureLayers.add(TextureLayerData.deserialize((CompoundTag) layertag)));
 
-				return new SpaceObject.Serializable(Optional.ofNullable(dimension), name, size, galactic_position, parentOrbitMap, generation, childObjects, TextureLayerData.toPairList(textureLayers));
+				return new SpaceObject.Serializable(resourceKeyHerePlease, Optional.ofNullable(dimension), name, size, galactic_position, parentOrbitMap, generation, childObjects, TextureLayerData.toPairList(textureLayers));
 			}
 		}
 	}
