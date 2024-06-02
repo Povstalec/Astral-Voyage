@@ -34,7 +34,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 
     private static final String RENDER_OBJECTS = "render_objects";
 
-	private Vector3f galacticPosition = new Vector3f(2, 1, 1);
+	private Vector3f galacticPosition = new Vector3f(0, 0, 0);
     private Vector3f solarPosition = new Vector3f(0, 0, 0);
 	private Vector3f oldGalacticPosition = new Vector3f(0, 0, 0);
     private Vector3f oldSolarPosition = new Vector3f(0, 0, 0);
@@ -60,7 +60,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
                 SpaceObject object = level.getServer().registryAccess().registryOrThrow(SpaceObject.REGISTRY_KEY).get(objects.getKey());
                 if (object.getGalacticPos().isPresent() && object.getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f))
                     object.getChildObjects().forEach(child -> {
-                        System.out.println(child.toString());
+                        System.out.println(child.location());
                         SpaceObject.Serializable  childObject = SpaceObjects.get(level.getServer()).spaceObjects.get(child.location().toString());
                         ClientSpaceObject clientChildObject = new ClientSpaceObject(child, childObject.getSize(), Optional.ofNullable(childObject.getOrbitMap().get().getSecond().getOrDefault("orbit_start", 0D)), new Vector3f(childObject.getOrbitMap().get().getSecond().getOrDefault("distance", 147280000d).floatValue(), 0, 0), Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
                         if (!childObjects.contains(clientChildObject))
