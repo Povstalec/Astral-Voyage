@@ -60,7 +60,7 @@ public class SpaceObject
 	private final String translationName;
 	private final float size;
 	private final Optional<Vector3f> galactic_position;
-	private final List<ResourceKey<SpaceObject>> childObjects;
+	public List<ResourceKey<SpaceObject>> childObjects;
 	private final Optional<SpaceObject.Generation> generation;
 	private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
 	private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
@@ -207,7 +207,7 @@ public class SpaceObject
 		private final Optional<Vector3f> galactic_position;
 		private final Optional<SpaceObject.Generation> generation;
         private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
-		private final List<ResourceKey<SpaceObject>> childObjects;
+		public List<ResourceKey<SpaceObject>> childObjects;
 		private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
 
 		public Serializable(ResourceKey<SpaceObject> objectKey, SpaceObject object)
@@ -239,6 +239,11 @@ public class SpaceObject
 		public String getName()
 		{
 			return this.name.get();
+		}
+
+		public ResourceKey<SpaceObject> getKey()
+		{
+			return this.objectKey.get();
 		}
 		
 		public float getSize()
@@ -345,7 +350,7 @@ public class SpaceObject
 
 				if(objectTag.contains(PARENT))
 				{
-					SpaceObject parent = server.registryAccess().registryOrThrow(REGISTRY_KEY).get(stringToSpaceObjectKey(objectTag.getString(PARENT)));
+					Serializable parent = SpaceObjects.get(server).spaceObjects.get(objectTag.getString(PARENT));
 					if(parent != null && !parent.getChildObjects().contains(objectKey))
 						parent.childObjects.add(objectKey);
 				}

@@ -79,9 +79,6 @@ public class SpaceObjects extends SavedData
 
 		tag.getAllKeys().forEach(objectString -> {
 			SpaceObject.Serializable spaceObject = SpaceObject.Serializable.deserialize(server, objectRegistry, tag.getCompound(objectString));
-			System.out.print(spaceObject.getName()+spaceObject.getGeneration().isPresent());
-			if(spaceObject.getGeneration().isPresent())
-			{}
 			this.spaceObjects.put(objectString, spaceObject);
 		});
 
@@ -106,18 +103,20 @@ public class SpaceObjects extends SavedData
 
 	private void addSpaceObjectFromDataPack(MinecraftServer server, ResourceKey<SpaceObject> spaceObjectKey, SpaceObject spaceObject)
 	{
+		if(spaceObject.getGeneration().isPresent())
+		{
+			SpaceObject newObject = new SpaceObject(Optional.empty(), AstralVoyage.MODID+":body_"+UUID.randomUUID(), 13000, Optional.empty(), new ArrayList<>(), Optional.empty(), Optional.of(new Pair<>(spaceObjectKey, Map.of("distance", ((double) new Random().nextInt(spaceObject.getGeneration().get().getGenerationDistance().getFirst().intValue(), spaceObject.getGeneration().get().getGenerationDistance().getSecond().intValue()))))), Collections.singletonList(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/planets/earth"), new Pair<>(List.of(255, 255, 255, 255), false))));
+			newObject.setParent(Optional.of(spaceObjectKey));
+			saveSpaceObject(new SpaceObject.Serializable(stringToSpaceObjectKey(newObject.getTranslationName()), newObject));
+		}
+
 		SpaceObject.Serializable object = new SpaceObject.Serializable(spaceObjectKey, spaceObject);
-        if(object.getGeneration().isPresent())
-        {
-            SpaceObject newObject = new SpaceObject(Optional.empty(), AstralVoyage.MODID+":body_"+UUID.randomUUID(), 13000, Optional.empty(), new ArrayList<>(), Optional.empty(), Optional.of(new Pair(spaceObjectKey, Map.of("distance", ((double) new Random().nextInt(spaceObject.getGeneration().get().getGenerationDistance().getFirst().intValue(), spaceObject.getGeneration().get().getGenerationDistance().getSecond().intValue()))))), Collections.singletonList(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/planets/earth"), new Pair<List<Integer>, Boolean>(List.of(255, 255, 255, 255), false))));
-            saveSpaceObject(new SpaceObject.Serializable(stringToSpaceObjectKey(newObject.getTranslationName()), newObject));
-        }
 		saveSpaceObject(object);
 	}
 
 	private boolean saveSpaceObject(SpaceObject.Serializable spaceObject)
 	{
-		String spaceObjectName = spaceObject.getName();
+		String spaceObjectName = spaceObject.getKey().location().toString();
 
 		this.spaceObjects.put(spaceObjectName, spaceObject);
 

@@ -32,7 +32,7 @@ public final class SpaceObjectRenderer
 
 		Vector3f sphericalPos = new Vector3f((float) Math.sqrt(shipToObject.x*shipToObject.x + shipToObject.y*shipToObject.y + shipToObject.z*shipToObject.z), (float) Math.atan2(shipToObject.x, shipToObject.z), (float) Math.atan2(Math.sqrt(shipToObject.x*shipToObject.x + shipToObject.z*shipToObject.z), shipToObject.y));
 		float objectRenderSize = Math.min(Math.max((size/distance)*SIZE*6, Float.compare(galShipToObject.length(), 0f) == 0 ? 0.1F : 0.5F), 360F);
-		if(Float.compare(galShipToObject.length(), 0F) != 0)
+		if(galShipToObject.length() > 0.1)
 		{
 			sphericalPos = new Vector3f((float) Math.sqrt(galShipToObject.x * galShipToObject.x + galShipToObject.y * galShipToObject.y + galShipToObject.z * galShipToObject.z), (float) Math.atan2(galShipToObject.x, galShipToObject.z), (float) Math.atan2(Math.sqrt(galShipToObject.x * galShipToObject.x + galShipToObject.z * galShipToObject.z), galShipToObject.y));
 		}
