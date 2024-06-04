@@ -13,7 +13,6 @@
 			"rotation": 79.0
 		}
 	},
-	"children": [],
 	"texture_layers":
 	[
 		{"texture": "astralvoyage:textures/environment/planets/mars.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},

@@ -13,7 +13,6 @@
 			"rotation": 113.0
 		}
 	},
-	"children": [],
 	"texture_layers":
 	[
 		{"texture": "astralvoyage:textures/environment/planets/mercury.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},

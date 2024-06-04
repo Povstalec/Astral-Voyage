@@ -30,7 +30,6 @@ public class SpaceObject
 
 	private static final Codec<Vector3f> GALACTIC_POS = Codec.FLOAT.listOf().comapFlatMap(f -> Util.fixedSize(f, 3).map(vec -> new Vector3f(vec.get(0), vec.get(1), vec.get(2))), (element) -> List.of(element.get(0), element.get(1), element.get(2))).stable();
 	private static final Codec<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> PARENT = Codec.pair(RESOURCE_KEY_CODEC.fieldOf("parent_object").codec(), Codec.unboundedMap(Codec.STRING, Codec.DOUBLE).fieldOf("orbit").codec());
-	private static final Codec<ResourceKey<SpaceObject>> CHILD_OBJECTS = RESOURCE_KEY_CODEC.fieldOf("child_object").codec();
 	private static final Codec<Pair<List<Integer>, Boolean>> TEXTURE_SETTINGS = Codec.pair(Codec.INT.listOf().fieldOf("rgba").codec(), Codec.BOOL.fieldOf("blends").codec());
 	private static final Codec<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> TEXTURE_LAYER = Codec.pair(ResourceLocation.CODEC.fieldOf("texture").codec(), TEXTURE_SETTINGS.fieldOf("texture_settings").codec());
 
@@ -41,7 +40,6 @@ public class SpaceObject
 			Codec.STRING.fieldOf("name").forGetter(SpaceObject::getTranslationName),
 			Codec.FLOAT.fieldOf("size").forGetter(SpaceObject::getSize),
 			GALACTIC_POS.optionalFieldOf("galactic_position").forGetter(SpaceObject::getGalacticPos),
-			CHILD_OBJECTS.listOf().fieldOf("children").forGetter(SpaceObject::getChildObjects),
 			// Optional info for generating random objects
 			SpaceObject.Generation.CODEC.optionalFieldOf("generation").forGetter(SpaceObject::getGeneration),
 			// Parent Stellar Location, probably used for orbits and stuff in the future
@@ -60,7 +58,6 @@ public class SpaceObject
 	private final String translationName;
 	private final float size;
 	private final Optional<Vector3f> galactic_position;
-	private final List<ResourceKey<SpaceObject>> childObjects;
 	private final Optional<SpaceObject.Generation> generation;
 	private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
 	private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
@@ -74,7 +71,7 @@ public class SpaceObject
 	private Optional<Double> rotation = Optional.empty();
 	
 	public SpaceObject(Optional<ResourceKey<Level>> dimension, String translationName, 
-		float size, Optional<Vector3f> galactic_position, List<ResourceKey<SpaceObject>> childObjects, Optional<SpaceObject.Generation> generation,
+		float size, Optional<Vector3f> galactic_position, Optional<SpaceObject.Generation> generation,
 		Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, 
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
 	{
@@ -82,7 +79,6 @@ public class SpaceObject
 		this.translationName = translationName;
 		this.size = size;
 		this.galactic_position = galactic_position;
-		this.childObjects = childObjects;
 		this.generation = generation;
 		this.parentOrbitMap = parentOrbitMap;
 		this.textureLayers = textureLayers;
@@ -113,11 +109,6 @@ public class SpaceObject
 
 	public Optional<Vector3f> getGalacticPos(){
 		return this.galactic_position;
-	}
-
-	public List<ResourceKey<SpaceObject>> getChildObjects()
-	{
-		return this.childObjects;
 	}
 
 	public Optional<SpaceObject.Generation> getGeneration()
@@ -197,7 +188,6 @@ public class SpaceObject
 		private static final String SIZE = "size";
 		private static final String PARENT = "parent";
 		private static final String GENERATION = "generation";
-		private static final String CHILD_OBJECTS = "child_objects";
 		private static final String TEXTURE_LAYERS = "texture_layers";
 
 		private final Optional<ResourceKey<SpaceObject>> objectKey;
@@ -207,7 +197,7 @@ public class SpaceObject
 		private final Optional<Vector3f> galactic_position;
 		private final Optional<SpaceObject.Generation> generation;
         private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
-		private final List<ResourceKey<SpaceObject>> childObjects;
+		private List<ResourceKey<SpaceObject>> childObjects = new ArrayList<>();
 		private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
 
 		public Serializable(ResourceKey<SpaceObject> objectKey, SpaceObject object)
@@ -219,11 +209,10 @@ public class SpaceObject
 			this.galactic_position = object.getGalacticPos();
             this.parentOrbitMap = object.getParentOrbitMap();
 			this.generation = object.getGeneration();
-			this.childObjects = object.getChildObjects();
 			this.textureLayers = object.getTextureLayers();
 		}
 
-		public Serializable(Optional<ResourceKey<SpaceObject>> id,Optional<ResourceKey<Level>> dimension, String name, float size, Optional<Vector3f> galactic_position, Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, Optional<SpaceObject.Generation> generation, List<ResourceKey<SpaceObject>> childObjects, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
+		public Serializable(Optional<ResourceKey<SpaceObject>> id,Optional<ResourceKey<Level>> dimension, String name, float size, Optional<Vector3f> galactic_position, Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, Optional<SpaceObject.Generation> generation, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
 		{
 			this.objectKey = id;
 			this.dimension = dimension;
@@ -232,7 +221,6 @@ public class SpaceObject
 			this.galactic_position = galactic_position;
 			this.parentOrbitMap = parentOrbitMap;
 			this.generation = generation;
-			this.childObjects = childObjects;
 			this.textureLayers = textureLayers;
 		}
 
@@ -269,6 +257,16 @@ public class SpaceObject
 		public List<ResourceKey<SpaceObject>> getChildObjects()
 		{
 			return this.childObjects;
+		}
+
+		public void addChild(ResourceKey<SpaceObject> child)
+		{
+			this.childObjects.add(child);
+		}
+
+		public void removeChild(ResourceKey<SpaceObject> child)
+		{
+			this.childObjects.remove(child);
 		}
 
 		public Optional<Generation> getGeneration()
@@ -322,12 +320,6 @@ public class SpaceObject
 					galPos.putFloat("y", galactic_position.get().y);
 					galPos.putFloat("z", galactic_position.get().z);
 					objectTag.put("galactic_position", galPos);
-				}
-				if(!childObjects.isEmpty())
-				{
-					ListTag childObjects = new ListTag();
-					this.childObjects.forEach(child -> childObjects.add(StringTag.valueOf(child.location().toString())));
-					objectTag.put(CHILD_OBJECTS, childObjects);
 				}
 				this.parentOrbitMap.ifPresent(spaceObjectResourceKey -> objectTag.putString(PARENT, spaceObjectResourceKey.getFirst().location().toString()));
 				ListTag textureLayers = new ListTag();
@@ -393,12 +385,6 @@ public class SpaceObject
 				Optional<ResourceKey<SpaceObject>> parent = Optional.empty();
 				if(objectTag.contains(PARENT))
 					parent = Optional.ofNullable(stringToSpaceObjectKey(objectTag.getString(PARENT)));
-
-				List<ResourceKey<SpaceObject>> childObjects = new ArrayList<>();
-				if(objectTag.contains(CHILD_OBJECTS)){
-					ListTag childObjectsTag = objectTag.getList(CHILD_OBJECTS, Tag.TAG_STRING);
-					childObjectsTag.forEach(childObject -> childObjects.add(stringToSpaceObjectKey(childObject.getAsString())));
-				}
 				Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap = Optional.empty();
 				if(parent.isPresent() && orbitMap.isPresent())
 					parentOrbitMap = Optional.of(new Pair<>(parent.get(), orbitMap.get()));
@@ -407,7 +393,7 @@ public class SpaceObject
 				List<TextureLayerData> textureLayers = new ArrayList<>();
 				layersTag.forEach(layertag -> textureLayers.add(TextureLayerData.deserialize((CompoundTag) layertag)));
 
-				return new SpaceObject.Serializable(Optional.ofNullable(stringToSpaceObjectKey(name)), Optional.ofNullable(dimension), name, size, galactic_position, parentOrbitMap, generation, childObjects, TextureLayerData.toPairList(textureLayers));
+				return new SpaceObject.Serializable(Optional.ofNullable(stringToSpaceObjectKey(name)), Optional.ofNullable(dimension), name, size, galactic_position, parentOrbitMap, generation, TextureLayerData.toPairList(textureLayers));
 			}
 		}
 	}

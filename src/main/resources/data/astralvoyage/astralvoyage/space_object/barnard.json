@@ -1,8 +1,7 @@
 {
 	"name": "stellar_location.astralvoyage.barnard",
 	"size": 280000,
-	"galactic_position": [2, 1, 0],
-	"children": [],
+	"galactic_position": [2, 1, 1],
 	"generation": {
 		"orbiting_object_count": 1,
 		"distance": {

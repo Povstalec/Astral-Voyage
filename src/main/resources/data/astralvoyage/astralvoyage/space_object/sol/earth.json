@@ -14,7 +14,6 @@
 			"rotation": 0.0
 		}
 	},
-	"children": [],
 	"texture_layers":
 	[
 		{"texture": "astralvoyage:textures/environment/planets/earth.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
