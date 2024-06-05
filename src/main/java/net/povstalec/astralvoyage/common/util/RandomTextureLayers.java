@@ -42,10 +42,20 @@ public class RandomTextureLayers {
 
     public enum Star {
 
-        G(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/sol.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
-                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/sol_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
-        M(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/barnard.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
-                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/barnard_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true)))));
+        G(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_g.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_g_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
+        M(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_m.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_m_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
+        F(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_f.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_f_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
+        B(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_b.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_b_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
+        A(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_a.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_a_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
+        O(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_o.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_o_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
+        K(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_k.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_k_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true)))));
 
 
 
