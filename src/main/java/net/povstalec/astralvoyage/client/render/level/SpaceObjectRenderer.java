@@ -2,12 +2,8 @@ package net.povstalec.astralvoyage.client.render.level;
 
 import java.util.List;
 
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.world.level.block.Block;
-import net.minecraftforge.network.NetworkHooks;
-import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
-import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -17,7 +13,9 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Vector3f;
+import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
+import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
+import net.povstalec.astralvoyage.common.util.SphericalCoords;
 
 public final class SpaceObjectRenderer
 {
@@ -30,19 +28,19 @@ public final class SpaceObjectRenderer
 		int[] rgba = layer.getSecond().getFirst().stream().mapToInt((integer) -> integer).toArray();
 		boolean blend = layer.getSecond().getSecond();
 
-		Vector3f sphericalPos = new Vector3f((float) Math.sqrt(shipToObject.x*shipToObject.x + shipToObject.y*shipToObject.y + shipToObject.z*shipToObject.z), (float) Math.atan2(shipToObject.x, shipToObject.z), (float) Math.atan2(Math.sqrt(shipToObject.x*shipToObject.x + shipToObject.z*shipToObject.z), shipToObject.y));
-		float objectRenderSize = Math.min(Math.max((size/distance)*SIZE*6, galShipToObject.length() > 0.1 ? 0.1F : 0.5F), 360F);
+		SphericalCoords sphericalCoords = new SphericalCoords(shipToObject);
+		float objectRenderSize = Math.min(Math.max((size/distance) * SIZE * 6, galShipToObject.length() > 0.1 ? 0.1F : 0.5F), 360F);
 		if(galShipToObject.length() > 0.1)
 		{
 			objectRenderSize = 0.5F;
-			sphericalPos = new Vector3f((float) Math.sqrt(galShipToObject.x * galShipToObject.x + galShipToObject.y * galShipToObject.y + galShipToObject.z * galShipToObject.z), (float) Math.atan2(galShipToObject.x, galShipToObject.z), (float) Math.atan2(Math.sqrt(galShipToObject.x * galShipToObject.x + galShipToObject.z * galShipToObject.z), galShipToObject.y));
+			sphericalCoords = new SphericalCoords(galShipToObject);
 		}
 
-		sphericalPos.x = DISTANCE;
-		Vector3f corner00 = placeOnSphere(-objectRenderSize, -objectRenderSize, sphericalPos, offset, rotation);
-		Vector3f corner10 = placeOnSphere(objectRenderSize, -objectRenderSize, sphericalPos, offset, rotation);
-		Vector3f corner11 = placeOnSphere(objectRenderSize, objectRenderSize,  sphericalPos, offset, rotation);
-		Vector3f corner01 = placeOnSphere(-objectRenderSize, objectRenderSize, sphericalPos, offset, rotation);
+		sphericalCoords.r = DISTANCE;
+		Vector3f corner00 = placeOnSphere(-objectRenderSize, -objectRenderSize, sphericalCoords, offset, rotation);
+		Vector3f corner10 = placeOnSphere(objectRenderSize, -objectRenderSize, sphericalCoords, offset, rotation);
+		Vector3f corner11 = placeOnSphere(objectRenderSize, objectRenderSize,  sphericalCoords, offset, rotation);
+		Vector3f corner01 = placeOnSphere(-objectRenderSize, objectRenderSize, sphericalCoords, offset, rotation);
 
 
 		if(rgba.length < 4)
@@ -76,8 +74,8 @@ public final class SpaceObjectRenderer
 		textureLayers.forEach(layer -> renderSurfaceLayer(bufferbuilder, lastMatrix, postSize, distance, layer, shipToObject, galShipToObject, spaceObject.getOrbitOffset().orElse(0D), rotation));
 	}
 
-	public static Vector3f placeOnSphere(float offsetX, float offsetY, Vector3f sphericalPos, double orbitOffset, double rotation) {
-		Vector3f cartesianCoords = sphericalToCartesian(sphericalPos);
+	public static Vector3f placeOnSphere(float offsetX, float offsetY, SphericalCoords sphericalCoords, double orbitOffset, double rotation) {
+		Vector3f cartesianCoords = sphericalCoords.toCartesian();
 
 		double polarR = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
 		double polarPhi = Math.atan2(offsetY, offsetX);
@@ -86,31 +84,11 @@ public final class SpaceObjectRenderer
 		double polarX = polarR * Math.cos(polarPhi);
 		double polarY = polarR * Math.sin(polarPhi);
 
-		cartesianCoords.x += - polarY * Math.cos(sphericalPos.z) * Math.sin(sphericalPos.y) - polarX * Math.cos(sphericalPos.y);
-		cartesianCoords.y += polarY * Math.sin(sphericalPos.z);
-		cartesianCoords.z += - polarY * Math.cos(sphericalPos.z) * Math.cos(sphericalPos.y) + polarX * Math.sin(sphericalPos.y) + Math.toRadians(orbitOffset);
+		cartesianCoords.x += - polarY * Math.cos(sphericalCoords.phi) * Math.sin(sphericalCoords.theta) - polarX * Math.cos(sphericalCoords.theta);
+		cartesianCoords.y += polarY * Math.sin(sphericalCoords.phi);
+		cartesianCoords.z += - polarY * Math.cos(sphericalCoords.phi) * Math.cos(sphericalCoords.theta) + polarX * Math.sin(sphericalCoords.theta) + Math.toRadians(orbitOffset);
 
 		return cartesianCoords;
-	}
-
-	public static double cartesianX(Vector3f sphericalCoords)
-	{
-		return sphericalCoords.x * Math.sin(sphericalCoords.z) * Math.sin(sphericalCoords.y);
-	}
-	
-	public static double cartesianY(Vector3f sphericalCoords)
-	{
-		return sphericalCoords.x * Math.cos(sphericalCoords.z);
-	}
-	
-	public static double cartesianZ(Vector3f sphericalCoords)
-	{
-		return sphericalCoords.x * Math.sin(sphericalCoords.z) * Math.cos(sphericalCoords.y);
-	}
-	
-	public static Vector3f sphericalToCartesian(Vector3f sphericalCoords)
-	{
-		return new Vector3f((float) cartesianX(sphericalCoords), (float) cartesianY(sphericalCoords), (float) cartesianZ(sphericalCoords));
 	}
 
 	public static Vector3f vectorBodyToBody(Vector3f bodyA, Vector3f bodyB)
