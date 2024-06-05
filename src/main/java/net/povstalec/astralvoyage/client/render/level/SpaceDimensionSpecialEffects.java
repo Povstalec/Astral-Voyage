@@ -100,8 +100,8 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
 		
 		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
-    	Vector3f galacticPosition = getGalacticPosition(capability).mul(0.0001f);
-    	Vector3f oldGalacticPosition = getOldGalacticPosition(capability).mul(0.0001f);
+    	Vector3f galacticPosition = getGalacticPosition(capability);
+    	Vector3f oldGalacticPosition = getOldGalacticPosition(capability);
 
     	float galacticX = Mth.lerp(partialTick, oldGalacticPosition.x, galacticPosition.x);
     	float galacticY = Mth.lerp(partialTick, oldGalacticPosition.y, galacticPosition.y);
