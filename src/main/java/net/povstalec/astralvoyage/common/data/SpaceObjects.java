@@ -96,7 +96,7 @@ public class SpaceObjects extends SavedData
 	private void registerRandomSpaceObjects()
 	{
 		Random random = new Random();
-		RandomTextureLayers.Star layer = RandomTextureLayers.Star.values()[random.nextInt(0, 1)];
+		RandomTextureLayers.Star layer = RandomTextureLayers.Star.values()[random.nextInt(0, 2)];
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layerList = List.of(layer.getTextureLayer().getFirst().getLayer(), layer.getTextureLayer().getSecond().getLayer());
 		String id = AstralVoyage.MODID + ":star_" + UUID.randomUUID();
 		SpaceObject.Serializable newObject = new SpaceObject.Serializable(Optional.of(stringToSpaceObjectKey(id)),
