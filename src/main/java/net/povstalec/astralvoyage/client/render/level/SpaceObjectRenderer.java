@@ -75,7 +75,7 @@ public final class SpaceObjectRenderer
 	}
 
 	public static Vector3f placeOnSphere(float offsetX, float offsetY, SphericalCoords sphericalCoords, double orbitOffset, double rotation) {
-		Vector3f cartesianCoords = sphericalCoords.toCartesian();
+		Vector3f cartesianCoords = sphericalCoords.toCartesianF();
 
 		double polarR = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
 		double polarPhi = Math.atan2(offsetY, offsetX);
