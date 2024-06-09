@@ -1,7 +1,7 @@
 {
 	"name": "stellar_location.astralvoyage.sagittarius",
 	"size": 51800000,
-	"galactic_position": [11700, 11900, 19900],
+	"galactic_position": [10, 11, 19],
 	"texture_layers":
 	[
 		{"texture": "astralvoyage:textures/environment/stars/black_hole.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
