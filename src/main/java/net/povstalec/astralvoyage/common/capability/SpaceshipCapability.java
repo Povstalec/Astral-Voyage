@@ -34,7 +34,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 
     private static final String RENDER_OBJECTS = "render_objects";
 
-	private Vector3f galacticPosition = new Vector3f(10, 11, 19);
+	private Vector3f galacticPosition = new Vector3f(10, 11, 10.90159f);
     private Vector3f solarPosition = new Vector3f(0, 0, 0);
 	private Vector3f oldGalacticPosition = new Vector3f(0, 0, 0);
     private Vector3f oldSolarPosition = new Vector3f(0, 0, 0);

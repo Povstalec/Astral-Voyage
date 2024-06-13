@@ -51,7 +51,7 @@ public class SpaceObjects extends SavedData
 	public void generateData(MinecraftServer server)
 	{
 		for (int i = 0; i <= 15; i++) {
-			registerRandomSpaceObjects();
+			registerRandomSpaceObjects(server.overworld().getSeed());
 		}
 		registerSpaceObjectFromDataPacks(server);
 	}
@@ -93,14 +93,14 @@ public class SpaceObjects extends SavedData
 	//********************************************Data********************************************
 	//============================================================================================
 
-	private void registerRandomSpaceObjects()
+	private void registerRandomSpaceObjects(long seed)
 	{
-		Random random = new Random();
+		Random random = new Random(seed);
 		RandomTextureLayers.Star layer = RandomTextureLayers.Star.values()[random.nextInt(0, 7)];
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layerList = List.of(layer.getTextureLayer().getFirst().getLayer(), layer.getTextureLayer().getSecond().getLayer());
 		String id = AstralVoyage.MODID + ":star_" + UUID.randomUUID();
 		SpaceObject.Serializable newObject = new SpaceObject.Serializable(Optional.of(stringToSpaceObjectKey(id)),
-				Optional.empty(), id, 13000, Optional.of(new Vector3f(random.nextFloat(2f, 1000f), random.nextFloat(2f, 1000f), random.nextFloat(2f, 1000f))), Optional.empty(),
+				Optional.empty(), id, 13000, Optional.of(new Vector3f(((int) random.nextFloat(2f, 1000f)), ((int) random.nextFloat(2f, 1000f)), ((int) random.nextFloat(2f, 1000f)))), Optional.empty(),
 				Optional.of(new SpaceObject.Generation((short) random.nextInt(0, 11), new Pair<>(random.nextFloat(128000, 18900000), random.nextFloat(128900000, 1897500000000f)))),
 				layerList);
 		saveSpaceObject(newObject.getKey(), newObject);

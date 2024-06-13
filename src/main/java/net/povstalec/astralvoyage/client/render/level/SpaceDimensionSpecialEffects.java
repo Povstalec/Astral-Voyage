@@ -103,9 +103,9 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     	Vector3f galacticPosition = getGalacticPosition(capability);
     	Vector3f oldGalacticPosition = getOldGalacticPosition(capability);
 
-    	float galacticX = Mth.lerp(partialTick, oldGalacticPosition.x, galacticPosition.x)*0.1000f;
-    	float galacticY = Mth.lerp(partialTick, oldGalacticPosition.y, galacticPosition.y)*0.1000f;
-    	float galacticZ = Mth.lerp(partialTick, oldGalacticPosition.z, galacticPosition.z)*0.1000f;
+    	float galacticX = Mth.lerp(partialTick, oldGalacticPosition.x, galacticPosition.x)*0.0001f;
+    	float galacticY = Mth.lerp(partialTick, oldGalacticPosition.y, galacticPosition.y)*0.0001f;
+    	float galacticZ = Mth.lerp(partialTick, oldGalacticPosition.z, galacticPosition.z)*0.0001f;
     	
 		galaxy.setStarBuffer(galacticX, galacticY, galacticZ, 0, 0, 0);
 		galaxy.renderStars(level, camera, partialTick, poseStack, projectionMatrix, setupFog);
