@@ -5,6 +5,7 @@
 	"texture_layers":
 	[
 		{"texture": "astralvoyage:textures/environment/stars/black_hole.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+		{"texture": "astralvoyage:textures/environment/stars/black_hole_disk.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends":  false}},
 		{"texture": "astralvoyage:textures/environment/stars/black_hole_halo.png", "texture_settings":  {"rgba":  [255, 255, 255, 255], "blends":  true}}
 	]
 }
