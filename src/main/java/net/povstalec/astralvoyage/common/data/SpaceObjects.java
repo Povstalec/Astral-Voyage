@@ -51,7 +51,7 @@ public class SpaceObjects extends SavedData
 	public void generateData(MinecraftServer server)
 	{
 		for (int i = 0; i <= 15; i++) {
-			registerRandomSpaceObjects(server.overworld().getSeed());
+			registerRandomSpaceObjects();
 		}
 		registerSpaceObjectFromDataPacks(server);
 	}
@@ -93,9 +93,9 @@ public class SpaceObjects extends SavedData
 	//********************************************Data********************************************
 	//============================================================================================
 
-	private void registerRandomSpaceObjects(long seed)
+	private void registerRandomSpaceObjects()
 	{
-		Random random = new Random(seed);
+		Random random = new Random();
 		RandomTextureLayers.Star layer = RandomTextureLayers.Star.values()[random.nextInt(0, 7)];
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layerList = List.of(layer.getTextureLayer().getFirst().getLayer(), layer.getTextureLayer().getSecond().getLayer());
 		String id = AstralVoyage.MODID + ":star_" + UUID.randomUUID();
