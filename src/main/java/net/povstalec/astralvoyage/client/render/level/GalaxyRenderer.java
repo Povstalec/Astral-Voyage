@@ -2,6 +2,7 @@ package net.povstalec.astralvoyage.client.render.level;
 
 import javax.annotation.Nullable;
 
+import net.povstalec.astralvoyage.common.util.SphericalCoords;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -132,7 +133,7 @@ public abstract class GalaxyRenderer
 					double progress = (double) i / numberOfStars;
 					
 					double phi = length * Math.PI * progress - rotation;
-					double r = StellarCoordinates.spiralR(5, phi, rotation);
+					double r = SphericalCoords.spiralR(5, phi, rotation);
 					
 					double x =  r * Math.cos(phi) + (randomsource.nextFloat() * 4.0F - 2.0F) * 1 / (progress * 1.5);
 					double z =  r * Math.sin(phi) + (randomsource.nextFloat() * 4.0F - 2.0F) * 1 / (progress * 1.5);

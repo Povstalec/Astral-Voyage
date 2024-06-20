@@ -1,16 +1,13 @@
 package net.povstalec.astralvoyage.common.events;
 
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.povstalec.astralvoyage.common.data.SpaceObjects;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
-import net.povstalec.astralvoyage.common.datapack.SpaceObject;
-import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
+import net.povstalec.astralvoyage.common.util.TextureLayerData;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.resources.ResourceLocation;
@@ -38,21 +35,6 @@ import java.util.Optional;
 
 @Mod.EventBusSubscriber(modid = AstralVoyage.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeEvents {
-
-    @SubscribeEvent
-    public static void playerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event)
-    {
-        MinecraftServer server = event.getEntity().getServer();
-        ResourceKey<Level> to = event.getTo();
-        ServerLevel levelTo = server.getLevel(to);
-
-        if(levelTo.dimensionTypeId().location().equals(WorldGenInit.SPACE_TYPE.location()))
-        {
-            List<ClientSpaceObject> list = new ArrayList<>();
-            SpaceObjects.get(server).spaceObjects.forEach((id, object) -> list.add(new ClientSpaceObject(object.getKey(), object.getSize(), Optional.of(Double.valueOf(0)), new Vector3f(0), object.getGalacticPos(), TextureLayerData.toDataList(object.getTextureLayers()))));
-            levelTo.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> cap.setRenderObjects(list));
-        }
-    }
 
     @SubscribeEvent
     public static void onLivingTick(LivingEvent.LivingTickEvent event) {

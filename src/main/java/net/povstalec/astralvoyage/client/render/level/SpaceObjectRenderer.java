@@ -14,13 +14,15 @@ import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.resources.ResourceLocation;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
-import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
+import net.povstalec.astralvoyage.common.util.TextureLayerData;
 import net.povstalec.astralvoyage.common.util.SphericalCoords;
 
 public final class SpaceObjectRenderer
 {
 	private static final float DISTANCE = 100F;
-	private static final float SIZE = 100F;
+	private static final float MIN_SIZE = 0.5F;
+	private static final float INTERSTELLAR_MIN_SIZE = 0.1F;
+	private static final float MAX_SIZE = 360F;
 	
 	private static void renderSurfaceLayer(BufferBuilder bufferbuilder, Matrix4f lastMatrix, float size, float distance, Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer, Vector3f shipToObject, Vector3f galShipToObject, double offset, float rotation)
 	{
@@ -29,12 +31,11 @@ public final class SpaceObjectRenderer
 		boolean blend = layer.getSecond().getSecond();
 
 		SphericalCoords sphericalCoords = new SphericalCoords(shipToObject);
-		float objectRenderSize = Math.min(Math.max((size/distance) * SIZE * 6, galShipToObject.length() > 0.1 ? 0.1F : 0.5F), 360F);
+		float objectRenderSize = fakeSize(size, distance, galShipToObject.length());
+
 		if(galShipToObject.length() > 0.1)
-		{
-			objectRenderSize = 0.5F;
 			sphericalCoords = new SphericalCoords(galShipToObject);
-		}
+
 
 		sphericalCoords.r = DISTANCE;
 		Vector3f corner00 = placeOnSphere(-objectRenderSize, -objectRenderSize, sphericalCoords, offset, rotation);
@@ -69,9 +70,8 @@ public final class SpaceObjectRenderer
 	public static void renderSurface(BufferBuilder bufferbuilder, Matrix4f lastMatrix, ClientSpaceObject spaceObject, float distance, Vector3f galShipToObject, Vector3f shipToObject, float rotation)
 	{
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers = TextureLayerData.toPairList(spaceObject.getTextureLayers());
-		float postSize = Float.compare(galShipToObject.length(), 0f) == 0 ? spaceObject.size : 1;
 
-		textureLayers.forEach(layer -> renderSurfaceLayer(bufferbuilder, lastMatrix, postSize, distance, layer, shipToObject, galShipToObject, spaceObject.getOrbitOffset().orElse(0D), rotation));
+		textureLayers.forEach(layer -> renderSurfaceLayer(bufferbuilder, lastMatrix, spaceObject.getSize(), distance, layer, shipToObject, galShipToObject, spaceObject.getOrbitOffset().orElse(0D), rotation));
 	}
 
 	public static Vector3f placeOnSphere(float offsetX, float offsetY, SphericalCoords sphericalCoords, double orbitOffset, double rotation) {
@@ -96,10 +96,9 @@ public final class SpaceObjectRenderer
 		return new Vector3f(bodyA.x-bodyB.x, bodyA.y-bodyB.y, bodyA.z-bodyB.z);
 	}
 
-	//TODO A size calculation function which accounts for planets and stars
-	//Accounting for it being in galactic coordinate space(stars) and solar(planets/moons) as those need different minimal sizes
-	public float fakeSize(float realSize, float solarDistance, float galacticDistance)
+	//TODO This is still kinda bad, I think
+	public static float fakeSize(float realSize, float solarDistance, float galacticDistance)
 	{
-		return 1F;
+		return Math.min(Math.max(realSize/solarDistance, galacticDistance > 0.1 ? INTERSTELLAR_MIN_SIZE : MIN_SIZE), MAX_SIZE);
 	}
 }

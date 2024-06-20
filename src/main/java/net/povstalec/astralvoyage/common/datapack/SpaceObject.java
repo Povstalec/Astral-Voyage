@@ -13,14 +13,13 @@ import net.minecraft.Util;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
+import net.povstalec.astralvoyage.common.util.TextureLayerData;
 
 public class SpaceObject
 {

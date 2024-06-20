@@ -1,7 +1,6 @@
-package net.povstalec.astralvoyage.common.network.packets;
+package net.povstalec.astralvoyage.common.util;
 
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.StringTag;

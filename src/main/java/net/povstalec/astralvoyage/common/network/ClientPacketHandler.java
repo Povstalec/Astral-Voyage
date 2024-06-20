@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
+import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
 import org.joml.Vector3f;
 
@@ -17,6 +18,14 @@ public class ClientPacketHandler {
         getLevel().ifPresent(level -> {
             level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> {
                 cap.deserializeNBT(mes.tag);
+            });
+        });
+    }
+
+    public static void handleRenderObjectUpdatePacket(RenderObjectUpdateMessage mes) {
+        getLevel().ifPresent(level -> {
+            level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> {
+                cap.setRenderObjects(mes.objects);
             });
         });
     }

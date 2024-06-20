@@ -3,13 +3,9 @@ package net.povstalec.astralvoyage.client.render.level;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
-import com.mojang.datafixers.util.Pair;
-import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

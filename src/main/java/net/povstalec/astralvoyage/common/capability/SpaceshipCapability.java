@@ -2,16 +2,15 @@ package net.povstalec.astralvoyage.common.capability;
 
 import com.google.common.collect.Lists;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.povstalec.astralvoyage.common.data.SpaceObjects;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
+import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
-import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
+import net.povstalec.astralvoyage.common.util.TextureLayerData;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -32,9 +31,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 	private static final String Y_AXIS_ROTATION = "y_axis_rotation";
 	private static final String Z_AXIS_ROTATION = "z_axis_rotation";
 
-    private static final String RENDER_OBJECTS = "render_objects";
-
-	private Vector3f galacticPosition = new Vector3f(0, 0, 0);
+    private Vector3f galacticPosition = new Vector3f(0, 0, 0);
     private Vector3f solarPosition = new Vector3f(0, 0, 0);
 	private Vector3f oldGalacticPosition = new Vector3f(0, 0, 0);
     private Vector3f oldSolarPosition = new Vector3f(0, 0, 0);
@@ -53,30 +50,51 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     	this.oldGalacticPosition.set(galacticPosition);
         this.oldSolarPosition.set(solarPosition);
     	this.oldRotation.set(rotation);
-        if(!level.isClientSide()) {
-            List<ClientSpaceObject> childObjects = new ArrayList<>(this.renderObjects);
-            childObjects.removeIf(cap -> cap.getGalacticPos().isEmpty());
-            this.getRenderObjects().forEach(objects -> {
-                SpaceObject.Serializable object = SpaceObjects.get(level.getServer()).spaceObjects.get(objects.getKey().location().toString());
-                if (object.getGalacticPos().isPresent() && object.getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f))
-                    object.getChildObjects().forEach(child -> {
-                        SpaceObject.Serializable childObject = SpaceObjects.get(level.getServer()).spaceObjects.get(child.location().toString());
-                        ClientSpaceObject clientChildObject = new ClientSpaceObject(child, childObject.getSize(), Optional.ofNullable(childObject.getOrbitMap().get().getSecond().getOrDefault("orbit_start", 0D)), new Vector3f(childObject.getOrbitMap().get().getSecond().getOrDefault("distance", 147280000d).floatValue(), 0, 0), Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
-                        if (!childObjects.contains(clientChildObject))
-                            childObjects.add(clientChildObject);
-                    });
-            });
-            this.renderObjects = childObjects;
+
+        if(!level.isClientSide())
+        {
+            handleRenderObjects(level);
         }
+
     	clientUpdate(level);
     }
-    
+
+    private void handleRenderObjects(Level level)
+    {
+        List<ClientSpaceObject> childObjects = new ArrayList<>();
+        SpaceObjects.get(level).spaceObjects.forEach((objectId, object) ->
+                childObjects.add(new ClientSpaceObject(SpaceObject.stringToSpaceObjectKey(objectId), object.getSize(),
+                        Optional.of(object.getOrbitMap().isPresent() && object.getOrbitMap().get().getSecond().containsKey("orbit_start") ? object.getOrbitMap().get().getSecond().get("orbit_start") : 0D),
+                        new Vector3f(object.getOrbitMap().isPresent() && object.getOrbitMap().get().getSecond().containsKey("distance") ? object.getOrbitMap().get().getSecond().get("distance").floatValue() : 0f, 0 ,0),
+                        object.getGalacticPos(), TextureLayerData.toDataList(object.getTextureLayers()))));
+
+        childObjects.removeIf(filter -> filter.getGalacticPos().isEmpty());
+
+        childObjects.forEach(objects -> {
+            SpaceObject.Serializable object = SpaceObjects.get(level.getServer()).spaceObjects.get(objects.getKey().location().toString());
+            if (object.getGalacticPos().isPresent() && object.getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f))
+                object.getChildObjects().forEach(child -> {
+                    SpaceObject.Serializable childObject = SpaceObjects.get(level.getServer()).spaceObjects.get(child.location().toString());
+                    ClientSpaceObject clientChildObject = new ClientSpaceObject(child, childObject.getSize(),
+                            Optional.of(childObject.getOrbitMap().isPresent() && childObject.getOrbitMap().get().getSecond().containsKey("orbit_start") ? childObject.getOrbitMap().get().getSecond().get("orbit_start") : 0D),
+                            new Vector3f(childObject.getOrbitMap().isPresent() && childObject.getOrbitMap().get().getSecond().containsKey("distance") ? childObject.getOrbitMap().get().getSecond().get("distance").floatValue() : 147280000f, 0, 0),
+                            Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
+                    if (!childObjects.contains(clientChildObject))
+                        childObjects.add(clientChildObject);
+                });
+        });
+
+        this.renderObjects = childObjects;
+    }
+
     private void clientUpdate(Level level)
     {
         if(level != null && !level.isClientSide)
         {
             AVNetwork.sendPacketToDimension(level.dimension(),
             		new SpaceObjectUpdateMessage(this.serializeNBT()));
+            AVNetwork.sendPacketToDimension(level.dimension(),
+                    new RenderObjectUpdateMessage(this.getRenderObjects()));
         }
     }
     
@@ -165,13 +183,6 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         tag.putFloat(Y_AXIS_ROTATION, rotation.y);
         tag.putFloat(Z_AXIS_ROTATION, rotation.z);
 
-        ListTag renderObjects = new ListTag();
-        this.renderObjects.forEach(object -> {
-            CompoundTag objectTag = object.serialize();
-            renderObjects.add(objectTag);
-        });
-        tag.put(RENDER_OBJECTS, renderObjects);
-
         return tag;
     }
 
@@ -188,14 +199,5 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         this.rotation.x = nbt.getFloat(X_AXIS_ROTATION);
         this.rotation.y = nbt.getFloat(Y_AXIS_ROTATION);
         this.rotation.z = nbt.getFloat(Z_AXIS_ROTATION);
-
-        ListTag listTag = nbt.getList(RENDER_OBJECTS, Tag.TAG_COMPOUND);
-        List<ClientSpaceObject> renderObjects = new ArrayList<>();
-        listTag.forEach(tag -> {
-           CompoundTag objectTag = (CompoundTag) tag;
-           ClientSpaceObject object = ClientSpaceObject.deserialize(objectTag);
-           renderObjects.add(object);
-        });
-        this.renderObjects = renderObjects;
     }
 }

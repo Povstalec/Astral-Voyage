@@ -3,7 +3,6 @@ package net.povstalec.astralvoyage.common.util;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.network.packets.TextureLayerData;
 
 import java.util.List;
 
