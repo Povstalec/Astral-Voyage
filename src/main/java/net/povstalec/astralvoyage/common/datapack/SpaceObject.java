@@ -300,32 +300,30 @@ public class SpaceObject
 				objectTag.putString(NAME, this.name.get());
 				objectTag.putFloat(SIZE, this.size.get());
 
-				if(parentOrbitMap.isPresent())
+				if(this.getOrbitMap().isPresent())
 				{
 					CompoundTag orbitMap = new CompoundTag();
-					orbitMap.putDouble(DISTANCE, getOrbitMap().get().getSecond().get(DISTANCE));
-					orbitMap.putDouble(ORBIT_DAYS, getOrbitMap().get().getSecond().get(ORBIT_DAYS));
-					orbitMap.putDouble(ORBIT_START, getOrbitMap().get().getSecond().get(ORBIT_START));
-					orbitMap.putDouble(ORBIT_INCLINATION, getOrbitMap().get().getSecond().get(ORBIT_INCLINATION));
-					orbitMap.putDouble(ROTATION, getOrbitMap().get().getSecond().get(ROTATION));
+					orbitMap.putDouble(DISTANCE, this.getOrbitMap().get().getSecond().get(DISTANCE));
+					orbitMap.putDouble(ORBIT_DAYS, this.getOrbitMap().get().getSecond().get(ORBIT_DAYS));
+					orbitMap.putDouble(ORBIT_START, this.getOrbitMap().get().getSecond().get(ORBIT_START));
+					orbitMap.putDouble(ORBIT_INCLINATION, this.getOrbitMap().get().getSecond().get(ORBIT_INCLINATION));
+					orbitMap.putDouble(ROTATION, this.getOrbitMap().get().getSecond().get(ROTATION));
 
 					objectTag.put("orbit", orbitMap);
 				}
 
-				if(galactic_position.isPresent())
+				if(this.getGalacticPos().isPresent())
 				{
 					CompoundTag galPos = new CompoundTag();
-					galPos.putFloat("x", galactic_position.get().x);
-					galPos.putFloat("y", galactic_position.get().y);
-					galPos.putFloat("z", galactic_position.get().z);
+					galPos.putFloat("x", this.getGalacticPos().get().x);
+					galPos.putFloat("y", this.getGalacticPos().get().y);
+					galPos.putFloat("z", this.getGalacticPos().get().z);
 					objectTag.put("galactic_position", galPos);
 				}
 				this.parentOrbitMap.ifPresent(spaceObjectResourceKey -> objectTag.putString(PARENT, spaceObjectResourceKey.getFirst().location().toString()));
 				ListTag textureLayers = new ListTag();
 
-				this.textureLayers.forEach(textureLayer -> {
-					textureLayers.add(TextureLayerData.serialize(new TextureLayerData(textureLayer)));
-				});
+				this.textureLayers.forEach(textureLayer -> textureLayers.add(TextureLayerData.serialize(new TextureLayerData(textureLayer))));
 				objectTag.put(TEXTURE_LAYERS, textureLayers);
 			}
 

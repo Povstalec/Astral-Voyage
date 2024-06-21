@@ -50,7 +50,7 @@ public class SpaceObjects extends SavedData
 
 	public void generateData(MinecraftServer server)
 	{
-		for (int i = 0; i <= 15; i++) {
+		for (int i = 0; i <= 30; i++) {
 			registerRandomSpaceObjects();
 		}
 		registerSpaceObjectFromDataPacks(server);
@@ -150,8 +150,6 @@ public class SpaceObjects extends SavedData
 				saveSpaceObject(newObject.getKey(), newObject);
 			}
 		}
-
-		System.out.println("Registry : " + spaceObjectName);
 		this.spaceObjects.put(spaceObjectName, object);
 
 		return true;

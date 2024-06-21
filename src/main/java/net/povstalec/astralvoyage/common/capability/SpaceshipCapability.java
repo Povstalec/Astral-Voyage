@@ -70,6 +70,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 
         childObjects.removeIf(filter -> filter.getGalacticPos().isEmpty());
 
+        List<ClientSpaceObject> objectsToAdd = new ArrayList<>(childObjects);
         childObjects.forEach(objects -> {
             SpaceObject.Serializable object = SpaceObjects.get(level.getServer()).spaceObjects.get(objects.getKey().location().toString());
             if (object.getGalacticPos().isPresent() && object.getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f))
@@ -79,8 +80,8 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
                             Optional.of(childObject.getOrbitMap().isPresent() && childObject.getOrbitMap().get().getSecond().containsKey("orbit_start") ? childObject.getOrbitMap().get().getSecond().get("orbit_start") : 0D),
                             new Vector3f(childObject.getOrbitMap().isPresent() && childObject.getOrbitMap().get().getSecond().containsKey("distance") ? childObject.getOrbitMap().get().getSecond().get("distance").floatValue() : 147280000f, 0, 0),
                             Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
-                    if (!childObjects.contains(clientChildObject))
-                        childObjects.add(clientChildObject);
+                    if (!objectsToAdd.contains(clientChildObject))
+                        objectsToAdd.add(clientChildObject);
                 });
         });
 
