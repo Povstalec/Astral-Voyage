@@ -20,6 +20,7 @@ public class ItemTabsInit {
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(BlockInit.SPACESHIP_GENERATOR_BLOCK.get());
                         pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_BLOCK.get());
+                        pOutput.accept(BlockInit.SPACESHIP_HEADING_BLOCK.get());
                     }).build());
 
 

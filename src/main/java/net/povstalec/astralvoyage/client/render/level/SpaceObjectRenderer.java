@@ -23,7 +23,7 @@ public final class SpaceObjectRenderer
 	private static final float MIN_SIZE = 0.5F;
 	private static final float MAX_SIZE = 360F;
 	private static final float INTERSTELLAR_MIN_SIZE = 0.1F;
-	private static final float INTERSTELLAR_MAX_SIZE = 0.5F;
+	private static final float INTERSTELLAR_MAX_SIZE = 0.7F;
 
 	
 	private static void renderSurfaceLayer(BufferBuilder bufferbuilder, Matrix4f lastMatrix, float size, float distance, Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer, Vector3f shipToObject, Vector3f galShipToObject, double offset, float rotation)
@@ -31,6 +31,7 @@ public final class SpaceObjectRenderer
 		ResourceLocation texture = layer.getFirst();
 		int[] rgba = layer.getSecond().getFirst().stream().mapToInt((integer) -> integer).toArray();
 		boolean blend = layer.getSecond().getSecond();
+		galShipToObject = new Vector3f(-galShipToObject.x, -galShipToObject.y, -galShipToObject.z);
 
 		SphericalCoords sphericalCoords = new SphericalCoords(shipToObject);
 		float objectRenderSize = fakeSize(size, distance, galShipToObject.length());
