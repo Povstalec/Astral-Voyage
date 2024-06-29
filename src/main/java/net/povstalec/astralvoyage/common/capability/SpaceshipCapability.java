@@ -10,6 +10,7 @@ import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
 import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
+import net.povstalec.astralvoyage.common.util.Rotation;
 import net.povstalec.astralvoyage.common.util.TextureLayerData;
 import org.joml.Vector3f;
 
@@ -26,18 +27,16 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 	private static final String GALACTIC_POS_X = "galactic_pos_x";
 	private static final String GALACTIC_POS_Y = "galactic_pos_y";
 	private static final String GALACTIC_POS_Z = "galactic_pos_z";
-	
-	private static final String X_AXIS_ROTATION = "x_axis_rotation";
-	private static final String Y_AXIS_ROTATION = "y_axis_rotation";
-	private static final String Z_AXIS_ROTATION = "z_axis_rotation";
 
     private Vector3f galacticPosition = new Vector3f(0, 0, 0);
     private Vector3f solarPosition = new Vector3f(0, 0, 0);
 	private Vector3f oldGalacticPosition = new Vector3f(0, 0, 0);
     private Vector3f oldSolarPosition = new Vector3f(0, 0, 0);
 
-	private Vector3f rotation = new Vector3f(0, 0, 0);
-	private Vector3f oldRotation = new Vector3f(0, 0, 0);
+	private Rotation rotation = new Rotation(0, 0, 0);
+	private Rotation oldRotation = new Rotation(0 ,0 , 0);
+
+    private Rotation targetRotation = new Rotation(0, 0, 0);
 
     private List<ClientSpaceObject> renderObjects = Lists.newArrayList();
 
@@ -101,10 +100,17 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     
 	public void setRotation(float xAxisRotation, float yAxisRotation, float zAxisRotation)
 	{
-		this.rotation.x = xAxisRotation;
-		this.rotation.y = yAxisRotation;
-		this.rotation.z = zAxisRotation;
+		this.rotation.yaw = xAxisRotation;
+		this.rotation.pitch = yAxisRotation;
+		this.rotation.roll = zAxisRotation;
 	}
+
+    public void setTargetRotation(float xAxisRotation, float yAxisRotation, float zAxisRotation)
+    {
+        this.targetRotation.yaw = xAxisRotation;
+        this.targetRotation.pitch = yAxisRotation;
+        this.targetRotation.roll = zAxisRotation;
+    }
 
     public void setSolarPosition(float solarX, float solarY, float solarZ)
     {
@@ -122,16 +128,21 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 
     public void moveGalacticPosition(Vector3f vector)
     {
-        this.galacticPosition.x += vector.x;
-        this.galacticPosition.y += vector.y;
-        this.galacticPosition.z += vector.z;
+        this.galacticPosition.x += this.rotation.step()*vector.x;
+        this.galacticPosition.y += this.rotation.step()*vector.y;
+        this.galacticPosition.z += this.rotation.step()*vector.z;
     }
 
     public void moveSolarPosition(Vector3f vector)
     {
-        this.solarPosition.x += vector.x;
-        this.solarPosition.y += vector.y;
-        this.solarPosition.z += vector.z;
+        this.solarPosition.x += this.rotation.step()*vector.x;
+        this.solarPosition.y += this.rotation.step()*vector.y;
+        this.solarPosition.z += this.rotation.step()*vector.z;
+    }
+
+    public void rotate(Rotation rotation)
+    {
+        this.rotation = rotation;
     }
 
     public List<ClientSpaceObject> getRenderObjects()
@@ -154,7 +165,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 		return oldGalacticPosition;
 	}
 
-	public Vector3f getRotation()
+	public Rotation getRotation()
 	{
 		return rotation;
 	}
@@ -163,7 +174,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         this.renderObjects = renderObjects;
     }
 
-	public Vector3f getOldRotation()
+	public Rotation getOldRotation()
 	{
 		return oldRotation;
 	}
@@ -180,9 +191,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         tag.putFloat(GALACTIC_POS_Y, galacticPosition.y);
         tag.putFloat(GALACTIC_POS_Z, galacticPosition.z);
         
-        tag.putFloat(X_AXIS_ROTATION, rotation.x);
-        tag.putFloat(Y_AXIS_ROTATION, rotation.y);
-        tag.putFloat(Z_AXIS_ROTATION, rotation.z);
+        tag.put("rotation", rotation.serialize());
 
         return tag;
     }
@@ -197,8 +206,6 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         this.galacticPosition.y = nbt.getFloat(GALACTIC_POS_Y);
         this.galacticPosition.z = nbt.getFloat(GALACTIC_POS_Z);
         
-        this.rotation.x = nbt.getFloat(X_AXIS_ROTATION);
-        this.rotation.y = nbt.getFloat(Y_AXIS_ROTATION);
-        this.rotation.z = nbt.getFloat(Z_AXIS_ROTATION);
+        this.rotation.set(Rotation.deserialize(nbt));
     }
 }
