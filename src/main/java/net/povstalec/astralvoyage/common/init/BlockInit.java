@@ -14,7 +14,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.blocks.SpaceshipGeneratorBlock;
-import net.povstalec.astralvoyage.common.blocks.SpaceshipHeadingBlock;
 import net.povstalec.astralvoyage.common.blocks.SpaceshipMovementBlock;
 
 public class BlockInit {
@@ -25,7 +24,6 @@ public class BlockInit {
 
     public static final RegistryObject<SpaceshipMovementBlock> SPACESHIP_MOVEMENT_BLOCK = registerWithItem("spaceship_movement_block", () -> new SpaceshipMovementBlock(BlockBehaviour.Properties.of().forceSolidOn()));
 
-    public static final RegistryObject<SpaceshipHeadingBlock> SPACESHIP_HEADING_BLOCK = registerWithItem("spaceship_heading_block", () -> new SpaceshipHeadingBlock(BlockBehaviour.Properties.of().forceSolidOn()));
 
     public static <T extends Block> RegistryObject<T> registerWithItem(String name, final Supplier<T> block, Function<Item.Properties, Item.Properties> properties){
         final RegistryObject<T> reg = BLOCKS.register(name, block);

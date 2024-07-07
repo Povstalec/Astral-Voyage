@@ -6,7 +6,6 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.block_entities.SpaceshipHeadingBlockEntity;
 import net.povstalec.astralvoyage.common.block_entities.SpaceshipMovementBlockEntity;
 
 public class BlockEntityInit {
@@ -14,9 +13,6 @@ public class BlockEntityInit {
 
     public static final RegistryObject<BlockEntityType<SpaceshipMovementBlockEntity>> MOVEMENT_BLOCK = BLOCK_ENTITIES.register("movement",
             () -> BlockEntityType.Builder.of(SpaceshipMovementBlockEntity::new, BlockInit.SPACESHIP_MOVEMENT_BLOCK.get()).build(null));
-
-    public static final RegistryObject<BlockEntityType<SpaceshipHeadingBlockEntity>> HEADING_BLOCK = BLOCK_ENTITIES.register("heading",
-            () -> BlockEntityType.Builder.of(SpaceshipHeadingBlockEntity::new, BlockInit.SPACESHIP_HEADING_BLOCK.get()).build(null));
 
     public static void register(IEventBus eventBus)
     {

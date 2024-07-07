@@ -31,7 +31,6 @@ public final class SpaceObjectRenderer
 		ResourceLocation texture = layer.getFirst();
 		int[] rgba = layer.getSecond().getFirst().stream().mapToInt((integer) -> integer).toArray();
 		boolean blend = layer.getSecond().getSecond();
-		galShipToObject = new Vector3f(-galShipToObject.x, -galShipToObject.y, -galShipToObject.z);
 
 		SphericalCoords sphericalCoords = new SphericalCoords(shipToObject);
 		float objectRenderSize = fakeSize(size, distance, galShipToObject.length());

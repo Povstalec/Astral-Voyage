@@ -6,7 +6,6 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-import net.povstalec.astralvoyage.common.util.Rotation;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -78,13 +77,13 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     	
     	@NotNull LazyOptional<SpaceshipCapability> capability = getSpaceShipCapability(level);
     	
-    	Rotation rotation = getRotation(capability);
-    	Rotation oldRotation = getOldRotation(capability);
+    	Vector3f rotation = getRotation(capability);
+    	Vector3f oldRotation = getOldRotation(capability);
         List<ClientSpaceObject> renderObjects = getRenderObjects(capability);
 
-    	float xAxisRotation = Mth.lerp(partialTick, oldRotation.yaw, rotation.yaw);
-    	float yAxisRotation = Mth.lerp(partialTick, oldRotation.pitch, rotation.pitch);
-    	float zAxisRotation = Mth.lerp(partialTick, oldRotation.roll, rotation.roll);
+    	float xAxisRotation = Mth.lerp(partialTick, oldRotation.x, rotation.x);
+    	float yAxisRotation = Mth.lerp(partialTick, oldRotation.y, rotation.y);
+    	float zAxisRotation = Mth.lerp(partialTick, oldRotation.z, rotation.z);
     	
         poseStack.mulPose(Axis.YP.rotationDegrees(yAxisRotation));
         poseStack.mulPose(Axis.XP.rotationDegrees(xAxisRotation));
@@ -219,24 +218,24 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
     	return new Vector3f(0, 0, 0);
     }
     
-    public static Rotation getRotation(@NotNull LazyOptional<SpaceshipCapability> capability)
+    public static Vector3f getRotation(@NotNull LazyOptional<SpaceshipCapability> capability)
     {
-    	Optional<Rotation> rotation = capability.map(cap -> cap.getRotation());
+    	Optional<Vector3f> rotation = capability.map(cap -> cap.getRotation());
     	
     	if(rotation.isPresent())
     		return rotation.get();
     	
-    	return new Rotation(0, 0, 0);
+    	return new Vector3f(0, 0, 0);
     }
 
-    public static Rotation getOldRotation(@NotNull LazyOptional<SpaceshipCapability> capability)
+    public static Vector3f getOldRotation(@NotNull LazyOptional<SpaceshipCapability> capability)
     {
-    	Optional<Rotation> oldRotation = capability.map(cap -> cap.getOldRotation());
+    	Optional<Vector3f> oldRotation = capability.map(cap -> cap.getOldRotation());
 
     	if(oldRotation.isPresent())
     		return oldRotation.get();
 
-    	return new Rotation(0, 0, 0);
+    	return new Vector3f(0, 0, 0);
     }
 
     public static <T, U extends Comparable<? super U>> Comparator<T> reverseComparing(
