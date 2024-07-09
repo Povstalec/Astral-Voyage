@@ -10,9 +10,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
-import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
-import net.povstalec.astralvoyage.common.network.packets.UpdateDimensionsPacket;
+import net.povstalec.astralvoyage.common.network.packets.*;
 
 public class AVNetwork {
     public static final String NET_VERSION = "1.0";
@@ -24,6 +22,8 @@ public class AVNetwork {
         INSTANCE.registerMessage(id(), UpdateDimensionsPacket.class, UpdateDimensionsPacket::write, UpdateDimensionsPacket::read, UpdateDimensionsPacket::handle);
         INSTANCE.registerMessage(id(), SpaceObjectUpdateMessage.class, SpaceObjectUpdateMessage::write, SpaceObjectUpdateMessage::read, SpaceObjectUpdateMessage::handle);
         INSTANCE.registerMessage(id(), RenderObjectUpdateMessage.class, RenderObjectUpdateMessage::write, RenderObjectUpdateMessage::read, RenderObjectUpdateMessage::handle);
+        INSTANCE.registerMessage(id(), PlanetUpdateMessage.class, PlanetUpdateMessage::write, PlanetUpdateMessage::read, PlanetUpdateMessage::handle);
+        INSTANCE.registerMessage(id(), PlanetRenderUpdateMessage.class, PlanetRenderUpdateMessage::write, PlanetRenderUpdateMessage::read, PlanetRenderUpdateMessage::handle);
     }
 
     public static void sendPacketToAll(Object message){

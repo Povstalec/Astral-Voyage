@@ -7,6 +7,8 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
+import net.povstalec.astralvoyage.common.network.packets.PlanetRenderUpdateMessage;
+import net.povstalec.astralvoyage.common.network.packets.PlanetUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
 import org.joml.Vector3f;
@@ -15,9 +17,33 @@ import org.joml.Vector3f;
 public class ClientPacketHandler {
 
     public static void handleSpaceObjectUpdatePacket(SpaceObjectUpdateMessage mes) {
-        getLevel().ifPresent(level -> {
-            level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> {
+        getLevel().ifPresent(level ->
+        {
+            level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(
+            cap -> {
                 cap.deserializeNBT(mes.tag);
+            });
+        });
+    }
+
+    public static void handlePlanetUpdatePacket(PlanetUpdateMessage mes)
+    {
+        getLevel().ifPresent(level ->
+        {
+            level.getCapability(CapabilitiesInit.PLANET).ifPresent(
+            cap -> {
+                cap.deserializeNBT(mes.tag);
+            });
+        });
+    }
+
+    public static void handlePlanetRenderUpdatePacket(PlanetRenderUpdateMessage mes)
+    {
+        getLevel().ifPresent(
+        level -> {
+            level.getCapability(CapabilitiesInit.PLANET).ifPresent(
+            cap -> {
+                   cap.setRenderObjects(mes.objects);
             });
         });
     }

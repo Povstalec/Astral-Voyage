@@ -22,8 +22,10 @@ public final class SpaceObjectRenderer
 	private static final float DISTANCE = 100F;
 	private static final float MIN_SIZE = 0.5F;
 	private static final float MAX_SIZE = 360F;
-	private static final float INTERSTELLAR_MIN_SIZE = 0.1F;
+	private static final float INTERSTELLAR_MIN_SIZE = 0.5F;
 	private static final float INTERSTELLAR_MAX_SIZE = 0.7F;
+	private static final float SPACESHIP_MAX_SIZE = 0.25F;
+	private static final float SPACESHIP_MIN_SIZE = 0.05F;
 
 	
 	private static void renderSurfaceLayer(BufferBuilder bufferbuilder, Matrix4f lastMatrix, float size, float distance, Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer, Vector3f shipToObject, Vector3f galShipToObject, double offset, float rotation)
@@ -101,7 +103,10 @@ public final class SpaceObjectRenderer
 	//TODO This is still kinda bad, I think
 	public static float fakeSize(float realSize, float solarDistance, float galacticDistance)
 	{
-		return Math.min(Math.max((realSize/solarDistance)*600, galacticDistance > 0.1 ? INTERSTELLAR_MIN_SIZE : MIN_SIZE),
+		if(realSize == 1)
+			return Math.min(Math.max((realSize/solarDistance)*1200, SPACESHIP_MIN_SIZE), SPACESHIP_MAX_SIZE);
+
+		return Math.min(Math.max((realSize/solarDistance)*1200, galacticDistance > 0.1 ? INTERSTELLAR_MIN_SIZE : MIN_SIZE),
 				galacticDistance > 0.1 ? INTERSTELLAR_MAX_SIZE : MAX_SIZE);
 	}
 }

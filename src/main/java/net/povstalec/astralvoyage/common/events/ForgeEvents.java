@@ -5,6 +5,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
+import net.povstalec.astralvoyage.common.capability.PlanetCapability;
 import net.povstalec.astralvoyage.common.data.SpaceObjects;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
@@ -64,6 +65,9 @@ public class ForgeEvents {
     public static void attachWorldCapabilies(AttachCapabilitiesEvent<Level> event) {
         if (event.getObject().dimensionTypeId().location().equals(WorldGenInit.SPACE_TYPE.location()))
             event.addCapability(new ResourceLocation(AstralVoyage.MODID, "spaceship"), new GenericProvider<>(CapabilitiesInit.SPACESHIP, new SpaceshipCapability()));
+
+        if(event.getObject().dimensionTypeId().location().equals(WorldGenInit.PLANET_TYPE.location()))
+            event.addCapability(new ResourceLocation(AstralVoyage.MODID, "planet"), new GenericProvider<>(CapabilitiesInit.PLANET, new PlanetCapability()));
     }
 
     @SubscribeEvent
@@ -88,6 +92,14 @@ public class ForgeEvents {
 					cap.tick(level);
 				}
 			});
+
+            @NotNull LazyOptional<PlanetCapability> planetCapability = level.getCapability(CapabilitiesInit.PLANET);
+            planetCapability.ifPresent(
+                    cap -> {
+                        if(cap != null)
+                            cap.tick(level);
+                    }
+            );
 		}
 	}
 

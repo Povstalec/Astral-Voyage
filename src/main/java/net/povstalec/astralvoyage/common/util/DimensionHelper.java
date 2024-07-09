@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import com.mojang.serialization.Lifecycle;
 
 import net.minecraft.Util;
+import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -25,6 +26,7 @@ import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.BorderChangeListener;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -35,6 +37,7 @@ import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.init.WorldGenInit;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
 import net.povstalec.astralvoyage.common.network.packets.UpdateDimensionsPacket;
+import net.povstalec.astralvoyage.common.worldgen.dimension.PlanetChunkGenerator;
 import net.povstalec.astralvoyage.common.worldgen.dimension.SpaceChunkGenerator;
 
 public class DimensionHelper {
@@ -146,25 +149,47 @@ public class DimensionHelper {
     }
 
 
-    public static ServerLevel createSpaceship(MinecraftServer server, ResourceLocation dimLoc){
+    public static ServerLevel createSpaceship(MinecraftServer server, ResourceLocation dimLoc)
+    {
         ServerLevel level = DimensionHelper.createAndRegisterLevel(server, server.forgeGetWorldMap(), ResourceKey.create(Registries.DIMENSION, dimLoc), () -> createSpaceshipStem(server));
 
         return level;
     }
 
-    public static ServerLevel createSpaceship(MinecraftServer server){
+    public static ServerLevel createSpaceship(MinecraftServer server)
+    {
         return createSpaceship(server, new ResourceLocation(AstralVoyage.MODID, UUID.randomUUID().toString()));
     }
 
-    public static LevelStem createSpaceshipStem(MinecraftServer server) {
+    public static ServerLevel createPlanet(MinecraftServer server, ResourceLocation dimensionLocation)
+    {
+        ServerLevel level = DimensionHelper.createAndRegisterLevel(server, server.forgeGetWorldMap(), ResourceKey.create(Registries.DIMENSION, dimensionLocation), () -> createPlanetStem(server));
+
+        return level;
+    }
+
+    public static LevelStem createSpaceshipStem(MinecraftServer server)
+    {
         RegistryAccess registries = server.registryAccess();
 
-        LevelStem steam = new LevelStem(registries.registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(WorldGenInit.SPACE_TYPE),
+        LevelStem stem = new LevelStem(registries.registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(WorldGenInit.SPACE_TYPE),
                 new SpaceChunkGenerator(
                         registries.registryOrThrow(Registries.BIOME).asLookup()
                 ));
 
-        return steam;
+        return stem;
+    }
+
+    public static LevelStem createPlanetStem(MinecraftServer server)
+    {
+        RegistryAccess registries = server.registryAccess();
+
+        LevelStem stem = new LevelStem(registries.registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(WorldGenInit.PLANET_TYPE),
+                new PlanetChunkGenerator(
+                        registries.registryOrThrow(Registries.BIOME).asLookup()
+                ));
+
+        return stem;
     }
 
 }

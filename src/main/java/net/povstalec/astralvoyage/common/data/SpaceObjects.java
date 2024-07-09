@@ -15,18 +15,20 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.util.RandomTextureLayers;
-import org.apache.commons.compress.utils.Lists;
 import org.joml.Vector3f;
 
 import java.util.*;
-
-import static net.povstalec.astralvoyage.common.datapack.SpaceObject.stringToSpaceObjectKey;
 
 public class SpaceObjects extends SavedData
 {
 	private static final String FILE_NAME = AstralVoyage.MODID + "-space_objects";
 
 	private static final String SPACE_OBJECTS = "space_objects";
+
+	private static final int MAX_STARS = 50;
+	private static final int MIN_STARS = 10;
+	private static final int MIN_PLANETS_PER_STAR = 0;
+	private static final int MAX_PLATERS_PER_STAR = 10;
 
 	public HashMap<String, SpaceObject.Serializable> spaceObjects = new HashMap<>();
 	
@@ -50,10 +52,14 @@ public class SpaceObjects extends SavedData
 
 	public void generateData(MinecraftServer server)
 	{
-		for (int i = 0; i <= 30; i++) {
-			registerRandomSpaceObjects();
+		Random random = new Random();
+
+		for (int i = 0; i <= random.nextInt(MIN_STARS, MAX_STARS); i++) {
+			registerRandomSpaceObjects(random);
 		}
 		registerSpaceObjectFromDataPacks(server);
+
+		this.setDirty();
 	}
 
 	private CompoundTag serialize()
@@ -65,7 +71,8 @@ public class SpaceObjects extends SavedData
 		return tag;
 	}
 
-	private CompoundTag serializeSpaceObjects(){
+	private CompoundTag serializeSpaceObjects()
+	{
 		CompoundTag spaceObjectsTag = new CompoundTag();
 
 		this.spaceObjects.forEach((objectID, spaceObject) -> spaceObjectsTag.put(objectID, spaceObject.serialize()));
@@ -78,7 +85,8 @@ public class SpaceObjects extends SavedData
 		deserializeSpaceObjects(tag);
 	}
 
-	private void deserializeSpaceObjects(CompoundTag tag){
+	private void deserializeSpaceObjects(CompoundTag tag)
+	{
 		final RegistryAccess registries = server.registryAccess();
 		final Registry<SpaceObject> objectRegistry = registries.registryOrThrow(SpaceObject.REGISTRY_KEY);
 
@@ -93,17 +101,16 @@ public class SpaceObjects extends SavedData
 	//********************************************Data********************************************
 	//============================================================================================
 
-	private void registerRandomSpaceObjects()
+	private void registerRandomSpaceObjects(Random random)
 	{
-		Random random = new Random();
 		RandomTextureLayers.Star layer = RandomTextureLayers.Star.values()[random.nextInt(0, 7)];
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layerList = List.of(layer.getTextureLayer().getFirst().getLayer(), layer.getTextureLayer().getSecond().getLayer());
 		String id = AstralVoyage.MODID + ":star_" + UUID.randomUUID();
-		SpaceObject.Serializable newObject = new SpaceObject.Serializable(Optional.of(stringToSpaceObjectKey(id)),
-				Optional.empty(), id, 13000, Optional.of(new Vector3f(((int) random.nextFloat(2f, 1000f)), ((int) random.nextFloat(2f, 1000f)), ((int) random.nextFloat(2f, 1000f)))), Optional.empty(),
+		SpaceObject.Serializable newObject = new SpaceObject.Serializable(Optional.empty(), Optional.of(id), Optional.of(13000F),
+				Optional.of(new Vector3f(((int) random.nextFloat(-1000f, 1000f)), ((int) random.nextFloat(-10000f, 1000f)), ((int) random.nextFloat(-1000f, 1000f)))), Optional.empty(),
 				Optional.of(new SpaceObject.Generation((short) random.nextInt(0, 11), new Pair<>(random.nextFloat(128000, 18900000), random.nextFloat(128900000, 1897500000000f)))),
 				layerList);
-		saveSpaceObject(newObject.getKey(), newObject);
+		saveSpaceObject(newObject);
 	}
 
 	private void registerSpaceObjectFromDataPacks(MinecraftServer server)
@@ -122,17 +129,22 @@ public class SpaceObjects extends SavedData
 	private void addSpaceObjectFromDataPack(MinecraftServer server, ResourceKey<SpaceObject> spaceObjectKey, SpaceObject spaceObject)
 	{
 		SpaceObject.Serializable object = new SpaceObject.Serializable(spaceObjectKey, spaceObject);
-		saveSpaceObject(spaceObjectKey, object);
+		saveSpaceObject(object);
 	}
 
-	private boolean saveSpaceObject(ResourceKey<SpaceObject> spaceObjectKey, SpaceObject.Serializable object)
+	private boolean saveSpaceObject(SpaceObject.Serializable object)
 	{
-		String spaceObjectName = object.getKey().location().toString();
+		String spaceObjectName = AstralVoyage.MODID + ":empty";
+		if(object.getName().isPresent())
+			spaceObjectName = object.getName().get();
+		if(object.getKey().isPresent())
+			spaceObjectName = object.getKey().get().location().toString();
+
 		if(object.getOrbitMap().isPresent())
 		{
 			SpaceObject.Serializable parentObject = spaceObjects.get(object.getOrbitMap().get().getFirst().location().toString());
 			if(parentObject != null)
-				parentObject.addChild(object.getKey());
+				parentObject.addChild(SpaceObject.stringToSpaceObjectKey(spaceObjectName));
 		}
 		if(object.getGeneration().isPresent())
 		{
@@ -142,12 +154,15 @@ public class SpaceObjects extends SavedData
 				RandomTextureLayers.Planet[] values = RandomTextureLayers.Planet.values();
 				List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layerList = List.of(values[random.nextInt(0, 8)].getTextureLayer(), values[random.nextInt(8, 16)].getTextureLayer());
 				String id = AstralVoyage.MODID + ":body_" + UUID.randomUUID();
-				SpaceObject.Serializable newObject = new SpaceObject.Serializable(Optional.of(stringToSpaceObjectKey(id)),Optional.empty(),
-						id, 13000, Optional.empty(),
-						Optional.of(new Pair<>(object.getKey(), Map.of("distance", ((double) new Random().nextInt(object.getGeneration().get().getGenerationDistance().getFirst().intValue(), object.getGeneration().get().getGenerationDistance().getSecond().intValue()))))),
+				SpaceObject.Serializable newObject = new SpaceObject.Serializable(
+						Optional.empty(), Optional.of(id), Optional.of(13000F), Optional.empty(),
+						Optional.of(new Pair<>(SpaceObject.stringToSpaceObjectKey(spaceObjectName),
+						Map.of("distance", ((double) new Random().nextInt(object.getGeneration().get().getGenerationDistance().getFirst().intValue(),
+						object.getGeneration().get().getGenerationDistance().getSecond().intValue())),
+								"orbit_days", 0d, "orbit_start", 0d, "orbit_inclination", 0d, "rotation", 0d))),
 						Optional.empty(), layerList);
-				object.addChild(newObject.getKey());
-				saveSpaceObject(newObject.getKey(), newObject);
+				object.addChild(SpaceObject.stringToSpaceObjectKey(id));
+				saveSpaceObject(newObject);
 			}
 		}
 		this.spaceObjects.put(spaceObjectName, object);
