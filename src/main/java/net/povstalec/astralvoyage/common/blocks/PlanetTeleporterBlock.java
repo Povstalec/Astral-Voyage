@@ -39,7 +39,7 @@ public class PlanetTeleporterBlock extends Block {
                 Vector3f vector = new Vector3f(0);
                 if(thing.getValue().getOrbitMap().isPresent())
                     vector = new Vector3f(thing.getValue().getOrbitMap().get().getSecond().get("distance").floatValue(), 0, 0);
-                return vector.distance(cap.getSolarPosition()) < 1000;
+                return vector.distance(cap.getSolarPosition()) < 500000;
             }).toList();
             objectList.get(0).getValue().getDimension().ifPresentOrElse(present ->
             pPlayer.teleportTo(

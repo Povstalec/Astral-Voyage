@@ -68,9 +68,5 @@ public class RandomTextureLayers {
         public Pair<TextureLayerData, TextureLayerData> getTextureLayer() {
             return texture_layer_pair;
         }
-
     }
-
-
-
 }

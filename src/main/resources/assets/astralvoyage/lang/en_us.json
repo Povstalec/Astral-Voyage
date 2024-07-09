@@ -2,6 +2,7 @@
   "astralvoyage.main": "Astral Voyage",
   "block.astralvoyage.spaceship_generator_block": "Spaceship Generator",
   "block.astralvoyage.spaceship_movement_block": "Spaceship Movement Block",
+  "block.astralvoyage.ship_teleporter_block": "Ship Teleporter Block",
   "block.astralvoyage.planet_teleporter_block": "Planet Teleporter Block",
   "tooltip.astralvoyage.movementBlock": "When powered with Redstone, will push the ship into the direction of the facing of the block with speed of 20Mm/s"
 

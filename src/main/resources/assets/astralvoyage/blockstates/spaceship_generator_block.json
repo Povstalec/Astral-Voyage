@@ -1,0 +1,6 @@
+{
+  "variants":
+  {
+    "": {"model": "astralvoyage:block/ship_generator_block"}
+  }
+}

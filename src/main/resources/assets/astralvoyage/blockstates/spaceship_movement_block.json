@@ -1,0 +1,54 @@
+{
+  "variants": {
+    "facing=down,movement_type=solar": {
+      "model": "astralvoyage:block/ship_movement_block",
+      "x": 180
+    },
+    "facing=up,movement_type=solar": {
+      "model": "astralvoyage:block/ship_movement_block"
+    },
+    "facing=north,movement_type=solar": {
+      "model": "astralvoyage:block/ship_movement_block",
+      "x": 270
+    },
+    "facing=south,movement_type=solar": {
+      "model": "astralvoyage:block/ship_movement_block",
+      "x": 90
+    },
+    "facing=west,movement_type=solar": {
+      "model": "astralvoyage:block/ship_movement_block",
+      "y": 90,
+      "x": 90
+    },
+    "facing=east,movement_type=solar": {
+      "model": "astralvoyage:block/ship_movement_block",
+      "y": 270,
+      "x": 90
+    },
+    "facing=down,movement_type=galactic": {
+      "model": "astralvoyage:block/ship_movement_block_galactic",
+      "x": 180
+    },
+    "facing=up,movement_type=galactic": {
+      "model": "astralvoyage:block/ship_movement_block_galactic"
+    },
+    "facing=north,movement_type=galactic": {
+      "model": "astralvoyage:block/ship_movement_block_galactic",
+      "x": 270
+    },
+    "facing=south,movement_type=galactic": {
+      "model": "astralvoyage:block/ship_movement_block_galactic",
+      "x": 90
+    },
+    "facing=west,movement_type=galactic": {
+      "model": "astralvoyage:block/ship_movement_block_galactic",
+      "y": 90,
+      "x": 90
+    },
+    "facing=east,movement_type=galactic": {
+      "model": "astralvoyage:block/ship_movement_block_galactic",
+      "y": 270,
+      "x": 90
+    }
+  }
+}

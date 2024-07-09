@@ -15,12 +15,13 @@ public class ItemTabsInit {
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, AstralVoyage.MODID);
 
     public static final RegistryObject<CreativeModeTab> MAIN = CREATIVE_MODE_TABS.register("main",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(Items.AIR))
+            () -> CreativeModeTab.builder().icon(() -> new ItemStack(BlockInit.SPACESHIP_GENERATOR_BLOCK.get()))
                     .title(Component.translatable("astralvoyage.main"))
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(BlockInit.SPACESHIP_GENERATOR_BLOCK.get());
                         pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_BLOCK.get());
                         pOutput.accept(BlockInit.PLANET_TELEPORTER_BLOCK.get());
+                        pOutput.accept(BlockInit.SHIP_TELEPORTER_BLOCK.get());
                     }).build());
 
 

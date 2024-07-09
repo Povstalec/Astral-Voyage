@@ -3,7 +3,7 @@ loaderVersion="[47,)"
 license="MIT"
 [[mods]]
 modId="astralvoyage"
-version="0.1.0"
+version="0.0.1"
 displayName="Astral Voyage"
 credits=""
 authors="mistersecret312, Povstalec"

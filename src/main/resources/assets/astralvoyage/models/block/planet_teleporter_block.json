@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures":
+  {
+    "up": "astralvoyage:block/planet_teleporter_block_topbottom",
+    "down": "astralvoyage:block/planet_teleporter_block_topbottom",
+    "west": "astralvoyage:block/planet_teleporter_block_side",
+    "east": "astralvoyage:block/planet_teleporter_block_side",
+    "north": "astralvoyage:block/planet_teleporter_block_side",
+    "south": "astralvoyage:block/planet_teleporter_block_side"
+  }
+}

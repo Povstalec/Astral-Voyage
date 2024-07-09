@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.povstalec.astralvoyage.common.blocks.SpaceshipMovementBlock;
 import net.povstalec.astralvoyage.common.init.BlockEntityInit;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
+import net.povstalec.astralvoyage.common.util.EnumMovementType;
 import org.joml.Vector3f;
 
 public class SpaceshipMovementBlockEntity extends BlockEntity {
@@ -57,11 +58,10 @@ public class SpaceshipMovementBlockEntity extends BlockEntity {
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos blockPos, BlockState state, T t)
     {
-        SpaceshipMovementBlockEntity entity = (SpaceshipMovementBlockEntity) t;
         Vector3f movement = state.getValue(SpaceshipMovementBlock.FACING).step();
         if(state.getValue(SpaceshipMovementBlock.POWERED))
             level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> {
-                if (entity.getMovementType())
+                if (state.getValue(SpaceshipMovementBlock.MOVEMENT_TYPE).equals(EnumMovementType.GALACTIC))
                     cap.moveGalacticPosition(movement.mul(0.001f));
                 else cap.moveSolarPosition(movement.mul(5000f));
             });

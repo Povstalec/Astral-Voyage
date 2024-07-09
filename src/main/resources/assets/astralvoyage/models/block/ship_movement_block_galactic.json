@@ -1,0 +1,9 @@
+{
+  "parent": "astralvoyage:block/movement_block_template",
+  "textures":
+  {
+    "endup": "astralvoyage:block/ship_movement_block_front_galactic",
+    "side": "astralvoyage:block/ship_movement_block_side_galactic",
+    "enddown": "astralvoyage:block/ship_movement_block_back_galactic"
+  }
+}

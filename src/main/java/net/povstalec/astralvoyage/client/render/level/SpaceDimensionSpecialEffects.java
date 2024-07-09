@@ -10,6 +10,7 @@ import com.mojang.datafixers.util.Either;
 import net.povstalec.astralvoyage.common.capability.PlanetCapability;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import com.google.common.collect.Lists;
@@ -162,7 +163,7 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
 
             poseStack.mulPose(Axis.YP.rotationDegrees(yAxisRotation));
             poseStack.mulPose(Axis.XP.rotationDegrees(xAxisRotation));
-            poseStack.mulPose(Axis.ZP.rotationDegrees(zAxisRotation));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(zAxisRotation+90));
 
             BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
             RenderSystem.depthMask(false);

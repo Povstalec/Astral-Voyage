@@ -23,12 +23,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.povstalec.astralvoyage.common.block_entities.SpaceshipMovementBlockEntity;
 import net.povstalec.astralvoyage.common.init.BlockEntityInit;
 import net.povstalec.astralvoyage.common.init.BlockInit;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 import net.povstalec.astralvoyage.common.util.DimensionHelper;
+import net.povstalec.astralvoyage.common.util.EnumMovementType;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -38,20 +40,23 @@ public class SpaceshipMovementBlock extends BaseEntityBlock {
 
     public static final DirectionProperty FACING = DirectionalBlock.FACING;
     public static final BooleanProperty POWERED = BooleanProperty.create("powered");
+    public static final EnumProperty<EnumMovementType> MOVEMENT_TYPE = EnumProperty.create("movement_type", EnumMovementType.class);
 
     public SpaceshipMovementBlock(Properties prop) {
         super(prop);
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(POWERED, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(POWERED, false).setValue(MOVEMENT_TYPE, EnumMovementType.SOLAR));
+    }
+
+    @Override
+    public RenderShape getRenderShape(BlockState pState) {
+        return RenderShape.MODEL;
     }
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
         if(!level.isClientSide)
         {
-            SpaceshipMovementBlockEntity entity = (SpaceshipMovementBlockEntity) level.getBlockEntity(pos);
-            if (entity != null) {
-                entity.setMovementType(!entity.getMovementType());
-            }
+            level.setBlock(pos, state.setValue(MOVEMENT_TYPE, state.getValue(MOVEMENT_TYPE).equals(EnumMovementType.SOLAR) ? EnumMovementType.GALACTIC : EnumMovementType.SOLAR), 2);
         }
         return InteractionResult.SUCCESS;
     }
@@ -59,12 +64,12 @@ public class SpaceshipMovementBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection().getOpposite()).setValue(POWERED, false);
+        return this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection().getOpposite()).setValue(POWERED, false).setValue(MOVEMENT_TYPE, EnumMovementType.SOLAR);
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
-        stateBuilder.add(FACING).add(POWERED);
+        stateBuilder.add(FACING).add(POWERED).add(MOVEMENT_TYPE);
     }
 
     @Nullable
