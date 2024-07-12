@@ -87,44 +87,45 @@ public class PlanetCapability implements INBTSerializable<CompoundTag>
         MinecraftServer server = level.getServer();
         List<ClientSpaceObject> renderObjects = new ArrayList<>();
         SpaceObject.Serializable selfObject = SpaceObjects.get(server).spaceObjects.get(this.key.location().toString());
-        if(selfObject.getOrbitMap().isPresent())
-        {
-            String parentObjectId = selfObject.getOrbitMap().get().getFirst().location().toString();
-            SpaceObject.Serializable parentObject =  SpaceObjects.get(server).spaceObjects.get(selfObject.getOrbitMap().get().getFirst().location().toString());
-            renderObjects.add(serializeableToClient(parentObjectId, parentObject));
+        if(selfObject != null) {
+            if (selfObject.getOrbitMap().isPresent()) {
+                String parentObjectId = selfObject.getOrbitMap().get().getFirst().location().toString();
+                SpaceObject.Serializable parentObject = SpaceObjects.get(server).spaceObjects.get(selfObject.getOrbitMap().get().getFirst().location().toString());
+                renderObjects.add(serializeableToClient(parentObjectId, parentObject));
 
-            parentObject.getChildObjects().forEach(
-            children -> {
-                SpaceObject.Serializable childObject =  SpaceObjects.get(server).spaceObjects.get(children.location().toString());
-                if(!children.location().toString().equals(this.key.location().toString()))
-                    renderObjects.add(serializeableToClient(children.location().toString(), childObject));
-            });
+                parentObject.getChildObjects().forEach(
+                        children -> {
+                            SpaceObject.Serializable childObject = SpaceObjects.get(server).spaceObjects.get(children.location().toString());
+                            if (!children.location().toString().equals(this.key.location().toString()))
+                                renderObjects.add(serializeableToClient(children.location().toString(), childObject));
+                        });
+            }
+            List<Map.Entry<String, SpaceObject.Serializable>> listGlobal = SpaceObjects.get(server).spaceObjects.entrySet().stream().filter(entry -> entry.getValue().getGalacticPos().isPresent() && !entry.getValue().getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f)).toList();
+            listGlobal.forEach(
+                    entry -> {
+                        String objectId = entry.getKey();
+                        SpaceObject.Serializable object = entry.getValue();
+
+                        renderObjects.add(serializeableToClient(objectId, object));
+                    });
+
+            List<ResourceKey<Level>> shipLevels = new ArrayList<>();
+            server.getAllLevels().forEach(
+                    serverLevel -> {
+                        if (serverLevel.getCapability(CapabilitiesInit.SPACESHIP).isPresent())
+                            shipLevels.add(serverLevel.dimension());
+                    });
+
+            shipLevels.forEach(
+                    shipLevel -> {
+                        server.getLevel(shipLevel).getCapability(CapabilitiesInit.SPACESHIP).ifPresent(
+                                shipCap -> {
+                                    renderObjects.add(spaceshipToClient(shipCap, server.getLevel(shipLevel)));
+                                });
+                    });
+
+            this.renderObjects = renderObjects;
         }
-        List<Map.Entry<String, SpaceObject.Serializable>> listGlobal = SpaceObjects.get(server).spaceObjects.entrySet().stream().filter(entry -> entry.getValue().getGalacticPos().isPresent() && !entry.getValue().getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f)).toList();
-        listGlobal.forEach(
-                entry -> {
-                    String objectId = entry.getKey();
-                    SpaceObject.Serializable object = entry.getValue();
-
-                    renderObjects.add(serializeableToClient(objectId, object));
-                });
-
-        List<ResourceKey<Level>> shipLevels = new ArrayList<>();
-        server.getAllLevels().forEach(
-        serverLevel -> {
-            if(serverLevel.getCapability(CapabilitiesInit.SPACESHIP).isPresent())
-                shipLevels.add(serverLevel.dimension());
-        });
-
-        shipLevels.forEach(
-        shipLevel -> {
-            server.getLevel(shipLevel).getCapability(CapabilitiesInit.SPACESHIP).ifPresent(
-            shipCap -> {
-                renderObjects.add(spaceshipToClient(shipCap, server.getLevel(shipLevel)));
-            });
-        });
-
-        this.renderObjects = renderObjects;
     }
 
     @Override

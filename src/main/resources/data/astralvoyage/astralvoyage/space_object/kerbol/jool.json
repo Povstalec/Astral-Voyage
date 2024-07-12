@@ -1,0 +1,21 @@
+{
+  "name": "stellar_location.astralvoyage.jool",
+  "size": 12000,
+  "parent":
+  {
+    "parent_object": "astralvoyage:kerbol",
+    "orbit":
+    {
+      "distance": 68773560.0,
+      "orbit_days": 4845.17,
+      "orbit_start": 0.0,
+      "orbit_inclination": 1.3,
+      "rotation": 0.0
+    }
+  },
+  "texture_layers":
+  [
+    {"texture": "astralvoyage:textures/environment/planets/jool.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+    {"texture": "astralvoyage:textures/environment/planets/jupiter_halo.png", "texture_settings": {"rgba": [125, 255, 125, 255], "blends":  true}}
+  ]
+}

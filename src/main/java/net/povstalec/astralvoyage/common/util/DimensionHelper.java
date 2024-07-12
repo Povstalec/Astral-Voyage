@@ -1,39 +1,38 @@
 package net.povstalec.astralvoyage.common.util;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Lifecycle;
 
 import net.minecraft.Util;
-import net.minecraft.core.Holder;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.level.LevelEvent;
 import net.povstalec.astralvoyage.AstralVoyage;
+import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.init.WorldGenInit;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
 import net.povstalec.astralvoyage.common.network.packets.UpdateDimensionsPacket;
@@ -161,9 +160,9 @@ public class DimensionHelper {
         return createSpaceship(server, new ResourceLocation(AstralVoyage.MODID, UUID.randomUUID().toString()));
     }
 
-    public static ServerLevel createPlanet(MinecraftServer server, ResourceLocation dimensionLocation)
+    public static ServerLevel createPlanet(MinecraftServer server, Map.Entry<String, SpaceObject.Serializable> planet)
     {
-        ServerLevel level = DimensionHelper.createAndRegisterLevel(server, server.forgeGetWorldMap(), ResourceKey.create(Registries.DIMENSION, dimensionLocation), () -> createPlanetStem(server));
+        ServerLevel level = DimensionHelper.createAndRegisterLevel(server, server.forgeGetWorldMap(), ResourceKey.create(Registries.DIMENSION, ResourceLocation.tryParse(planet.getKey())), () -> createPlanetStem(server, planet.getValue()));
 
         return level;
     }
@@ -180,14 +179,30 @@ public class DimensionHelper {
         return stem;
     }
 
-    public static LevelStem createPlanetStem(MinecraftServer server)
+    public static LevelStem createPlanetStem(MinecraftServer server, SpaceObject.Serializable planet)
     {
         RegistryAccess registries = server.registryAccess();
 
-        LevelStem stem = new LevelStem(registries.registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(WorldGenInit.PLANET_TYPE),
-                new PlanetChunkGenerator(
-                        registries.registryOrThrow(Registries.BIOME).asLookup()
-                ));
+        Random random = new Random();
+        List<Holder<Biome>> holderList = new ArrayList<>();
+        planet.getSurface().get().getSecond().forEach(biome ->
+                holderList.add(registries.registryOrThrow(Registries.BIOME).getHolderOrThrow(biome)));
+
+        List<Pair<Climate.ParameterPoint, Holder<Biome>>> parameters = new ArrayList<>();
+        holderList.forEach(
+        biome -> parameters.add(new Pair<>(Climate.parameters(random.nextFloat(-2f, 2f),
+                random.nextFloat(-2f, 2f), random.nextFloat(-2f, 2f),
+                random.nextFloat(-2f, 2f), random.nextFloat(-2f, 2f),
+                random.nextFloat(-2f, 2f), random.nextFloat(-1f, 1f)), biome)));
+        Climate.ParameterList<Holder<Biome>> parameterList = new Climate.ParameterList<>(parameters);
+
+        MultiNoiseBiomeSource multiSource = MultiNoiseBiomeSource.createFromList(parameterList);
+
+        LevelStem stem =
+                new LevelStem(
+                   registries.registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(WorldGenInit.PLANET_TYPE),
+                new NoiseBasedChunkGenerator(multiSource,
+                   registries.registryOrThrow(Registries.NOISE_SETTINGS).getHolderOrThrow(planet.getSurface().get().getFirst())));
 
         return stem;
     }

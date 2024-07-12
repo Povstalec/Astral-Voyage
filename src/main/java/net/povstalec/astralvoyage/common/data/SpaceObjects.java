@@ -25,10 +25,10 @@ public class SpaceObjects extends SavedData
 
 	private static final String SPACE_OBJECTS = "space_objects";
 
-	private static final int MAX_STARS = 50;
-	private static final int MIN_STARS = 10;
+	private static final int MAX_STARS = 500;
+	private static final int MIN_STARS = 50;
 	private static final int MIN_PLANETS_PER_STAR = 0;
-	private static final int MAX_PLATERS_PER_STAR = 10;
+	private static final int MAX_PLANETS_PER_STAR = 2;
 
 	public HashMap<String, SpaceObject.Serializable> spaceObjects = new HashMap<>();
 	
@@ -107,9 +107,16 @@ public class SpaceObjects extends SavedData
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layerList = List.of(layer.getTextureLayer().getFirst().getLayer(), layer.getTextureLayer().getSecond().getLayer());
 		String id = AstralVoyage.MODID + ":star_" + UUID.randomUUID();
 		SpaceObject.Serializable newObject = new SpaceObject.Serializable(Optional.empty(), Optional.of(id), Optional.of(13000F),
-				Optional.of(new Vector3f(((int) random.nextFloat(-1000f, 1000f)), ((int) random.nextFloat(-10000f, 1000f)), ((int) random.nextFloat(-1000f, 1000f)))), Optional.empty(),
-				Optional.of(new SpaceObject.Generation((short) random.nextInt(0, 11), new Pair<>(random.nextFloat(128000, 18900000), random.nextFloat(128900000, 1897500000000f)))),
-				layerList);
+				Optional.of(new Vector3f(
+						((int) random.nextFloat(-1000f, 1000f)),
+						((int) random.nextFloat(-1000f, 1000f)),
+						((int) random.nextFloat(-1000f, 1000f)))),
+				Optional.empty(),
+				Optional.of(new SpaceObject.Generation(
+						(short) random.nextInt(MIN_PLANETS_PER_STAR, MAX_PLANETS_PER_STAR),
+						new Pair<>(random.nextFloat(128000, 18900000),
+								random.nextFloat(128900000, 1897500000000f)))),
+				layerList, Optional.empty());
 		saveSpaceObject(newObject);
 	}
 
@@ -160,7 +167,7 @@ public class SpaceObjects extends SavedData
 						Map.of("distance", ((double) new Random().nextInt(object.getGeneration().get().getGenerationDistance().getFirst().intValue(),
 						object.getGeneration().get().getGenerationDistance().getSecond().intValue())),
 								"orbit_days", 0d, "orbit_start", 0d, "orbit_inclination", 0d, "rotation", 0d))),
-						Optional.empty(), layerList);
+						Optional.empty(), layerList, Optional.empty());
 				object.addChild(SpaceObject.stringToSpaceObjectKey(id));
 				saveSpaceObject(newObject);
 			}

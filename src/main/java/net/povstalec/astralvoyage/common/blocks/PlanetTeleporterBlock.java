@@ -1,6 +1,7 @@
 package net.povstalec.astralvoyage.common.blocks;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -35,36 +36,38 @@ public class PlanetTeleporterBlock extends Block {
         pLevel.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(
         cap -> {
             List<Map.Entry<String, SpaceObject.Serializable>> objectList = SpaceObjects.get(pLevel.getServer()).spaceObjects.entrySet().stream().filter(
-            thing -> {
-                Vector3f vector = new Vector3f(0);
-                if(thing.getValue().getOrbitMap().isPresent())
-                    vector = new Vector3f(thing.getValue().getOrbitMap().get().getSecond().get("distance").floatValue(), 0, 0);
-                return vector.distance(cap.getSolarPosition()) < 500000;
-            }).toList();
-            objectList.get(0).getValue().getDimension().ifPresentOrElse(present ->
-            pPlayer.teleportTo(
-                   pLevel.getServer().levelKeys().stream().toList().contains(present)
-                            ? pLevel.getServer().getLevel(present) : (ServerLevel) pLevel,
+                    thing -> {
+                        Vector3f vector = new Vector3f(0);
+                        if (thing.getValue().getOrbitMap().isPresent())
+                            vector = new Vector3f(thing.getValue().getOrbitMap().get().getSecond().get("distance").floatValue(), 0, 0);
+                        return vector.distance(cap.getSolarPosition()) < 500000;
+                    }).toList();
+            objectList.get(0).getValue().getDimension().ifPresent(present ->
+                    pPlayer.teleportTo(
+                            pLevel.getServer().levelKeys().stream().toList().contains(present)
+                                    ? pLevel.getServer().getLevel(present) : (ServerLevel) pLevel,
                             pPlayer.getOnPos().getX(), pPlayer.getOnPos().getY(),
                             pPlayer.getOnPos().getZ(), RelativeMovement.ALL,
                             pPlayer.getYRot(), pPlayer.getXRot())
-            ,() -> {
-                ServerLevel planetLevel = DimensionHelper.createPlanet(pLevel.getServer(), ResourceLocation.tryParse(objectList.get(0).getKey()));
+            );
+            if (objectList.get(0).getValue().getSurface().isPresent() && objectList.get(0).getValue().getDimension().isEmpty()) {
+                ServerLevel planetLevel = DimensionHelper.createPlanet(pLevel.getServer(), objectList.get(0));
                 planetLevel.getCapability(CapabilitiesInit.PLANET).ifPresent(planet -> {
                     planet.setKey(SpaceObject.stringToSpaceObjectKey(objectList.get(0).getKey()));
                     if (objectList.get(0).getValue().getOrbitMap().isPresent()) {
                         planet.setParent(Optional.of(objectList.get(0).getValue().getOrbitMap().get().getFirst()));
                         planet.setSolarPosition(objectList.get(0).getValue().getOrbitMap().get().getSecond().get("distance").floatValue(), 0, 0);
                         SpaceObject.Serializable parentObject = SpaceObjects.get(pLevel.getServer()).spaceObjects.get(objectList.get(0).getValue().getOrbitMap().get().getFirst().location().toString());
-                        if(parentObject.getGalacticPos().isPresent())
+                        if (parentObject.getGalacticPos().isPresent())
                             planet.setGalacticPostion(parentObject.getGalacticPos().get().x, parentObject.getGalacticPos().get().y, parentObject.getGalacticPos().get().z);
                     }
                 });
                 pPlayer.teleportTo(planetLevel,
-                                pPlayer.getOnPos().getX(), pPlayer.getOnPos().getY(),
-                                pPlayer.getOnPos().getZ(), RelativeMovement.ALL,
-                                pPlayer.getYRot(), pPlayer.getXRot());
-            });
+                        pPlayer.getOnPos().getX(), pPlayer.getOnPos().getY(),
+                        pPlayer.getOnPos().getZ(), RelativeMovement.ALL,
+                        pPlayer.getYRot(), pPlayer.getXRot());
+            }
+            else pPlayer.displayClientMessage(Component.translatable("astralvoyage.planet_teleporter.no_settings_or_dimension").append(objectList.get(0).getKey()), true);
         });
         return InteractionResult.PASS;
     }

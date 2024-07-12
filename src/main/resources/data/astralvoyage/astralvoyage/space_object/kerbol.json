@@ -1,0 +1,10 @@
+{
+  "name": "stellar_location.astralvoyage.kerbol",
+  "size": 261600,
+  "galactic_position": [24, 15, 31],
+  "texture_layers":
+  [
+    {"texture": "astralvoyage:textures/environment/stars/star_g.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+    {"texture": "astralvoyage:textures/environment/stars/star_g_halo.png", "texture_settings":  {"rgba":  [255, 255, 255, 255], "blends":  true}}
+  ]
+}

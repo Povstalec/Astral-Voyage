@@ -2,6 +2,11 @@ package net.povstalec.astralvoyage.common.datapack;
 
 import java.util.*;
 
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.NoiseSettings;
 import net.povstalec.astralvoyage.common.data.SpaceObjects;
 import org.joml.Vector3f;
 
@@ -20,7 +25,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.util.TextureLayerData;
-
 public class SpaceObject
 {
 	public static final ResourceLocation SPACE_OBJECT_LOCATION = new ResourceLocation(AstralVoyage.MODID, "space_object");
@@ -31,6 +35,7 @@ public class SpaceObject
 	private static final Codec<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> PARENT = Codec.pair(RESOURCE_KEY_CODEC.fieldOf("parent_object").codec(), Codec.unboundedMap(Codec.STRING, Codec.DOUBLE).fieldOf("orbit").codec());
 	private static final Codec<Pair<List<Integer>, Boolean>> TEXTURE_SETTINGS = Codec.pair(Codec.INT.listOf().fieldOf("rgba").codec(), Codec.BOOL.fieldOf("blends").codec());
 	private static final Codec<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> TEXTURE_LAYER = Codec.pair(ResourceLocation.CODEC.fieldOf("texture").codec(), TEXTURE_SETTINGS.fieldOf("texture_settings").codec());
+    private static final Codec<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> SURFACE_CODEC = Codec.pair(ResourceKey.codec(Registries.NOISE_SETTINGS).fieldOf("noise_settings").codec(), Codec.list(ResourceKey.codec(Registries.BIOME)).fieldOf("biomes").codec());
 
 	public static final Codec<SpaceObject> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			// Dimension this Stellar Location is tied to
@@ -44,14 +49,17 @@ public class SpaceObject
 			// Parent Stellar Location, probably used for orbits and stuff in the future
 			PARENT.optionalFieldOf("parent").forGetter(SpaceObject::getParentOrbitMap),
 			// Textures and colors
-			TEXTURE_LAYER.listOf().fieldOf("texture_layers").forGetter(SpaceObject::getTextureLayers)
-			).apply(instance, SpaceObject::new));
+			TEXTURE_LAYER.listOf().fieldOf("texture_layers").forGetter(SpaceObject::getTextureLayers),
+            //Surface Settings
+            SURFACE_CODEC.optionalFieldOf("surface").forGetter(SpaceObject::getSurface)
+    ).apply(instance, SpaceObject::new));
 	
 	private static final String DISTANCE = "distance";
 	private static final String ORBIT_DAYS = "orbit_days";
 	private static final String ORBIT_START = "orbit_start";
 	private static final String ORBIT_INCLINATION = "orbit_inclination";
 	private static final String ROTATION = "rotation";
+    public static final String SURFACE = "surface";
 	
 	private final Optional<ResourceKey<Level>> dimension;
 	private final String translationName;
@@ -60,6 +68,7 @@ public class SpaceObject
 	private final Optional<SpaceObject.Generation> generation;
 	private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
 	private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
+    private final Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface;
 
 	private Optional<ResourceKey<SpaceObject>> parent;
 	// Orbital characteristics
@@ -72,7 +81,8 @@ public class SpaceObject
 	public SpaceObject(Optional<ResourceKey<Level>> dimension, String translationName, 
 		float size, Optional<Vector3f> galactic_position, Optional<SpaceObject.Generation> generation,
 		Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, 
-		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
+		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers,
+        Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface)
 	{
 		this.dimension = dimension;
 		this.translationName = translationName;
@@ -81,6 +91,7 @@ public class SpaceObject
 		this.generation = generation;
 		this.parentOrbitMap = parentOrbitMap;
 		this.textureLayers = textureLayers;
+        this.surface = surface;
 		
 		if(parentOrbitMap.isPresent())
 		{
@@ -119,7 +130,11 @@ public class SpaceObject
 	{
 		return this.parentOrbitMap;
 	}
-	
+
+	public Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> getSurface() {
+		return surface;
+	}
+
 	public Optional<ResourceKey<SpaceObject>> getParent()
 	{
 		return this.parent;
@@ -198,6 +213,7 @@ public class SpaceObject
         private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
 		private List<ResourceKey<SpaceObject>> childObjects = new ArrayList<>();
 		private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
+		private final Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface;
 
 		public Serializable(ResourceKey<SpaceObject> objectKey, SpaceObject object)
 		{
@@ -209,9 +225,10 @@ public class SpaceObject
             this.parentOrbitMap = object.getParentOrbitMap();
 			this.generation = object.getGeneration();
 			this.textureLayers = object.getTextureLayers();
+			this.surface = object.getSurface();
 		}
 
-		public Serializable(Optional<ResourceKey<Level>> dimension, Optional<String> name, Optional<Float> size, Optional<Vector3f> galactic_position, Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, Optional<SpaceObject.Generation> generation, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers)
+		public Serializable(Optional<ResourceKey<Level>> dimension, Optional<String> name, Optional<Float> size, Optional<Vector3f> galactic_position, Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, Optional<SpaceObject.Generation> generation, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers, Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface)
 		{
 			this.objectKey = Optional.empty();
 			this.dimension = dimension;
@@ -221,6 +238,7 @@ public class SpaceObject
 			this.parentOrbitMap = parentOrbitMap;
 			this.generation = generation;
 			this.textureLayers = textureLayers;
+			this.surface = surface;
 		}
 
 		public Optional<String> getName()
@@ -248,7 +266,12 @@ public class SpaceObject
 			return this.dimension;
 		}
 
-        public Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> getOrbitMap()
+		public Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> getSurface()
+		{
+			return surface;
+		}
+
+		public Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> getOrbitMap()
         {
             return this.parentOrbitMap;
         }
@@ -284,15 +307,6 @@ public class SpaceObject
 
 			if(this.objectKey.isPresent()) {
 				objectTag.putString(OBJECT_KEY, this.objectKey.get().location().toString());
-
-				if(this.generation.isPresent())
-				{
-					CompoundTag generation = new CompoundTag();
-					generation.putShort("count", this.generation.get().getOrbitingObjectCount());
-					generation.putFloat("distance_min", this.generation.get().getGenerationDistance().getFirst());
-					generation.putFloat("distance_max", this.generation.get().getGenerationDistance().getSecond());
-					objectTag.put(GENERATION, generation);
-				}
 			}
 			else
 			{
@@ -304,6 +318,11 @@ public class SpaceObject
 
 				if(this.getSize().isPresent())
 					objectTag.putFloat(SIZE, this.getSize().get());
+
+				if(this.generation.isPresent())
+				{
+					objectTag.put(GENERATION, generation.get().serialize());
+				}
 
 				if(this.getOrbitMap().isPresent())
 				{
@@ -330,6 +349,18 @@ public class SpaceObject
 
 				this.textureLayers.forEach(textureLayer -> textureLayers.add(TextureLayerData.serialize(new TextureLayerData(textureLayer))));
 				objectTag.put(TEXTURE_LAYERS, textureLayers);
+			}
+
+			if (this.getSurface().isPresent()) {
+				CompoundTag surfaceTag = new CompoundTag();
+				this.getSurface().ifPresent(
+						surface -> {
+							surfaceTag.putString("noise_settings", surface.getFirst().location().toString());
+							ListTag biomeList = new ListTag();
+							surface.getSecond().forEach(biome -> biomeList.add(StringTag.valueOf(biome.location().toString())));
+							surfaceTag.put("biomes", biomeList);
+						});
+				objectTag.put(SURFACE, surfaceTag);
 			}
 
 			return objectTag;
@@ -389,7 +420,7 @@ public class SpaceObject
 				if(objectTag.contains(GENERATION))
 				{
 					CompoundTag generationTag = objectTag.getCompound(GENERATION);
-					generation = Optional.of(new Generation(generationTag.getShort("count"), new Pair(generationTag.getFloat("distance_min"), generationTag.getFloat("distance_max"))));
+					generation = Optional.of(Generation.deserialize(generationTag));
 				}
 
 				Optional<ResourceKey<SpaceObject>> parent = Optional.empty();
@@ -403,7 +434,22 @@ public class SpaceObject
 				List<TextureLayerData> textureLayers = new ArrayList<>();
 				layersTag.forEach(layertag -> textureLayers.add(TextureLayerData.deserialize((CompoundTag) layertag)));
 
-				return new SpaceObject.Serializable(dimension, name, size, galactic_position, parentOrbitMap, generation, TextureLayerData.toPairList(textureLayers));
+				Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface = Optional.empty();
+				if(objectTag.contains(SURFACE)) {
+					CompoundTag surfaceTag = objectTag.getCompound(SURFACE);
+					ResourceKey<NoiseGeneratorSettings> key = ResourceKey.create(Registries.NOISE_SETTINGS, ResourceLocation.tryParse(surfaceTag.getString("noise_settings")));
+
+					List<ResourceKey<Biome>> biomeList = new ArrayList<>();
+					ListTag biomesTag = surfaceTag.getList("biomes", Tag.TAG_STRING);
+					biomesTag.forEach(
+							biome -> {
+								StringTag biomeTag = ((StringTag) biome);
+								biomeList.add(ResourceKey.create(Registries.BIOME, ResourceLocation.tryParse(biomeTag.getAsString())));
+							});
+
+					surface = Optional.of(new Pair<>(key, biomeList));
+				}
+				return new SpaceObject.Serializable(dimension, name, size, galactic_position, parentOrbitMap, generation, TextureLayerData.toPairList(textureLayers), surface);
 			}
 		}
 	}
@@ -431,14 +477,20 @@ public class SpaceObject
 	
 	public static final class Generation
 	{
-		private static final Codec<Pair<Float, Float>> DISTANCE = Codec.pair(Codec.FLOAT.fieldOf("min").codec(), Codec.FLOAT.fieldOf("max").codec());
-		
+		public static final String ORBITING_OBJECT_COUNT = "orbiting_object_count";
+		public static final String DISTANCE = "distance";
+		public static final String DISTANCE_MIN = "min";
+		public static final String DISTANCE_MAX = "max";
+
+		private static final Codec<Pair<Float, Float>> DISTANCE_CODEC = Codec.pair(Codec.FLOAT.fieldOf(DISTANCE_MIN).codec(), Codec.FLOAT.fieldOf(DISTANCE_MAX).codec());
+
 		public static final Codec<SpaceObject.Generation> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 				// Dimension this Stellar Location is tied to
-				Codec.SHORT.fieldOf("orbiting_object_count").forGetter(SpaceObject.Generation::getOrbitingObjectCount),
+				Codec.SHORT.fieldOf(ORBITING_OBJECT_COUNT).forGetter(SpaceObject.Generation::getOrbitingObjectCount),
 				// Translation name of the Stellar Location
-				DISTANCE.fieldOf("distance").forGetter(SpaceObject.Generation::getGenerationDistance)
-				).apply(instance, SpaceObject.Generation::new));
+				DISTANCE_CODEC.fieldOf(DISTANCE).forGetter(SpaceObject.Generation::getGenerationDistance)
+				// Surface dimension generation settings
+		).apply(instance, SpaceObject.Generation::new));
 		
 		private short orbitingObjectCount;
 		private Pair<Float, Float> generationDistance;
@@ -457,6 +509,31 @@ public class SpaceObject
 		public Pair<Float, Float> getGenerationDistance()
 		{
 			return this.generationDistance;
+		}
+
+		public CompoundTag serialize()
+		{
+			CompoundTag tag = new CompoundTag();
+			tag.putShort(ORBITING_OBJECT_COUNT, this.getOrbitingObjectCount());
+
+			CompoundTag distanceRange = new CompoundTag();
+			distanceRange.putFloat(DISTANCE_MIN, this.getGenerationDistance().getFirst());
+			distanceRange.putFloat(DISTANCE_MAX, this.getGenerationDistance().getSecond());
+			tag.put(DISTANCE, distanceRange);
+
+			return tag;
+		}
+
+		public static Generation deserialize(CompoundTag tag)
+		{
+			short orbitingObjectCount = tag.getShort(ORBITING_OBJECT_COUNT);
+
+			CompoundTag distanceTag = tag.getCompound(DISTANCE);
+			float min = distanceTag.getFloat(DISTANCE_MIN);
+			float max = distanceTag.getFloat(DISTANCE_MAX);
+			Pair<Float, Float> distance = new Pair<>(min, max);
+
+			return new Generation(orbitingObjectCount, distance);
 		}
 	}
 

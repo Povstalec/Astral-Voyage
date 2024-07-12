@@ -1,0 +1,33 @@
+{
+  "name": "stellar_location.astralvoyage.kerbin",
+  "size": 1200,
+  "parent":
+  {
+    "parent_object": "astralvoyage:kerbol",
+    "orbit":
+    {
+      "distance": 13600000.0,
+      "orbit_days": 426.0,
+      "orbit_start": 71.0,
+      "orbit_inclination": 0.0,
+      "rotation": 0.0
+    }
+  },
+  "surface":
+  {
+    "noise_settings": "minecraft:overworld",
+    "biomes":
+    [
+      "minecraft:plains",
+      "minecraft:birch_forest",
+      "minecraft:dark_forest",
+      "minecraft:forest",
+      "minecraft:windswept_forest"
+    ]
+  },
+  "texture_layers":
+  [
+    {"texture": "astralvoyage:textures/environment/planets/earth.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+    {"texture": "astralvoyage:textures/environment/planets/earth_halo.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends":  true}}
+  ]
+}

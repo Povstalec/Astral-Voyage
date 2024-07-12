@@ -1,0 +1,29 @@
+{
+  "name": "stellar_location.astralvoyage.moho",
+  "size": 500,
+  "parent":
+  {
+    "parent_object": "astralvoyage:kerbol",
+    "orbit":
+    {
+      "distance": 5263138.0,
+      "orbit_days": 102.3,
+      "orbit_start": 52.0,
+      "orbit_inclination": 0.0,
+      "rotation": 0.0
+    }
+  },
+  "surface":
+  {
+    "noise_settings": "minecraft:overworld",
+    "biomes":
+    [
+      "minecraft:plains"
+    ]
+  },
+  "texture_layers":
+  [
+    {"texture": "astralvoyage:textures/environment/planets/moho.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+    {"texture": "astralvoyage:textures/environment/planets/mars_halo.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends":  true}}
+  ]
+}

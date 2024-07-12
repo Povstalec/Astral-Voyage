@@ -1,0 +1,30 @@
+{
+  "name": "stellar_location.astralvoyage.laythe",
+  "size": 1000,
+  "parent":
+  {
+    "parent_object": "astralvoyage:kerbol",
+    "orbit":
+    {
+      "distance": 68800744.0,
+      "orbit_days": 2.17,
+      "orbit_start": 0.0,
+      "orbit_inclination": 0.0,
+      "rotation": 0.0
+    }
+  },
+  "surface":
+  {
+    "noise_settings": "astralvoyage:lifeless_ocean",
+    "biomes":
+    [
+      "minecraft:beach",
+      "astralvoyage:planets/lifeless_ocean"
+    ]
+  },
+  "texture_layers":
+  [
+    {"texture": "astralvoyage:textures/environment/planets/laythe.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
+    {"texture": "astralvoyage:textures/environment/planets/earth_halo.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends":  true}}
+  ]
+}
