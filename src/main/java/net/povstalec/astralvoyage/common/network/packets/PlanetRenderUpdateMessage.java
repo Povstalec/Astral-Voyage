@@ -29,16 +29,18 @@ public class PlanetRenderUpdateMessage {
             buffer.writeResourceKey(object.getKey());
             buffer.writeFloat(object.getSize());
 
-            object.getOrbitOffset().ifPresentOrElse(offset -> {
+            if(object.getOrbitOffset() != null)
+            {
                 buffer.writeBoolean(true);
-                buffer.writeDouble(offset);
-            }, () -> buffer.writeBoolean(false));
+                buffer.writeDouble(object.getOrbitOffset());
+            } else buffer.writeBoolean(false);
 
             buffer.writeVector3f(object.getSolarPos());
-            object.getGalacticPos().ifPresentOrElse(galacticPos -> {
+            if(object.getGalacticPos() != null)
+            {
                 buffer.writeBoolean(true);
-                buffer.writeVector3f(galacticPos);
-            }, () -> buffer.writeBoolean(false));
+                buffer.writeVector3f(object.getGalacticPos());
+            } else buffer.writeBoolean(false);
 
             buffer.writeCollection(object.getTextureLayers(), (bufferL, layer) -> {
                 bufferL.writeResourceLocation(layer.getLayer().getFirst());
@@ -49,24 +51,24 @@ public class PlanetRenderUpdateMessage {
     }
 
     public static PlanetRenderUpdateMessage read(FriendlyByteBuf buf){
-        List<ClientSpaceObject> list = new ArrayList<>();
+        List<ClientSpaceObject> list;
 
         list = buf.readCollection(i -> new ArrayList<>(), buffer -> {
             ResourceKey<SpaceObject> key = buffer.readResourceKey(SpaceObject.REGISTRY_KEY);
 
             float size = buffer.readFloat();
 
-            Optional<Double> orbitStart = Optional.empty();
+            Double orbitStart = null;
             if(buffer.readBoolean())
-                orbitStart = Optional.of(buffer.readDouble());
+                orbitStart = buffer.readDouble();
 
             Vector3f solarPos = buffer.readVector3f();
 
-            Optional<Vector3f> galPos = Optional.empty();
+            Vector3f galPos = null;
             if(buffer.readBoolean())
-                galPos = Optional.of(buffer.readVector3f());
+                galPos = buffer.readVector3f();
 
-            List<TextureLayerData> layers = new ArrayList<>();
+            List<TextureLayerData> layers;
             layers = buffer.readCollection(i -> new ArrayList<>(), buff -> {
 
                 ResourceLocation id = buff.readResourceLocation();

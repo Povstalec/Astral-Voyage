@@ -185,7 +185,7 @@ public class DimensionHelper {
 
         Random random = new Random();
         List<Holder<Biome>> holderList = new ArrayList<>();
-        planet.getSurface().get().getSecond().forEach(biome ->
+        planet.getSurface().getSecond().forEach(biome ->
                 holderList.add(registries.registryOrThrow(Registries.BIOME).getHolderOrThrow(biome)));
 
         List<Pair<Climate.ParameterPoint, Holder<Biome>>> parameters = new ArrayList<>();
@@ -202,7 +202,7 @@ public class DimensionHelper {
                 new LevelStem(
                    registries.registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(WorldGenInit.PLANET_TYPE),
                 new NoiseBasedChunkGenerator(multiSource,
-                   registries.registryOrThrow(Registries.NOISE_SETTINGS).getHolderOrThrow(planet.getSurface().get().getFirst())));
+                   registries.registryOrThrow(Registries.NOISE_SETTINGS).getHolderOrThrow(planet.getSurface().getFirst())));
 
         return stem;
     }

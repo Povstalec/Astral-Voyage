@@ -69,7 +69,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     {
         MinecraftServer server = level.getServer();
         List<ClientSpaceObject> renderObjects = new ArrayList<>();
-        List<Map.Entry<String, SpaceObject.Serializable>> listLocal = SpaceObjects.get(server).spaceObjects.entrySet().stream().filter(entry -> entry.getValue().getGalacticPos().isPresent() && entry.getValue().getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f)).toList();
+        List<Map.Entry<String, SpaceObject.Serializable>> listLocal = SpaceObjects.get(server).spaceObjects.entrySet().stream().filter(entry -> entry.getValue().getGalacticPos() != null && entry.getValue().getGalacticPos().equals(this.getGalacticPosition(), 0.1f)).toList();
         listLocal.forEach(
         entry -> {
             String objectId = entry.getKey();
@@ -81,7 +81,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
                     childObject -> renderObjects.add(serializeableToClient(childObject.location().toString(),
                             SpaceObjects.get(server).spaceObjects.get(childObject.location().toString()))));
         });
-        List<Map.Entry<String, SpaceObject.Serializable>> listGlobal = SpaceObjects.get(server).spaceObjects.entrySet().stream().filter(entry -> entry.getValue().getGalacticPos().isPresent() && !entry.getValue().getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f)).toList();
+        List<Map.Entry<String, SpaceObject.Serializable>> listGlobal = SpaceObjects.get(server).spaceObjects.entrySet().stream().filter(entry -> entry.getValue().getGalacticPos() != null && !entry.getValue().getGalacticPos().equals(this.getGalacticPosition(), 0.1f)).toList();
         listGlobal.forEach(
         entry -> {
             String objectId = entry.getKey();
@@ -141,17 +141,17 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 
     public static ClientSpaceObject serializeableToClient(String objectId, SpaceObject.Serializable object)
     {
-        return new ClientSpaceObject(SpaceObject.stringToSpaceObjectKey(objectId), object.getSize().orElse(1300F),
-                Optional.of(object.getOrbitMap().isPresent() && object.getOrbitMap().get().getSecond().containsKey("orbit_start") ? object.getOrbitMap().get().getSecond().get("orbit_start") : 0D),
-                new Vector3f(object.getOrbitMap().isPresent() && object.getOrbitMap().get().getSecond().containsKey("distance") ? object.getOrbitMap().get().getSecond().get("distance").floatValue() : 0f, 0 ,0),
+        return new ClientSpaceObject(SpaceObject.stringToSpaceObjectKey(objectId), object.getSize() == null ? 1300 : object.getSize(),
+                object.getOrbitMap() != null && object.getOrbitMap().getSecond().containsKey("orbit_start") ? object.getOrbitMap().getSecond().get("orbit_start") : 0D,
+                new Vector3f(object.getOrbitMap() != null && object.getOrbitMap().getSecond().containsKey("distance") ? object.getOrbitMap().getSecond().get("distance").floatValue() : 0f, 0 ,0),
                 object.getGalacticPos(), TextureLayerData.toDataList(object.getTextureLayers()));
     }
 
     public static ClientSpaceObject spaceshipToClient(SpaceshipCapability capability, Level level)
     {
         return new ClientSpaceObject(SpaceObject.stringToSpaceObjectKey(level.dimension().location().toString()),
-                1, Optional.empty(), capability.getSolarPosition(),
-                Optional.of(capability.getGalacticPosition()),
+                1, null, capability.getSolarPosition(),
+                capability.getGalacticPosition(),
                 List.of(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/spaceship_glow.png"),
                         new Pair<>(List.of(255, 255, 255, 255), false)))));
     }

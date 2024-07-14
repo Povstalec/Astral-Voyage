@@ -39,15 +39,16 @@ public class ShipTeleporterBlock extends Block {
                 if(SpaceObjects.get(level.getServer()).spaceObjects.containsKey(name)) {
                     level.getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap -> {
                         SpaceObject.Serializable object = SpaceObjects.get(level.getServer()).spaceObjects.get(name);
-                        object.getGalacticPos().ifPresent(gPos -> cap.setGalacticPostion(gPos.x, gPos.y, gPos.z));
-                        object.getOrbitMap().ifPresentOrElse(orbitMap -> {
-                            SpaceObject.Serializable parent = SpaceObjects.get(level.getServer()).spaceObjects.get(orbitMap.getFirst().location().toString());
-                            float distance = orbitMap.getSecond().get("distance").floatValue();
-                            Vector3f solarPos = new Vector3f(distance, 0 ,0);
+                        if(object.getGalacticPos() != null)
+                            cap.setGalacticPostion(object.getGalacticPos().x, object.getGalacticPos().y, object.getGalacticPos().z);
+                        if(object.getOrbitMap() != null) {
+                            SpaceObject.Serializable parent = SpaceObjects.get(level.getServer()).spaceObjects.get(object.getOrbitMap().getFirst().location().toString());
+                            float distance = object.getOrbitMap().getSecond().get("distance").floatValue();
+                            Vector3f solarPos = new Vector3f(distance, 0, 0);
                             cap.setSolarPosition(solarPos.x, solarPos.y, solarPos.z);
-                            if(parent.getGalacticPos().isPresent() && !parent.getGalacticPos().get().equals(cap.getGalacticPosition(), 0.1f))
-                                cap.setGalacticPostion(parent.getGalacticPos().get().x, parent.getGalacticPos().get().y, parent.getGalacticPos().get().z);
-                        }, () -> cap.setSolarPosition(0f, 0f, 0f));
+                            if (parent.getGalacticPos() != null && !parent.getGalacticPos().equals(cap.getGalacticPosition(), 0.1f))
+                                cap.setGalacticPostion(parent.getGalacticPos().x, parent.getGalacticPos().y, parent.getGalacticPos().z);
+                        } else cap.setSolarPosition(0f, 0f, 0f);
                     });
                     return InteractionResult.SUCCESS;
                 }

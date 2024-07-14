@@ -106,17 +106,17 @@ public class SpaceObjects extends SavedData
 		RandomTextureLayers.Star layer = RandomTextureLayers.Star.values()[random.nextInt(0, 7)];
 		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layerList = List.of(layer.getTextureLayer().getFirst().getLayer(), layer.getTextureLayer().getSecond().getLayer());
 		String id = AstralVoyage.MODID + ":star_" + UUID.randomUUID();
-		SpaceObject.Serializable newObject = new SpaceObject.Serializable(Optional.empty(), Optional.of(id), Optional.of(13000F),
-				Optional.of(new Vector3f(
+		SpaceObject.Serializable newObject = new SpaceObject.Serializable(null, id, 13000F, null,
+				new Vector3f(
 						((int) random.nextFloat(-1000f, 1000f)),
 						((int) random.nextFloat(-1000f, 1000f)),
-						((int) random.nextFloat(-1000f, 1000f)))),
-				Optional.empty(),
-				Optional.of(new SpaceObject.Generation(
+						((int) random.nextFloat(-1000f, 1000f))),
+				null,
+				new SpaceObject.Generation(
 						(short) random.nextInt(MIN_PLANETS_PER_STAR, MAX_PLANETS_PER_STAR),
 						new Pair<>(random.nextFloat(128000, 18900000),
-								random.nextFloat(128900000, 1897500000000f)))),
-				layerList, Optional.empty());
+								random.nextFloat(128900000, 1897500000000f))),
+				layerList, null);
 		saveSpaceObject(newObject);
 	}
 
@@ -142,32 +142,33 @@ public class SpaceObjects extends SavedData
 	private boolean saveSpaceObject(SpaceObject.Serializable object)
 	{
 		String spaceObjectName = AstralVoyage.MODID + ":empty";
-		if(object.getName().isPresent())
-			spaceObjectName = object.getName().get();
-		if(object.getKey().isPresent())
-			spaceObjectName = object.getKey().get().location().toString();
+		if(object.getName() != null)
+			spaceObjectName = object.getName();
+		if(object.getKey() != null)
+			spaceObjectName = object.getKey().location().toString();
 
-		if(object.getOrbitMap().isPresent())
+		if(object.getOrbitMap() != null)
 		{
-			SpaceObject.Serializable parentObject = spaceObjects.get(object.getOrbitMap().get().getFirst().location().toString());
+			SpaceObject.Serializable parentObject = spaceObjects.get(object.getOrbitMap().getFirst().location().toString());
 			if(parentObject != null)
 				parentObject.addChild(SpaceObject.stringToSpaceObjectKey(spaceObjectName));
 		}
-		if(object.getGeneration().isPresent())
+
+		if(object.getGeneration() != null)
 		{
-			for(int i = 0; i<object.getGeneration().get().getOrbitingObjectCount(); i++)
+			for(int i = 0; i<object.getGeneration().getOrbitingObjectCount(); i++)
 			{
 				Random random = new Random();
 				RandomTextureLayers.Planet[] values = RandomTextureLayers.Planet.values();
 				List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layerList = List.of(values[random.nextInt(0, 8)].getTextureLayer(), values[random.nextInt(8, 16)].getTextureLayer());
 				String id = AstralVoyage.MODID + ":body_" + UUID.randomUUID();
 				SpaceObject.Serializable newObject = new SpaceObject.Serializable(
-						Optional.empty(), Optional.of(id), Optional.of(13000F), Optional.empty(),
-						Optional.of(new Pair<>(SpaceObject.stringToSpaceObjectKey(spaceObjectName),
-						Map.of("distance", ((double) new Random().nextInt(object.getGeneration().get().getGenerationDistance().getFirst().intValue(),
-						object.getGeneration().get().getGenerationDistance().getSecond().intValue())),
-								"orbit_days", 0d, "orbit_start", 0d, "orbit_inclination", 0d, "rotation", 0d))),
-						Optional.empty(), layerList, Optional.empty());
+						null, id, 13000F, null, null,
+						new Pair<>(SpaceObject.stringToSpaceObjectKey(spaceObjectName),
+						Map.of("distance", ((double) new Random().nextInt(object.getGeneration().getGenerationDistance().getFirst().intValue(),
+						object.getGeneration().getGenerationDistance().getSecond().intValue())),
+								"orbit_days", 0d, "orbit_start", 0d, "orbit_inclination", 0d, "rotation", 0d)),
+						null, layerList, null);
 				object.addChild(SpaceObject.stringToSpaceObjectKey(id));
 				saveSpaceObject(newObject);
 			}

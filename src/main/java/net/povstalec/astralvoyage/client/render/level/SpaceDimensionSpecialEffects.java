@@ -214,7 +214,7 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
 
     public static float getDegreeToObject(@NotNull LazyOptional<SpaceshipCapability> capability, ClientSpaceObject object)
     {
-        Vector3f shipPos = capability.map(cap -> cap.getSolarPosition()).get();
+        Vector3f shipPos = capability.map(SpaceshipCapability::getSolarPosition).orElse(new Vector3f(0f, 0f, 0f));
         float x = shipPos.x*object.solarPos.x+shipPos.y*object.solarPos.y+shipPos.z*object.solarPos.z;
         float y = (float) Math.sqrt(shipPos.x*shipPos.x+shipPos.y*shipPos.y+shipPos.z*shipPos.z);
         float z = (float) Math.sqrt(object.solarPos.x*object.solarPos.x+object.solarPos.y*object.solarPos.y+object.solarPos.z*object.solarPos.z);
@@ -228,7 +228,7 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
                 cap -> cap.map(SpaceshipCapability::getGalacticPosition),
                 cap -> cap.map(PlanetCapability::getGalacticPosition)
         );
-        Optional<Vector3f> objectGalacticPosition = object.getGalacticPos();
+        Optional<Vector3f> objectGalacticPosition = Optional.ofNullable(object.getGalacticPos());
 
         if(shipGalacticPosition.isPresent() && objectGalacticPosition.isPresent())
         {
@@ -275,11 +275,9 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
                 cap -> cap.map(SpaceshipCapability::getGalacticPosition),
                 cap -> cap.map(PlanetCapability::getGalacticPosition)
         );
-    	
-    	if(galacticPosition.isPresent())
-    		return galacticPosition.get();
-    	
-    	return new Vector3f(0, 0, 0);
+
+        return galacticPosition.orElseGet(() -> new Vector3f(0, 0, 0));
+
     }
 
     public static Vector3f getOldGalacticPosition(@NotNull Either<LazyOptional<SpaceshipCapability>, LazyOptional<PlanetCapability>> capability)
@@ -289,10 +287,8 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
                 cap -> cap.map(PlanetCapability::getOldGalacticPosition)
         );
 
-    	if(oldGalacticPosition.isPresent())
-    		return oldGalacticPosition.get();
+        return oldGalacticPosition.orElseGet(() -> new Vector3f(0, 0, 0));
 
-    	return new Vector3f(0, 0, 0);
     }
     
     public static Vector3f getRotation(@NotNull Either<LazyOptional<SpaceshipCapability>, LazyOptional<PlanetCapability>> capability)
@@ -301,11 +297,9 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
                 cap -> cap.map(SpaceshipCapability::getRotation),
                 cap -> cap.map(PlanetCapability::getRotation)
         );
-    	
-    	if(rotation.isPresent())
-    		return rotation.get();
-    	
-    	return new Vector3f(0, 0, 0);
+
+        return rotation.orElseGet(() -> new Vector3f(0, 0, 0));
+
     }
 
     public static Vector3f getOldRotation(@NotNull Either<LazyOptional<SpaceshipCapability>, LazyOptional<PlanetCapability>> capability)
@@ -315,10 +309,8 @@ public class SpaceDimensionSpecialEffects extends DimensionSpecialEffects
                 cap -> cap.map(PlanetCapability::getOldRotation)
         );
 
-    	if(oldRotation.isPresent())
-    		return oldRotation.get();
+        return oldRotation.orElseGet(() -> new Vector3f(0, 0, 0));
 
-    	return new Vector3f(0, 0, 0);
     }
 
     public static <T, U extends Comparable<? super U>> Comparator<T> reverseComparing(

@@ -2,7 +2,13 @@ package net.povstalec.astralvoyage;
 
 import java.util.Optional;
 
+import com.mojang.serialization.Codec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.registries.RegistryObject;
+import net.povstalec.astralvoyage.common.datapack.SpaceObjectType;
+import net.povstalec.astralvoyage.common.datapack.StarType;
 import net.povstalec.astralvoyage.common.init.*;
+import net.povstalec.astralvoyage.common.util.RegistryDispatcher;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -48,7 +54,7 @@ public class AstralVoyage
         ItemInit.register(modEventBus);
         ItemTabsInit.register(modEventBus);
         WorldGenInit.registerWorldgen(modEventBus);
-        
+
         modEventBus.addListener((DataPackRegistryEvent.NewRegistry event) -> 
         {
             event.dataPackRegistry(SpaceObject.REGISTRY_KEY, SpaceObject.CODEC, SpaceObject.CODEC);
@@ -76,6 +82,8 @@ public class AstralVoyage
     	
     	return isStellarViewsLoaded.get();	
     }
+
+
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

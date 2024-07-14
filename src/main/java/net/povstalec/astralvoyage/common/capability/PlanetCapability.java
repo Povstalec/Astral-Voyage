@@ -88,9 +88,9 @@ public class PlanetCapability implements INBTSerializable<CompoundTag>
         List<ClientSpaceObject> renderObjects = new ArrayList<>();
         SpaceObject.Serializable selfObject = SpaceObjects.get(server).spaceObjects.get(this.key.location().toString());
         if(selfObject != null) {
-            if (selfObject.getOrbitMap().isPresent()) {
-                String parentObjectId = selfObject.getOrbitMap().get().getFirst().location().toString();
-                SpaceObject.Serializable parentObject = SpaceObjects.get(server).spaceObjects.get(selfObject.getOrbitMap().get().getFirst().location().toString());
+            if (selfObject.getOrbitMap() != null) {
+                String parentObjectId = selfObject.getOrbitMap().getFirst().location().toString();
+                SpaceObject.Serializable parentObject = SpaceObjects.get(server).spaceObjects.get(selfObject.getOrbitMap().getFirst().location().toString());
                 renderObjects.add(serializeableToClient(parentObjectId, parentObject));
 
                 parentObject.getChildObjects().forEach(
@@ -100,7 +100,7 @@ public class PlanetCapability implements INBTSerializable<CompoundTag>
                                 renderObjects.add(serializeableToClient(children.location().toString(), childObject));
                         });
             }
-            List<Map.Entry<String, SpaceObject.Serializable>> listGlobal = SpaceObjects.get(server).spaceObjects.entrySet().stream().filter(entry -> entry.getValue().getGalacticPos().isPresent() && !entry.getValue().getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f)).toList();
+            List<Map.Entry<String, SpaceObject.Serializable>> listGlobal = SpaceObjects.get(server).spaceObjects.entrySet().stream().filter(entry -> entry.getValue().getGalacticPos() != null && !entry.getValue().getGalacticPos().equals(this.getGalacticPosition(), 0.1f)).toList();
             listGlobal.forEach(
                     entry -> {
                         String objectId = entry.getKey();

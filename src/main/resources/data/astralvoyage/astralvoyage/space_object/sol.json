@@ -1,5 +1,10 @@
 {
 	"name": "stellar_location.astralvoyage.sol",
+	"object_type":
+	{
+		"type": "astralvoyage:star",
+		"luminosity": 1.0
+	},
 	"size": 1400000,
 	"galactic_position": [0, 0, 0],
 	"texture_layers":

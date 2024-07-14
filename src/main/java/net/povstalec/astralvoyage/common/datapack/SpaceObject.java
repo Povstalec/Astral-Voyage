@@ -1,13 +1,16 @@
 package net.povstalec.astralvoyage.common.datapack;
 
 import java.util.*;
+import java.util.function.Function;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.NoiseSettings;
+import net.minecraftforge.registries.RegistryObject;
 import net.povstalec.astralvoyage.common.data.SpaceObjects;
+import net.povstalec.astralvoyage.common.init.SpaceObjectTypeInit;
 import org.joml.Vector3f;
 
 import com.mojang.datafixers.util.Pair;
@@ -25,6 +28,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.util.TextureLayerData;
+
+import javax.annotation.Nullable;
+
 public class SpaceObject
 {
 	public static final ResourceLocation SPACE_OBJECT_LOCATION = new ResourceLocation(AstralVoyage.MODID, "space_object");
@@ -43,6 +49,9 @@ public class SpaceObject
 			// Translation name of the Stellar Location
 			Codec.STRING.fieldOf("name").forGetter(SpaceObject::getTranslationName),
 			Codec.FLOAT.fieldOf("size").forGetter(SpaceObject::getSize),
+            //Space Object Type for extra data.
+            SpaceObjectTypeInit.OBJECT_TYPE_DISPATCHER.dispatchedCodec().optionalFieldOf("object_type").forGetter(SpaceObject::getType),
+            //Position in the galaxy
 			GALACTIC_POS.optionalFieldOf("galactic_position").forGetter(SpaceObject::getGalacticPos),
 			// Optional info for generating random objects
 			SpaceObject.Generation.CODEC.optionalFieldOf("generation").forGetter(SpaceObject::getGeneration),
@@ -60,87 +69,96 @@ public class SpaceObject
 	private static final String ORBIT_INCLINATION = "orbit_inclination";
 	private static final String ROTATION = "rotation";
     public static final String SURFACE = "surface";
-	
-	private final Optional<ResourceKey<Level>> dimension;
+
+    @Nullable private final ResourceKey<Level> dimension;
 	private final String translationName;
 	private final float size;
-	private final Optional<Vector3f> galactic_position;
-	private final Optional<SpaceObject.Generation> generation;
-	private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
+    @Nullable private final SpaceObjectType type;
+    @Nullable private final Vector3f galactic_position;
+    @Nullable private final SpaceObject.Generation generation;
+    @Nullable private final Pair<ResourceKey<SpaceObject>, Map<String, Double>> parentOrbitMap;
 	private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
-    private final Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface;
+    @Nullable private final Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> surface;
 
-	private Optional<ResourceKey<SpaceObject>> parent;
+	@Nullable private ResourceKey<SpaceObject> parent;
 	// Orbital characteristics
-	private Optional<Double> distance = Optional.empty(); // R
-	private Optional<Double> orbitDays = Optional.empty(); // How many days it takes for the planet to complete one orbit
-	private Optional<Double> orbitStart = Optional.empty(); // Phi
-	private Optional<Double> orbitInclination = Optional.empty(); // Tetha
-	private Optional<Double> rotation = Optional.empty();
+	@Nullable private Double distance = null; // R
+	@Nullable private Double orbitDays = null; // How many days it takes for the planet to complete one orbit
+	@Nullable private Double orbitStart = null; // Phi
+	@Nullable private Double orbitInclination = null; // Tetha
+	@Nullable private Double rotation = null;
 	
-	public SpaceObject(Optional<ResourceKey<Level>> dimension, String translationName, 
-		float size, Optional<Vector3f> galactic_position, Optional<SpaceObject.Generation> generation,
-		Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, 
-		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers,
-        Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface)
+	public SpaceObject(Optional<ResourceKey<Level>> dimension, String translationName,
+                       float size,  Optional<SpaceObjectType> type, Optional<Vector3f> galactic_position, Optional<SpaceObject.Generation> generation,
+                       Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap,
+                       List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers,
+                       Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface)
 	{
-		this.dimension = dimension;
+		this.dimension = dimension.orElse(null);
 		this.translationName = translationName;
 		this.size = size;
-		this.galactic_position = galactic_position;
-		this.generation = generation;
-		this.parentOrbitMap = parentOrbitMap;
+        this.type = type.orElse(null);
+        this.galactic_position = galactic_position.orElse(null);
+		this.generation = generation.orElse(null);
+		this.parentOrbitMap = parentOrbitMap.orElse(null);
 		this.textureLayers = textureLayers;
-        this.surface = surface;
+        this.surface = surface.orElse(null);
 		
 		if(parentOrbitMap.isPresent())
 		{
-			this.parent = Optional.of(parentOrbitMap.get().getFirst());
+			this.parent = parentOrbitMap.get().getFirst();
 			setupOrbit(parentOrbitMap.get().getSecond());
 		}
 		else
-			this.parent = Optional.empty();
+			this.parent = null;
 	}
-	
+
 	public Optional<ResourceKey<Level>> getDimension()
 	{
-		return this.dimension;
+		return Optional.ofNullable(this.dimension);
 	}
 	
 	public String getTranslationName()
 	{
 		return this.translationName;
 	}
-	
-	public float getSize()
+
+    @Nullable
+    public Optional<SpaceObjectType> getType() {
+        if(this.type != null)
+            return Optional.of(this.type);
+        else return Optional.empty();
+    }
+
+    public float getSize()
 	{
 		return this.size;
 	}
 
 	public Optional<Vector3f> getGalacticPos(){
-		return this.galactic_position;
+		return Optional.ofNullable(this.galactic_position);
 	}
 
 	public Optional<SpaceObject.Generation> getGeneration()
 	{
-		return this.generation;
+		return Optional.ofNullable(this.generation);
 	}
 	
 	private Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> getParentOrbitMap()
 	{
-		return this.parentOrbitMap;
+		return Optional.ofNullable(this.parentOrbitMap);
 	}
 
 	public Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> getSurface() {
-		return surface;
+		return Optional.ofNullable(surface);
 	}
 
 	public Optional<ResourceKey<SpaceObject>> getParent()
 	{
-		return this.parent;
+		return Optional.ofNullable(this.parent);
 	}
 
-	public void setParent(Optional<ResourceKey<SpaceObject>> parent)
+	public void setParent(ResourceKey<SpaceObject> parent)
 	{
 		this.parent = parent;
 	}
@@ -153,42 +171,45 @@ public class SpaceObject
 	private void setupOrbit(Map<String, Double> orbitMap)
 	{
 		if(orbitMap.containsKey(DISTANCE))
-			this.distance = Optional.of(orbitMap.get(DISTANCE));
+			this.distance = orbitMap.get(DISTANCE);
 		
 		if(orbitMap.containsKey(ORBIT_DAYS))
-			this.orbitDays = Optional.of(orbitMap.get(ORBIT_DAYS));
+			this.orbitDays = orbitMap.get(ORBIT_DAYS);
 		
 		if(orbitMap.containsKey(ORBIT_START))
-			this.orbitStart = Optional.of(orbitMap.get(ORBIT_START));
+			this.orbitStart = orbitMap.get(ORBIT_START);
 		
 		if(orbitMap.containsKey(ORBIT_INCLINATION))
-			this.orbitInclination = Optional.of(orbitMap.get(ORBIT_INCLINATION));
+			this.orbitInclination = orbitMap.get(ORBIT_INCLINATION);
 		
 		if(orbitMap.containsKey(ROTATION))
-			this.rotation = Optional.of(orbitMap.get(ROTATION));
+			this.rotation = orbitMap.get(ROTATION);
 	}
-	
-	public Optional<Double> getDistance()
+
+    @Nullable
+    public Double getDistance()
 	{
 		return distance;
 	}
-	
-	public Optional<Double> getAngularVelocity()
+
+    @Nullable
+	public Double getAngularVelocity()
 	{
 		return orbitDays;
 	}
-	
-	public Optional<Double> getOrbitOffset()
+
+    @Nullable
+	public Double getOrbitOffset()
 	{
-		return orbitStart;
+        return orbitStart;
 	}
 	
-	public Optional<Double> getOrbitInclination()
+	public Double getOrbitInclination()
 	{
-		return orbitInclination;
+        return orbitInclination;
 	}
 	
-	public Optional<Double> getRotation()
+	public Double getRotation()
 	{
 		return rotation;
 	}
@@ -200,40 +221,51 @@ public class SpaceObject
 		private static final String DIMENSION = "dimension";
 		private static final String NAME = "name";
 		private static final String SIZE = "size";
+        private static final String TYPE_ID = "type_key";
+        private static final String TYPE = "type";
 		private static final String PARENT = "parent";
 		private static final String GENERATION = "generation";
 		private static final String TEXTURE_LAYERS = "texture_layers";
 
-		private final Optional<ResourceKey<SpaceObject>> objectKey;
-		private final Optional<ResourceKey<Level>> dimension;
-		private final Optional<String> name;
-		private final Optional<Float> size;
-		private final Optional<Vector3f> galactic_position;
-		private final Optional<SpaceObject.Generation> generation;
-        private final Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap;
+		@Nullable private final ResourceKey<SpaceObject> objectKey;
+		@Nullable private final ResourceKey<Level> dimension;
+		@Nullable private final String name;
+		@Nullable private final Float size;
+        @Nullable private final SpaceObjectType type;
+		@Nullable private final Vector3f galactic_position;
+		@Nullable private final SpaceObject.Generation generation;
+        @Nullable private final Pair<ResourceKey<SpaceObject>, Map<String, Double>> parentOrbitMap;
 		private List<ResourceKey<SpaceObject>> childObjects = new ArrayList<>();
 		private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
-		private final Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface;
+		@Nullable private final Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> surface;
 
 		public Serializable(ResourceKey<SpaceObject> objectKey, SpaceObject object)
 		{
-			this.objectKey = Optional.of(objectKey);
-			this.dimension = object.getDimension();
-			this.name = Optional.of(object.getTranslationName());
-			this.size = Optional.of(object.getSize());
-			this.galactic_position = object.getGalacticPos();
-            this.parentOrbitMap = object.getParentOrbitMap();
-			this.generation = object.getGeneration();
+			this.objectKey = objectKey;
+			this.dimension = object.getDimension().orElse(null);
+			this.name = object.getTranslationName();
+			this.size = object.getSize();
+            this.type = object.getType().orElse(null);
+			this.galactic_position = object.getGalacticPos().orElse(null);
+            this.parentOrbitMap = object.getParentOrbitMap().orElse(null);
+			this.generation = object.getGeneration().orElse(null);
 			this.textureLayers = object.getTextureLayers();
-			this.surface = object.getSurface();
+			this.surface = object.getSurface().orElse(null);
 		}
 
-		public Serializable(Optional<ResourceKey<Level>> dimension, Optional<String> name, Optional<Float> size, Optional<Vector3f> galactic_position, Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap, Optional<SpaceObject.Generation> generation, List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers, Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface)
+		public Serializable(@Nullable ResourceKey<Level> dimension, @Nullable String name, @Nullable Float size,
+                            @Nullable SpaceObjectType type,
+                            @Nullable Vector3f galactic_position,
+                            @Nullable Pair<ResourceKey<SpaceObject>, Map<String, Double>> parentOrbitMap,
+                            @Nullable SpaceObject.Generation generation,
+                            List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers,
+                            @Nullable Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> surface)
 		{
-			this.objectKey = Optional.empty();
+			this.objectKey = null;
 			this.dimension = dimension;
 			this.name = name;
 			this.size = size;
+            this.type = type;
 			this.galactic_position = galactic_position;
 			this.parentOrbitMap = parentOrbitMap;
 			this.generation = generation;
@@ -241,37 +273,49 @@ public class SpaceObject
 			this.surface = surface;
 		}
 
-		public Optional<String> getName()
+        @Nullable
+		public String getName()
 		{
 			return this.name;
 		}
 
-		public Optional<ResourceKey<SpaceObject>> getKey()
+        @Nullable
+		public ResourceKey<SpaceObject> getKey()
 		{
 			return this.objectKey;
 		}
-		
-		public Optional<Float> getSize()
+
+        @Nullable
+		public Float getSize()
 		{
 			return this.size;
 		}
 
-		public Optional<Vector3f> getGalacticPos()
+        @Nullable
+        public SpaceObjectType getType() {
+            return type;
+        }
+
+        @Nullable
+		public Vector3f getGalacticPos()
 		{
 			return galactic_position;
 		}
 
-		public Optional<ResourceKey<Level>> getDimension()
+        @Nullable
+		public ResourceKey<Level> getDimension()
 		{
 			return this.dimension;
 		}
 
-		public Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> getSurface()
+        @Nullable
+		public Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> getSurface()
 		{
 			return surface;
 		}
 
-		public Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> getOrbitMap()
+        @Nullable
+		public Pair<ResourceKey<SpaceObject>, Map<String, Double>> getOrbitMap()
         {
             return this.parentOrbitMap;
         }
@@ -291,7 +335,8 @@ public class SpaceObject
 			this.childObjects.remove(child);
 		}
 
-		public Optional<Generation> getGeneration()
+        @Nullable
+		public Generation getGeneration()
 		{
 			return generation;
 		}
@@ -305,61 +350,71 @@ public class SpaceObject
 		{
 			CompoundTag objectTag = new CompoundTag();
 
-			if(this.objectKey.isPresent()) {
-				objectTag.putString(OBJECT_KEY, this.objectKey.get().location().toString());
+			if(this.objectKey != null) {
+				objectTag.putString(OBJECT_KEY, this.objectKey.location().toString());
+
+                if(this.getType() != null)
+                {
+                    objectTag.putString(TYPE_ID, SpaceObjectTypeInit.OBJECT_TYPE_DISPATCHER.registryGetter().get().getKey(this.getType().getType()).getPath());
+                    objectTag.put(TYPE, this.getType().serializeNBT());
+                }
 			}
 			else
 			{
-				if(this.getDimension().isPresent())
-					objectTag.putString(DIMENSION, this.getDimension().get().location().toString());
+				if(this.getDimension() != null)
+					objectTag.putString(DIMENSION, this.getDimension().location().toString());
 
-				if(this.getName().isPresent())
-					objectTag.putString(NAME, this.getName().get());
+				if(this.getName() != null)
+					objectTag.putString(NAME, this.getName());
 
-				if(this.getSize().isPresent())
-					objectTag.putFloat(SIZE, this.getSize().get());
+				if(this.getSize() != null)
+					objectTag.putFloat(SIZE, this.getSize());
 
-				if(this.generation.isPresent())
+                if(this.getType() != null) {
+                    objectTag.putString(TYPE_ID, SpaceObjectTypeInit.OBJECT_TYPE_DISPATCHER.registryGetter().get().getKey(this.getType().getType()).getPath());
+                    objectTag.put(TYPE, this.getType().serializeNBT());
+                }
+
+				if(this.generation != null)
 				{
-					objectTag.put(GENERATION, generation.get().serialize());
+					objectTag.put(GENERATION, generation.serialize());
 				}
 
-				if(this.getOrbitMap().isPresent())
+				if(this.getOrbitMap() != null)
 				{
 					CompoundTag orbitMap = new CompoundTag();
-					orbitMap.putDouble(DISTANCE, this.getOrbitMap().get().getSecond().get(DISTANCE));
-					orbitMap.putDouble(ORBIT_DAYS, this.getOrbitMap().get().getSecond().get(ORBIT_DAYS));
-					orbitMap.putDouble(ORBIT_START, this.getOrbitMap().get().getSecond().get(ORBIT_START));
-					orbitMap.putDouble(ORBIT_INCLINATION, this.getOrbitMap().get().getSecond().get(ORBIT_INCLINATION));
-					orbitMap.putDouble(ROTATION, this.getOrbitMap().get().getSecond().get(ROTATION));
+					orbitMap.putDouble(DISTANCE, this.getOrbitMap().getSecond().get(DISTANCE));
+					orbitMap.putDouble(ORBIT_DAYS, this.getOrbitMap().getSecond().get(ORBIT_DAYS));
+					orbitMap.putDouble(ORBIT_START, this.getOrbitMap().getSecond().get(ORBIT_START));
+					orbitMap.putDouble(ORBIT_INCLINATION, this.getOrbitMap().getSecond().get(ORBIT_INCLINATION));
+					orbitMap.putDouble(ROTATION, this.getOrbitMap().getSecond().get(ROTATION));
 
 					objectTag.put("orbit", orbitMap);
 				}
 
-				if(this.getGalacticPos().isPresent())
+				if(this.getGalacticPos() != null)
 				{
 					CompoundTag galPos = new CompoundTag();
-					galPos.putFloat("x", this.getGalacticPos().get().x);
-					galPos.putFloat("y", this.getGalacticPos().get().y);
-					galPos.putFloat("z", this.getGalacticPos().get().z);
+					galPos.putFloat("x", this.getGalacticPos().x);
+					galPos.putFloat("y", this.getGalacticPos().y);
+					galPos.putFloat("z", this.getGalacticPos().z);
 					objectTag.put("galactic_position", galPos);
 				}
-				this.parentOrbitMap.ifPresent(spaceObjectResourceKey -> objectTag.putString(PARENT, spaceObjectResourceKey.getFirst().location().toString()));
+                if(this.parentOrbitMap != null)
+                    objectTag.putString(PARENT, this.parentOrbitMap.getFirst().location().toString());
+
 				ListTag textureLayers = new ListTag();
 
 				this.textureLayers.forEach(textureLayer -> textureLayers.add(TextureLayerData.serialize(new TextureLayerData(textureLayer))));
 				objectTag.put(TEXTURE_LAYERS, textureLayers);
 			}
 
-			if (this.getSurface().isPresent()) {
+			if (this.getSurface() != null) {
 				CompoundTag surfaceTag = new CompoundTag();
-				this.getSurface().ifPresent(
-						surface -> {
-							surfaceTag.putString("noise_settings", surface.getFirst().location().toString());
-							ListTag biomeList = new ListTag();
-							surface.getSecond().forEach(biome -> biomeList.add(StringTag.valueOf(biome.location().toString())));
-							surfaceTag.put("biomes", biomeList);
-						});
+                surfaceTag.putString("noise_settings", this.getSurface().getFirst().location().toString());
+                ListTag biomeList = new ListTag();
+                this.getSurface().getSecond().forEach(biome -> biomeList.add(StringTag.valueOf(biome.location().toString())));
+                surfaceTag.put("biomes", biomeList);
 				objectTag.put(SURFACE, surfaceTag);
 			}
 
@@ -384,19 +439,24 @@ public class SpaceObject
 			}
 			else
 			{
-				Optional<String> name = Optional.empty();
+				String name = null;
 				if(objectTag.contains(NAME))
-					name = Optional.of(objectTag.getString(NAME));
+					name = objectTag.getString(NAME);
 
-				Optional<ResourceKey<Level>> dimension = Optional.empty();
+				ResourceKey<Level> dimension = null;
 				if(objectTag.contains(DIMENSION))
-					dimension = Optional.of(stringToDimension(objectTag.getString(DIMENSION)));
+					dimension = stringToDimension(objectTag.getString(DIMENSION));
 
-				Optional<Float> size = Optional.empty();
+				Float size = null;
 				if(objectTag.contains(SIZE))
-					size = Optional.of(objectTag.getFloat(SIZE));
+					size = objectTag.getFloat(SIZE);
 
-				Optional<Map<String, Double>> orbitMap = Optional.empty();
+                SpaceObjectType type = null;
+                if(objectTag.contains(TYPE_ID)) {
+                    type = SpaceObjectTypeInit.TYPE_SET.get(objectTag.getString(TYPE_ID)).deserializeNBT(objectTag);
+                }
+
+				Map<String, Double> orbitMap = null;
 				if(objectTag.contains("orbit"))
 				{
 					Map<String, Double> orbit = new HashMap<>(Map.of());
@@ -407,34 +467,34 @@ public class SpaceObject
 					orbit.put(ORBIT_INCLINATION, tag.getDouble(ORBIT_INCLINATION));
 					orbit.put(ROTATION, tag.getDouble(ROTATION));
 
-					orbitMap = Optional.of(orbit);
+					orbitMap = orbit;
 				}
 
-				Optional<Vector3f> galactic_position = Optional.empty();
+				Vector3f galactic_position = null;
 				if(objectTag.contains("galactic_position")) {
 					CompoundTag galPos = objectTag.getCompound("galactic_position");
-					galactic_position = Optional.of(new Vector3f(galPos.getFloat("x"), galPos.getFloat("y"), galPos.getFloat("y")));
+					galactic_position = new Vector3f(galPos.getFloat("x"), galPos.getFloat("y"), galPos.getFloat("y"));
 				}
 
-				Optional<Generation> generation = Optional.empty();
+				Generation generation = null;
 				if(objectTag.contains(GENERATION))
 				{
 					CompoundTag generationTag = objectTag.getCompound(GENERATION);
-					generation = Optional.of(Generation.deserialize(generationTag));
+					generation = Generation.deserialize(generationTag);
 				}
 
-				Optional<ResourceKey<SpaceObject>> parent = Optional.empty();
+				ResourceKey<SpaceObject> parent = null;
 				if(objectTag.contains(PARENT))
-					parent = Optional.ofNullable(stringToSpaceObjectKey(objectTag.getString(PARENT)));
-				Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap = Optional.empty();
-				if(parent.isPresent() && orbitMap.isPresent())
-					parentOrbitMap = Optional.of(new Pair<>(parent.get(), orbitMap.get()));
+					parent = stringToSpaceObjectKey(objectTag.getString(PARENT));
+				Pair<ResourceKey<SpaceObject>, Map<String, Double>> parentOrbitMap = null;
+				if(parent != null && orbitMap != null)
+					parentOrbitMap = new Pair<>(parent, orbitMap);
 
 				ListTag layersTag = objectTag.getList(TEXTURE_LAYERS, Tag.TAG_LIST);
 				List<TextureLayerData> textureLayers = new ArrayList<>();
 				layersTag.forEach(layertag -> textureLayers.add(TextureLayerData.deserialize((CompoundTag) layertag)));
 
-				Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface = Optional.empty();
+				Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> surface = null;
 				if(objectTag.contains(SURFACE)) {
 					CompoundTag surfaceTag = objectTag.getCompound(SURFACE);
 					ResourceKey<NoiseGeneratorSettings> key = ResourceKey.create(Registries.NOISE_SETTINGS, ResourceLocation.tryParse(surfaceTag.getString("noise_settings")));
@@ -447,9 +507,9 @@ public class SpaceObject
 								biomeList.add(ResourceKey.create(Registries.BIOME, ResourceLocation.tryParse(biomeTag.getAsString())));
 							});
 
-					surface = Optional.of(new Pair<>(key, biomeList));
+					surface = new Pair<>(key, biomeList);
 				}
-				return new SpaceObject.Serializable(dimension, name, size, galactic_position, parentOrbitMap, generation, TextureLayerData.toPairList(textureLayers), surface);
+				return new SpaceObject.Serializable(dimension, name, size, type, galactic_position, parentOrbitMap, generation, TextureLayerData.toPairList(textureLayers), surface);
 			}
 		}
 	}

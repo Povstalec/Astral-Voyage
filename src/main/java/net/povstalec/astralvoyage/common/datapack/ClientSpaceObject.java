@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceKey;
 import net.povstalec.astralvoyage.common.util.TextureLayerData;
 import org.joml.Vector3f;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,13 +15,13 @@ import java.util.Optional;
 public class ClientSpaceObject {
 
     public ResourceKey<SpaceObject> key;
-    public Optional<Vector3f> galPos;
+    @Nullable public Vector3f galPos;
     public Vector3f solarPos;
     public float size;
-    public Optional<Double> orbitStartAngle;
+    @Nullable Double orbitStartAngle;
     public List<TextureLayerData> textureLayers;
 
-    public ClientSpaceObject(ResourceKey<SpaceObject> key, float size, Optional<Double> orbitStartAngle, Vector3f solarPos, Optional<Vector3f> galPos, List<TextureLayerData> layers)
+    public ClientSpaceObject(ResourceKey<SpaceObject> key, float size, @Nullable Double orbitStartAngle, Vector3f solarPos, @Nullable Vector3f galPos, List<TextureLayerData> layers)
     {
         this.key = key;
         this.size = size;
@@ -39,12 +40,14 @@ public class ClientSpaceObject {
         return this.size;
     }
 
-    public Optional<Vector3f> getGalacticPos()
+    @Nullable
+    public Vector3f getGalacticPos()
     {
         return galPos;
     }
 
-    public Optional<Double> getOrbitOffset()
+    @Nullable
+    public Double getOrbitOffset()
     {
         return this.orbitStartAngle;
     }

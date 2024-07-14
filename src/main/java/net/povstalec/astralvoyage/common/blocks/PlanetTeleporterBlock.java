@@ -38,28 +38,28 @@ public class PlanetTeleporterBlock extends Block {
             List<Map.Entry<String, SpaceObject.Serializable>> objectList = SpaceObjects.get(pLevel.getServer()).spaceObjects.entrySet().stream().filter(
                     thing -> {
                         Vector3f vector = new Vector3f(0);
-                        if (thing.getValue().getOrbitMap().isPresent())
-                            vector = new Vector3f(thing.getValue().getOrbitMap().get().getSecond().get("distance").floatValue(), 0, 0);
+                        if (thing.getValue().getOrbitMap() != null)
+                            vector = new Vector3f(thing.getValue().getOrbitMap().getSecond().get("distance").floatValue(), 0, 0);
                         return vector.distance(cap.getSolarPosition()) < 500000;
                     }).toList();
-            objectList.get(0).getValue().getDimension().ifPresent(present ->
-                    pPlayer.teleportTo(
-                            pLevel.getServer().levelKeys().stream().toList().contains(present)
-                                    ? pLevel.getServer().getLevel(present) : (ServerLevel) pLevel,
-                            pPlayer.getOnPos().getX(), pPlayer.getOnPos().getY(),
-                            pPlayer.getOnPos().getZ(), RelativeMovement.ALL,
-                            pPlayer.getYRot(), pPlayer.getXRot())
-            );
-            if (objectList.get(0).getValue().getSurface().isPresent() && objectList.get(0).getValue().getDimension().isEmpty()) {
+            if(objectList.get(0).getValue().getDimension() != null)
+                pPlayer.teleportTo(
+                        pLevel.getServer().levelKeys().stream().toList().contains(objectList.get(0).getValue().getDimension())
+                                ? pLevel.getServer().getLevel(objectList.get(0).getValue().getDimension()) : (ServerLevel) pLevel,
+                        pPlayer.getOnPos().getX(), pPlayer.getOnPos().getY(),
+                        pPlayer.getOnPos().getZ(), RelativeMovement.ALL,
+                        pPlayer.getYRot(), pPlayer.getXRot());
+
+            if (objectList.get(0).getValue().getSurface() != null && objectList.get(0).getValue().getDimension() == null) {
                 ServerLevel planetLevel = DimensionHelper.createPlanet(pLevel.getServer(), objectList.get(0));
                 planetLevel.getCapability(CapabilitiesInit.PLANET).ifPresent(planet -> {
                     planet.setKey(SpaceObject.stringToSpaceObjectKey(objectList.get(0).getKey()));
-                    if (objectList.get(0).getValue().getOrbitMap().isPresent()) {
-                        planet.setParent(Optional.of(objectList.get(0).getValue().getOrbitMap().get().getFirst()));
-                        planet.setSolarPosition(objectList.get(0).getValue().getOrbitMap().get().getSecond().get("distance").floatValue(), 0, 0);
-                        SpaceObject.Serializable parentObject = SpaceObjects.get(pLevel.getServer()).spaceObjects.get(objectList.get(0).getValue().getOrbitMap().get().getFirst().location().toString());
-                        if (parentObject.getGalacticPos().isPresent())
-                            planet.setGalacticPostion(parentObject.getGalacticPos().get().x, parentObject.getGalacticPos().get().y, parentObject.getGalacticPos().get().z);
+                    if (objectList.get(0).getValue().getOrbitMap() != null) {
+                        planet.setParent(Optional.of(objectList.get(0).getValue().getOrbitMap().getFirst()));
+                        planet.setSolarPosition(objectList.get(0).getValue().getOrbitMap().getSecond().get("distance").floatValue(), 0, 0);
+                        SpaceObject.Serializable parentObject = SpaceObjects.get(pLevel.getServer()).spaceObjects.get(objectList.get(0).getValue().getOrbitMap().getFirst().location().toString());
+                        if (parentObject.getGalacticPos() != null)
+                            planet.setGalacticPostion(parentObject.getGalacticPos().x, parentObject.getGalacticPos().y, parentObject.getGalacticPos().z);
                     }
                 });
                 pPlayer.teleportTo(planetLevel,
