@@ -3,18 +3,20 @@ package net.povstalec.astralvoyage.common.datapack;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.StringRepresentable;
 import net.povstalec.astralvoyage.common.init.SpaceObjectTypeInit;
+import net.povstalec.astralvoyage.common.util.SpectralClass;
 
 public class StarType implements SpaceObjectType
 {
     public static final Codec<StarType> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.FLOAT.fieldOf("luminosity").forGetter(star -> star.luminosity)
+            StringRepresentable.fromEnum(SpectralClass::values).fieldOf("spectral_class").forGetter(StarType::getSpectralClass)
     ).apply(instance, StarType::new));
 
-    public float luminosity;
-    public StarType(float luminosity)
+    public SpectralClass spectral;
+    public StarType(SpectralClass spectral)
     {
-        this.luminosity = luminosity;
+        this.spectral = spectral;
     }
 
     @Override
@@ -25,22 +27,22 @@ public class StarType implements SpaceObjectType
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag tag = new CompoundTag();
-        tag.putFloat("luminosity", this.luminosity);
+        tag.putString("spectral_class", this.spectral.getSerializedName());
         return tag;
     }
 
     @Override
     public SpaceObjectType deserializeNBT(CompoundTag tag) {
-        StarType type = new StarType(0);
-        type.setLuminosity(tag.getFloat("luminosity"));
+        StarType type = new StarType(SpectralClass.M);
+        type.setSpectral(SpectralClass.valueOf(tag.getString("spectral_class")));
         return type;
     }
 
-    public float getLuminosity() {
-        return luminosity;
+    public SpectralClass getSpectralClass() {
+        return this.spectral;
     }
 
-    public void setLuminosity(float luminosity) {
-        this.luminosity = luminosity;
+    public void setSpectral(SpectralClass spectral) {
+        this.spectral = spectral;
     }
 }

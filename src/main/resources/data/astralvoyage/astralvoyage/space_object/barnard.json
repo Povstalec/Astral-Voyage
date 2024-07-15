@@ -1,5 +1,10 @@
 {
 	"name": "stellar_location.astralvoyage.barnard",
+	"object_type":
+	{
+		"type": "astralvoyage:star",
+		"spectral_class": "g"
+	},
 	"size": 280000,
 	"galactic_position": [2, 1, 1],
 	"generation": {

@@ -14,7 +14,10 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
+import net.povstalec.astralvoyage.common.datapack.StarType;
 import net.povstalec.astralvoyage.common.util.RandomTextureLayers;
+import net.povstalec.astralvoyage.common.util.SpectralClass;
+import net.povstalec.astralvoyage.common.util.TextureLayerData;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -28,7 +31,7 @@ public class SpaceObjects extends SavedData
 	private static final int MAX_STARS = 500;
 	private static final int MIN_STARS = 50;
 	private static final int MIN_PLANETS_PER_STAR = 0;
-	private static final int MAX_PLANETS_PER_STAR = 2;
+	private static final int MAX_PLANETS_PER_STAR = 5;
 
 	public HashMap<String, SpaceObject.Serializable> spaceObjects = new HashMap<>();
 	
@@ -103,10 +106,10 @@ public class SpaceObjects extends SavedData
 
 	private void registerRandomSpaceObjects(Random random)
 	{
-		RandomTextureLayers.Star layer = RandomTextureLayers.Star.values()[random.nextInt(0, 7)];
-		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layerList = List.of(layer.getTextureLayer().getFirst().getLayer(), layer.getTextureLayer().getSecond().getLayer());
+		StarType type = new StarType(SpectralClass.randomClass(random));
+		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layerList = TextureLayerData.toPairList(type.getSpectralClass().getLayers());
 		String id = AstralVoyage.MODID + ":star_" + UUID.randomUUID();
-		SpaceObject.Serializable newObject = new SpaceObject.Serializable(null, id, 13000F, null,
+		SpaceObject.Serializable newObject = new SpaceObject.Serializable(null, id, 13000F, type,
 				new Vector3f(
 						((int) random.nextFloat(-1000f, 1000f)),
 						((int) random.nextFloat(-1000f, 1000f)),

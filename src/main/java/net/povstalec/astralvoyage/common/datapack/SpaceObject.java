@@ -29,6 +29,7 @@ import net.minecraft.world.level.Level;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.util.TextureLayerData;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class SpaceObject
@@ -158,7 +159,7 @@ public class SpaceObject
 		return Optional.ofNullable(this.parent);
 	}
 
-	public void setParent(ResourceKey<SpaceObject> parent)
+	public void setParent(@Nullable ResourceKey<SpaceObject> parent)
 	{
 		this.parent = parent;
 	}
@@ -203,12 +204,14 @@ public class SpaceObject
 	{
         return orbitStart;
 	}
-	
+
+	@Nullable
 	public Double getOrbitInclination()
 	{
         return orbitInclination;
 	}
-	
+
+	@Nullable
 	public Double getRotation()
 	{
 		return rotation;
@@ -239,7 +242,7 @@ public class SpaceObject
 		private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
 		@Nullable private final Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> surface;
 
-		public Serializable(ResourceKey<SpaceObject> objectKey, SpaceObject object)
+		public Serializable(@Nonnull ResourceKey<SpaceObject> objectKey, SpaceObject object)
 		{
 			this.objectKey = objectKey;
 			this.dimension = object.getDimension().orElse(null);
@@ -350,14 +353,9 @@ public class SpaceObject
 		{
 			CompoundTag objectTag = new CompoundTag();
 
-			if(this.objectKey != null) {
+			if(this.objectKey != null)
+			{
 				objectTag.putString(OBJECT_KEY, this.objectKey.location().toString());
-
-                if(this.getType() != null)
-                {
-                    objectTag.putString(TYPE_ID, SpaceObjectTypeInit.OBJECT_TYPE_DISPATCHER.registryGetter().get().getKey(this.getType().getType()).getPath());
-                    objectTag.put(TYPE, this.getType().serializeNBT());
-                }
 			}
 			else
 			{
@@ -451,7 +449,7 @@ public class SpaceObject
 				if(objectTag.contains(SIZE))
 					size = objectTag.getFloat(SIZE);
 
-                SpaceObjectType type = null;
+				SpaceObjectType type = null;
                 if(objectTag.contains(TYPE_ID)) {
                     type = SpaceObjectTypeInit.TYPE_SET.get(objectTag.getString(TYPE_ID)).deserializeNBT(objectTag);
                 }
