@@ -3,7 +3,7 @@
 	"object_type":
 	{
 		"type": "astralvoyage:star",
-		"luminosity": 1.0
+		"spectral_class": "g"
 	},
 	"size": 1400000,
 	"galactic_position": [0, 0, 0],

@@ -1,5 +1,10 @@
 {
 	"name": "stellar_location.astralvoyage.sagittarius",
+	"object_type":
+	{
+		"type": "astralvoyage:star",
+		"spectral_class": "black_hole"
+	},
 	"size": 51800000,
 	"galactic_position": [10, 11, 19],
 	"texture_layers":

@@ -41,31 +41,36 @@ public class RandomTextureLayers {
 
     public enum Star {
 
-        G(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_g.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
-                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_g_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
-        M(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_m.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
-                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_m_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
-        F(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_f.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
-                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_f_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
-        B(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_b.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
-                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_b_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
-        A(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_a.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
-                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_a_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
-        O(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_o.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+        XB(List.of(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/black_hole"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/black_hole_disk"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/black_hole_halo"), new Pair<>(List.of(255, 255, 255, 255), true))))),
+
+        O(List.of(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_o.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
                 new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_o_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
-        K(new Pair<>(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_k.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
-                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_k_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true)))));
+        B(List.of(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_b.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_b_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
+        A(List.of(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_a.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_a_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
+        F(List.of(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_f.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_f_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
+        G(List.of(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_g.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_g_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
+        K(List.of(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_k.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_k_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true))))),
+        M(List.of(new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_m.png"), new Pair<>(List.of(255, 255, 255, 255), false))),
+                new TextureLayerData(new Pair<>(new ResourceLocation(AstralVoyage.MODID, "textures/environment/stars/star_m_halo.png"), new Pair<>(List.of(255, 255, 255, 255), true)))));
 
 
 
-        private Pair<TextureLayerData, TextureLayerData> texture_layer_pair;
+        private List<TextureLayerData> texture_layer_pair;
 
-        Star(Pair<TextureLayerData, TextureLayerData> layer)
+        Star(List<TextureLayerData> layer)
         {
             this.texture_layer_pair = layer;
         }
 
-        public Pair<TextureLayerData, TextureLayerData> getTextureLayer() {
+        public List<TextureLayerData> getTextureLayer()
+        {
             return texture_layer_pair;
         }
     }

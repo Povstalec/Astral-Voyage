@@ -1,5 +1,10 @@
 {
   "name": "stellar_location.astralvoyage.kerbol",
+  "object_type":
+  {
+    "type": "astralvoyage:star",
+    "spectral_class": "g"
+  },
   "size": 261600,
   "galactic_position": [24, 15, 31],
   "texture_layers":
