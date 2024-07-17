@@ -40,9 +40,7 @@ public class SpaceObject
 
 	private static final Codec<Vector3f> GALACTIC_POS = Codec.FLOAT.listOf().comapFlatMap(f -> Util.fixedSize(f, 3).map(vec -> new Vector3f(vec.get(0), vec.get(1), vec.get(2))), (element) -> List.of(element.get(0), element.get(1), element.get(2))).stable();
 	private static final Codec<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> PARENT = Codec.pair(RESOURCE_KEY_CODEC.fieldOf("parent_object").codec(), Codec.unboundedMap(Codec.STRING, Codec.DOUBLE).fieldOf("orbit").codec());
-	private static final Codec<Pair<List<Integer>, Boolean>> TEXTURE_SETTINGS = Codec.pair(Codec.INT.listOf().fieldOf("rgba").codec(), Codec.BOOL.fieldOf("blends").codec());
-	private static final Codec<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> TEXTURE_LAYER = Codec.pair(ResourceLocation.CODEC.fieldOf("texture").codec(), TEXTURE_SETTINGS.fieldOf("texture_settings").codec());
-    private static final Codec<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> SURFACE_CODEC = Codec.pair(ResourceKey.codec(Registries.NOISE_SETTINGS).fieldOf("noise_settings").codec(), Codec.list(ResourceKey.codec(Registries.BIOME)).fieldOf("biomes").codec());
+	private static final Codec<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> SURFACE_CODEC = Codec.pair(ResourceKey.codec(Registries.NOISE_SETTINGS).fieldOf("noise_settings").codec(), Codec.list(ResourceKey.codec(Registries.BIOME)).fieldOf("biomes").codec());
 
 	public static final Codec<SpaceObject> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			// Dimension this Stellar Location is tied to
@@ -59,7 +57,7 @@ public class SpaceObject
 			// Parent Stellar Location, probably used for orbits and stuff in the future
 			PARENT.optionalFieldOf("parent").forGetter(SpaceObject::getParentOrbitMap),
 			// Textures and colors
-			TEXTURE_LAYER.listOf().fieldOf("texture_layers").forGetter(SpaceObject::getTextureLayers),
+			TextureLayerData.CODEC.listOf().fieldOf("texture_layers").forGetter(SpaceObject::getTextureLayers),
             //Surface Settings
             SURFACE_CODEC.optionalFieldOf("surface").forGetter(SpaceObject::getSurface)
     ).apply(instance, SpaceObject::new));
@@ -78,7 +76,7 @@ public class SpaceObject
     @Nullable private final Vector3f galactic_position;
     @Nullable private final SpaceObject.Generation generation;
     @Nullable private final Pair<ResourceKey<SpaceObject>, Map<String, Double>> parentOrbitMap;
-	private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
+	private final List<TextureLayerData> textureLayers;
     @Nullable private final Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> surface;
 
 	@Nullable private ResourceKey<SpaceObject> parent;
@@ -92,7 +90,7 @@ public class SpaceObject
 	public SpaceObject(Optional<ResourceKey<Level>> dimension, String translationName,
                        float size,  Optional<SpaceObjectType> type, Optional<Vector3f> galactic_position, Optional<SpaceObject.Generation> generation,
                        Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap,
-                       List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers,
+                       List<TextureLayerData> textureLayers,
                        Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface)
 	{
 		this.dimension = dimension.orElse(null);
@@ -164,7 +162,7 @@ public class SpaceObject
 		this.parent = parent;
 	}
 	
-	public List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> getTextureLayers()
+	public List<TextureLayerData> getTextureLayers()
 	{
 		return this.textureLayers;
 	}
@@ -239,7 +237,7 @@ public class SpaceObject
 		@Nullable private final SpaceObject.Generation generation;
         @Nullable private final Pair<ResourceKey<SpaceObject>, Map<String, Double>> parentOrbitMap;
 		private List<ResourceKey<SpaceObject>> childObjects = new ArrayList<>();
-		private final List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers;
+		private final List<TextureLayerData> textureLayers;
 		@Nullable private final Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> surface;
 
 		public Serializable(@Nonnull ResourceKey<SpaceObject> objectKey, SpaceObject object)
@@ -261,7 +259,7 @@ public class SpaceObject
                             @Nullable Vector3f galactic_position,
                             @Nullable Pair<ResourceKey<SpaceObject>, Map<String, Double>> parentOrbitMap,
                             @Nullable SpaceObject.Generation generation,
-                            List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> textureLayers,
+                            List<TextureLayerData> textureLayers,
                             @Nullable Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> surface)
 		{
 			this.objectKey = null;
@@ -344,7 +342,7 @@ public class SpaceObject
 			return generation;
 		}
 
-		public List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> getTextureLayers()
+		public List<TextureLayerData> getTextureLayers()
 		{
 			return this.textureLayers;
 		}
@@ -356,6 +354,9 @@ public class SpaceObject
 			if(this.objectKey != null)
 			{
 				objectTag.putString(OBJECT_KEY, this.objectKey.location().toString());
+
+				if(this.type != null)
+					objectTag.put(TYPE, type.serializeNBT());
 			}
 			else
 			{
@@ -403,7 +404,7 @@ public class SpaceObject
 
 				ListTag textureLayers = new ListTag();
 
-				this.textureLayers.forEach(textureLayer -> textureLayers.add(TextureLayerData.serialize(new TextureLayerData(textureLayer))));
+				this.textureLayers.forEach(textureLayer -> textureLayers.add(textureLayer.serialize()));
 				objectTag.put(TEXTURE_LAYERS, textureLayers);
 			}
 
@@ -507,7 +508,7 @@ public class SpaceObject
 
 					surface = new Pair<>(key, biomeList);
 				}
-				return new SpaceObject.Serializable(dimension, name, size, type, galactic_position, parentOrbitMap, generation, TextureLayerData.toPairList(textureLayers), surface);
+				return new SpaceObject.Serializable(dimension, name, size, type, galactic_position, parentOrbitMap, generation, textureLayers, surface);
 			}
 		}
 	}

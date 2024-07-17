@@ -1,15 +1,10 @@
 package net.povstalec.astralvoyage.common.init;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryObject;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.datapack.SpaceObjectType;
@@ -18,8 +13,6 @@ import net.povstalec.astralvoyage.common.util.RegistryDispatcher;
 import net.povstalec.astralvoyage.common.util.SpectralClass;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = AstralVoyage.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -34,7 +27,7 @@ public class SpaceObjectTypeInit {
     );
 
     public static final RegistryObject<Codec<StarType>> STAR = register("star",
-            () -> StarType.CODEC, new StarType(SpectralClass.M));
+            () -> StarType.CODEC, new StarType(Either.left(SpectralClass.M)));
 
     public static <S extends SpaceObjectType> RegistryObject<Codec<S>> register(String name, Supplier<Codec<S>> supplier, S type)
     {

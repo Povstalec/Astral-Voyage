@@ -3,7 +3,11 @@
 	"object_type":
 	{
 		"type": "astralvoyage:star",
-		"spectral_class": "g"
+		"star_data": {
+			"luminosity": 0.0034,
+			"mass": 0.1610,
+			"temperature": 3222
+		}
 	},
 	"size": 280000,
 	"galactic_position": [2, 1, 1],
@@ -16,7 +20,7 @@
 	},
 	"texture_layers":
 	[
-		{"texture": "astralvoyage:textures/environment/stars/barnard.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
-		{"texture": "astralvoyage:textures/environment/stars/barnard_halo.png", "texture_settings":  {"rgba":  [255, 255, 255, 255], "blends":  true}}
+		{"layer":{"texture": "astralvoyage:textures/environment/stars/barnard.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}}},
+		{"layer":{"texture": "astralvoyage:textures/environment/stars/barnard_halo.png", "texture_settings":  {"rgba":  [255, 255, 255, 255], "blends":  true}}}
 	]
 }

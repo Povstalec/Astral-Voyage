@@ -1,15 +1,17 @@
 {
 	"name": "stellar_location.astralvoyage.sol",
-	"object_type":
-	{
+	"object_type": {
 		"type": "astralvoyage:star",
-		"spectral_class": "g"
+		"star_data": {
+			"luminosity": 1,
+			"mass": 1,
+			"temperature": 5772
+		}
 	},
 	"size": 1400000,
 	"galactic_position": [0, 0, 0],
-	"texture_layers":
-	[
-		{"texture": "astralvoyage:textures/environment/stars/sol.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
-		{"texture": "astralvoyage:textures/environment/stars/sol_halo.png", "texture_settings":  {"rgba":  [255, 255, 255, 255], "blends":  true}}
+	"texture_layers": [
+		{"layer": {"texture": "astralvoyage:textures/environment/stars/sol.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}}},
+		{"layer": {"texture": "astralvoyage:textures/environment/stars/sol_halo.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": true}}}
 	]
 }

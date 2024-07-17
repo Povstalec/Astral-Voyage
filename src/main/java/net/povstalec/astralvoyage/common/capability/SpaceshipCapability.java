@@ -144,7 +144,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
         return new ClientSpaceObject(SpaceObject.stringToSpaceObjectKey(objectId), object.getSize() == null ? 1300 : object.getSize(),
                 object.getOrbitMap() != null && object.getOrbitMap().getSecond().containsKey("orbit_start") ? object.getOrbitMap().getSecond().get("orbit_start") : 0D,
                 new Vector3f(object.getOrbitMap() != null && object.getOrbitMap().getSecond().containsKey("distance") ? object.getOrbitMap().getSecond().get("distance").floatValue() : 0f, 0 ,0),
-                object.getGalacticPos(), TextureLayerData.toDataList(object.getTextureLayers()));
+                object.getGalacticPos(), object.getTextureLayers());
     }
 
     public static ClientSpaceObject spaceshipToClient(SpaceshipCapability capability, Level level)

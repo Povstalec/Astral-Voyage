@@ -15,7 +15,7 @@
   },
   "texture_layers":
   [
-    {"texture": "astralvoyage:textures/environment/planets/jool.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
-    {"texture": "astralvoyage:textures/environment/planets/jupiter_halo.png", "texture_settings": {"rgba": [125, 255, 125, 255], "blends":  true}}
+    {"layer":{"texture": "astralvoyage:textures/environment/planets/jool.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}}},
+    {"layer":{"texture": "astralvoyage:textures/environment/planets/jupiter_halo.png", "texture_settings": {"rgba": [125, 255, 125, 255], "blends":  true}}}
   ]
 }

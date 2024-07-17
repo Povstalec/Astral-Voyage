@@ -2,6 +2,7 @@ package net.povstalec.astralvoyage.common.data;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -17,6 +18,7 @@ import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.datapack.StarType;
 import net.povstalec.astralvoyage.common.util.RandomTextureLayers;
 import net.povstalec.astralvoyage.common.util.SpectralClass;
+import net.povstalec.astralvoyage.common.util.StarProperties;
 import net.povstalec.astralvoyage.common.util.TextureLayerData;
 import org.joml.Vector3f;
 
@@ -106,10 +108,23 @@ public class SpaceObjects extends SavedData
 
 	private void registerRandomSpaceObjects(Random random)
 	{
-		StarType type = new StarType(SpectralClass.randomClass(random));
-		List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layerList = TextureLayerData.toPairList(type.getSpectralClass().getLayers());
+		StarType type = StarType.randomType(random);
+		StarProperties properties = type.getStarProperties();
+		SpectralClass spectralClass = null;
+		for(SpectralClass spectral : SpectralClass.values()) {
+			if (properties.getMass() >= spectral.getMassRange().getFirst() && properties.getMass() < spectral.getMassRange().getSecond())
+				spectralClass = spectral;
+		}
+
+		List<TextureLayerData> layerList;
+		if(spectralClass != null)
+			layerList = spectralClass.getLayers();
+		else layerList = RandomTextureLayers.Star.values()[random.nextInt(0, 7)].getTextureLayer();
 		String id = AstralVoyage.MODID + ":star_" + UUID.randomUUID();
-		SpaceObject.Serializable newObject = new SpaceObject.Serializable(null, id, 13000F, type,
+		SpaceObject.Serializable newObject = new SpaceObject.Serializable(null, id,
+				spectralClass == null ?
+						13000F : random.nextFloat(spectralClass.getRadiusRange().getFirst().floatValue(),
+						spectralClass.getRadiusRange().getSecond().floatValue()), type,
 				new Vector3f(
 						((int) random.nextFloat(-1000f, 1000f)),
 						((int) random.nextFloat(-1000f, 1000f)),
@@ -163,7 +178,7 @@ public class SpaceObjects extends SavedData
 			{
 				Random random = new Random();
 				RandomTextureLayers.Planet[] values = RandomTextureLayers.Planet.values();
-				List<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> layerList = List.of(values[random.nextInt(0, 8)].getTextureLayer(), values[random.nextInt(8, 16)].getTextureLayer());
+				List<TextureLayerData> layerList = List.of(values[random.nextInt(0, 8)].getTextureLayer(), values[random.nextInt(8, 16)].getTextureLayer());
 				String id = AstralVoyage.MODID + ":body_" + UUID.randomUUID();
 				SpaceObject.Serializable newObject = new SpaceObject.Serializable(
 						null, id, 13000F, null, null,

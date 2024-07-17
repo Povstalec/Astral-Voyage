@@ -3,13 +3,17 @@
   "object_type":
   {
     "type": "astralvoyage:star",
-    "spectral_class": "g"
+    "star_data": {
+      "luminosity": 0.008,
+      "mass": 0.00883,
+      "temperature": 5840
+    }
   },
-  "size": 261600,
+  "size": 523200,
   "galactic_position": [24, 15, 31],
   "texture_layers":
   [
-    {"texture": "astralvoyage:textures/environment/stars/star_g.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}},
-    {"texture": "astralvoyage:textures/environment/stars/star_g_halo.png", "texture_settings":  {"rgba":  [255, 255, 255, 255], "blends":  true}}
+    {"layer":{"texture": "astralvoyage:textures/environment/stars/star_g.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}}},
+    {"layer":{"texture": "astralvoyage:textures/environment/stars/star_g_halo.png", "texture_settings":  {"rgba":  [255, 255, 255, 255], "blends":  true}}}
   ]
 }

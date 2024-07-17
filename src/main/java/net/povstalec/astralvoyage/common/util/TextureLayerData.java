@@ -1,6 +1,8 @@
 package net.povstalec.astralvoyage.common.util;
 
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.StringTag;
@@ -11,7 +13,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TextureLayerData {
+public class TextureLayerData
+{
+    private static final Codec<Pair<List<Integer>, Boolean>> TEXTURE_SETTINGS = Codec.pair(Codec.INT.listOf().fieldOf("rgba").codec(), Codec.BOOL.fieldOf("blends").codec());
+    private static final Codec<Pair<ResourceLocation, Pair<List<Integer>, Boolean>>> TEXTURE_LAYER = Codec.pair(ResourceLocation.CODEC.fieldOf("texture").codec(), TEXTURE_SETTINGS.fieldOf("texture_settings").codec());
+
+    public static final Codec<TextureLayerData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            TEXTURE_LAYER.fieldOf("layer").forGetter(TextureLayerData::getLayer)
+    ).apply(instance, TextureLayerData::new));
     public Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer;
 
     public TextureLayerData(Pair<ResourceLocation, Pair<List<Integer>, Boolean>> layer){
@@ -26,14 +35,14 @@ public class TextureLayerData {
         this.layer = layer;
     }
 
-    public static CompoundTag serialize(TextureLayerData layerData)
+    public CompoundTag serialize()
     {
         CompoundTag layer = new CompoundTag();
         CompoundTag textureSettings = new CompoundTag();
-        StringTag rl = StringTag.valueOf(layerData.getLayer().getFirst().toString());
-        IntArrayTag rgba = new IntArrayTag(layerData.getLayer().getSecond().getFirst());
+        StringTag rl = StringTag.valueOf(this.getLayer().getFirst().toString());
+        IntArrayTag rgba = new IntArrayTag(this.getLayer().getSecond().getFirst());
         textureSettings.put("rgba", rgba);
-        textureSettings.putBoolean("blend", layerData.getLayer().getSecond().getSecond());
+        textureSettings.putBoolean("blend", this.getLayer().getSecond().getSecond());
         layer.put("texture", rl);
         layer.put("texture_settings", textureSettings);
         return layer;
