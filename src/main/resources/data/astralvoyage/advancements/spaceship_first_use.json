@@ -1,7 +1,7 @@
 {
     "display": {
         "icon": {
-            "item": "astralvoyage:ship_generator_block"
+            "item": "astralvoyage:spaceship_generator_block"
         },
         "title": {
             "translate": "advancement.astralvoyage.spaceship_first_use"
