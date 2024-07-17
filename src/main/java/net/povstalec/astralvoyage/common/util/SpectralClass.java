@@ -11,7 +11,7 @@ public enum SpectralClass implements StringRepresentable
     // Remnants
     XW("white_dwarf",new Pair<>(8000d, 40000d), new Pair<>(0.17d, 1.4d), new Pair<>(2100d, 6300d), new Pair<>(0.02d, 0.1d), 0.65f, RandomTextureLayers.Star.O.getTextureLayer()),
     XN("neutron_star", new Pair<>(600000d, 1000000d), new Pair<>(1.4, 4.5d), new Pair<>(10d, 20d), new Pair<>(0.5d, 3d), 0.01697f, RandomTextureLayers.Star.O.getTextureLayer()),
-    XB("black_hole", new Pair<>(0d, 0d), new Pair<>(5d, 100d), new Pair<>(10d, 150d), new Pair<>(0d, 1d), 0.003f, RandomTextureLayers.Star.XB.getTextureLayer()),
+    XB("black_hole", new Pair<>(0d, 100d), new Pair<>(5d, 100d), new Pair<>(10d, 150d), new Pair<>(0d, 1d), 0.003f, RandomTextureLayers.Star.XB.getTextureLayer()),
 
     // Main Sequence
     O("o", new Pair<>(33000d, Double.MAX_VALUE), new Pair<>(16d, Double.MAX_VALUE), new Pair<>(105000000D, Double.MAX_VALUE), new Pair<>(30000d, Double.MAX_VALUE), 0.00003f, RandomTextureLayers.Star.O.getTextureLayer()),
@@ -87,9 +87,8 @@ public enum SpectralClass implements StringRepresentable
         Random random = new Random();
         double surfaceTemperature = random.nextDouble(this.getSurfaceTemperatureRange().getFirst(), this.getSurfaceTemperatureRange().getSecond());
         double mass = random.nextDouble(this.getMassRange().getFirst(), this.getMassRange().getSecond());
-        double radius = random.nextDouble(this.getRadiusRange().getFirst(), this.getRadiusRange().getSecond());
         double luminosity = random.nextDouble(this.getLuminosityRange().getFirst(), this.getLuminosityRange().getSecond());
 
-        return new StarProperties(surfaceTemperature, mass, radius, luminosity);
+        return new StarProperties(surfaceTemperature, mass, luminosity);
     }
 }

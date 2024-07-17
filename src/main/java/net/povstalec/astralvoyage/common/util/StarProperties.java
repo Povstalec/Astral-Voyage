@@ -40,7 +40,6 @@ public class StarProperties {
     {
         double surfaceTemperature = tag.getDouble(SURFACE_TEMPERATURE);
         double mass = tag.getDouble(MASS);
-        double radius = tag.getDouble(RADIUS);
         double luminosity = tag.getDouble(LUMINOSITY);
 
         return new StarProperties(surfaceTemperature, mass, luminosity);
@@ -59,5 +58,20 @@ public class StarProperties {
     public double getLuminosity()
     {
         return luminosity;
+    }
+
+    public void setSurfaceTemperature(double surfaceTemperature)
+    {
+        this.surfaceTemperature = surfaceTemperature;
+    }
+
+    public void setMass(double mass)
+    {
+        this.mass = mass;
+    }
+
+    public void setLuminosity(double luminosity)
+    {
+        this.luminosity = luminosity;
     }
 }

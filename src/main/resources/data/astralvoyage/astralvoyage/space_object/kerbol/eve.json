@@ -13,14 +13,6 @@
       "rotation": 0.0
     }
   },
-  "surface":
-  {
-    "noise_settings": "minecraft:overworld",
-    "biomes":
-    [
-      "minecraft:plains"
-    ]
-  },
   "texture_layers":
   [
     {"layer":{"texture": "astralvoyage:textures/environment/planets/eve.png", "texture_settings": {"rgba": [255, 255, 255, 255], "blends": false}}},

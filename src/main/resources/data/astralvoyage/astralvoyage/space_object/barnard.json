@@ -6,7 +6,7 @@
 		"star_data": {
 			"luminosity": 0.0034,
 			"mass": 0.1610,
-			"temperature": 3222
+			"surface_temperature": 3222
 		}
 	},
 	"size": 280000,

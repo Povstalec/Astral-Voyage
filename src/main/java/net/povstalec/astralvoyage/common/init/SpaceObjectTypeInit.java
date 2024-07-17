@@ -13,6 +13,7 @@ import net.povstalec.astralvoyage.common.util.RegistryDispatcher;
 import net.povstalec.astralvoyage.common.util.SpectralClass;
 
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = AstralVoyage.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -27,7 +28,7 @@ public class SpaceObjectTypeInit {
     );
 
     public static final RegistryObject<Codec<StarType>> STAR = register("star",
-            () -> StarType.CODEC, new StarType(Either.left(SpectralClass.M)));
+            () -> StarType.CODEC, new StarType(Either.left(SpectralClass.M), Optional.empty()));
 
     public static <S extends SpaceObjectType> RegistryObject<Codec<S>> register(String name, Supplier<Codec<S>> supplier, S type)
     {

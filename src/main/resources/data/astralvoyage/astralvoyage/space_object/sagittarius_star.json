@@ -3,7 +3,16 @@
 	"object_type":
 	{
 		"type": "astralvoyage:star",
-		"spectral_class": "black_hole"
+		"star_data": "black_hole",
+		"accretion_disk":
+		{
+			"temperature": 10000000,
+			"luminosity": 100000000,
+			"width": 1000000,
+			"rotation_speed": [1000000, 0, 0],
+			"rotation_direction": [100000, 0, 0],
+			"anomaly": 0
+		}
 	},
 	"size": 51800000,
 	"galactic_position": [10, 11, 19],

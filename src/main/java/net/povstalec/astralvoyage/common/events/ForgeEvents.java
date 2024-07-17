@@ -1,15 +1,10 @@
 package net.povstalec.astralvoyage.common.events;
 
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.povstalec.astralvoyage.common.capability.PlanetCapability;
 import net.povstalec.astralvoyage.common.data.SpaceObjects;
-import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
-import net.povstalec.astralvoyage.common.datapack.SpaceObject;
-import net.povstalec.astralvoyage.common.util.TextureLayerData;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.resources.ResourceLocation;
@@ -29,11 +24,6 @@ import net.povstalec.astralvoyage.common.capability.GenericProvider;
 import net.povstalec.astralvoyage.common.capability.SpaceshipCapability;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 import net.povstalec.astralvoyage.common.init.WorldGenInit;
-import org.joml.Vector3f;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Mod.EventBusSubscriber(modid = AstralVoyage.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeEvents {
@@ -59,6 +49,18 @@ public class ForgeEvents {
             entity.setDeltaMovement(movementVector.x(), movementVector.y()+entity.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).getValue()-0.02, movementVector.z());
         }
         entity.fallDistance = 0;
+    }
+
+    @SubscribeEvent
+    public static void onPlayerEnterSpaceship(PlayerEvent.PlayerChangedDimensionEvent event)
+    {
+        if(event.getEntity().level().isClientSide())
+            return;
+
+        if(event.getEntity().getServer().getLevel(event.getTo()).dimensionTypeId() == WorldGenInit.SPACE_TYPE)
+        {
+            event.getEntity().getServer().getPlayerList().getPlayer(event.getEntity().getUUID()).getAdvancements().award(event.getEntity().getServer().getAdvancements().getAdvancement(new ResourceLocation(AstralVoyage.MODID, "spaceship_first_use")), "");
+        }
     }
 
     @SubscribeEvent

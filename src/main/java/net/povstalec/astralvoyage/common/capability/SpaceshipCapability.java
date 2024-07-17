@@ -39,7 +39,7 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 	private static final String Z_AXIS_ROTATION = "z_axis_rotation";
 
     private Vector3f galacticPosition = new Vector3f(0, 0, 0);
-    private Vector3f solarPosition = new Vector3f(107540000, 0, 0);
+    private Vector3f solarPosition = new Vector3f(147280000, 0, 0);
 	private Vector3f oldGalacticPosition = new Vector3f(0, 0, 0);
     private Vector3f oldSolarPosition = new Vector3f(0, 0, 0);
 
@@ -109,35 +109,6 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 
         this.renderObjects = renderObjects;
     }
-
-    /*private void handleRenderObjects(Level level)
-    {
-        List<ClientSpaceObject> renderObjects = new ArrayList<>();
-        SpaceObjects.get(level).spaceObjects.forEach((objectId, object) ->
-                renderObjects.add(new ClientSpaceObject(SpaceObject.stringToSpaceObjectKey(objectId), object.getSize(),
-                        Optional.of(object.getOrbitMap().isPresent() && object.getOrbitMap().get().getSecond().containsKey("orbit_start") ? object.getOrbitMap().get().getSecond().get("orbit_start") : 0D),
-                        new Vector3f(object.getOrbitMap().isPresent() && object.getOrbitMap().get().getSecond().containsKey("distance") ? object.getOrbitMap().get().getSecond().get("distance").floatValue() : 0f, 0 ,0),
-                        object.getGalacticPos(), TextureLayerData.toDataList(object.getTextureLayers()))));
-
-        renderObjects.removeIf(filter -> filter.getGalacticPos().isEmpty());
-
-        List<ClientSpaceObject> objectsToAdd = new ArrayList<>(renderObjects);
-        renderObjects.forEach(objects -> {
-            SpaceObject.Serializable object = SpaceObjects.get(level.getServer()).spaceObjects.get(objects.getKey().location().toString());
-            if (object.getGalacticPos().isPresent() && object.getGalacticPos().get().equals(this.getGalacticPosition(), 0.1f))
-                object.getChildObjects().forEach(child -> {
-                    SpaceObject.Serializable childObject = SpaceObjects.get(level.getServer()).spaceObjects.get(child.location().toString());
-                    ClientSpaceObject clientChildObject = new ClientSpaceObject(child, childObject.getSize(),
-                            Optional.of(childObject.getOrbitMap().isPresent() && childObject.getOrbitMap().get().getSecond().containsKey("orbit_start") ? childObject.getOrbitMap().get().getSecond().get("orbit_start") : 0D),
-                            new Vector3f(childObject.getOrbitMap().isPresent() && childObject.getOrbitMap().get().getSecond().containsKey("distance") ? childObject.getOrbitMap().get().getSecond().get("distance").floatValue() : 147280000f, 0, 0),
-                            Optional.empty(), TextureLayerData.toDataList(childObject.getTextureLayers()));
-                    if (!objectsToAdd.contains(clientChildObject))
-                        objectsToAdd.add(clientChildObject);
-                });
-        });
-
-        this.renderObjects = childObjects;
-    }*/
 
     public static ClientSpaceObject serializeableToClient(String objectId, SpaceObject.Serializable object)
     {

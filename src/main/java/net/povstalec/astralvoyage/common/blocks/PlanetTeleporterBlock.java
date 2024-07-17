@@ -42,10 +42,8 @@ public class PlanetTeleporterBlock extends Block {
                             vector = new Vector3f(thing.getValue().getOrbitMap().getSecond().get("distance").floatValue(), 0, 0);
                         return vector.distance(cap.getSolarPosition()) < 500000;
                     }).toList();
-            if(objectList.get(0).getValue().getDimension() != null)
-                pPlayer.teleportTo(
-                        pLevel.getServer().levelKeys().stream().toList().contains(objectList.get(0).getValue().getDimension())
-                                ? pLevel.getServer().getLevel(objectList.get(0).getValue().getDimension()) : (ServerLevel) pLevel,
+            if(objectList.get(0).getValue().getDimension() != null && pLevel.getServer().levelKeys().stream().toList().contains(objectList.get(0).getValue().getDimension()))
+                pPlayer.teleportTo(pLevel.getServer().getLevel(objectList.get(0).getValue().getDimension()),
                         pPlayer.getOnPos().getX(), pPlayer.getOnPos().getY(),
                         pPlayer.getOnPos().getZ(), RelativeMovement.ALL,
                         pPlayer.getYRot(), pPlayer.getXRot());

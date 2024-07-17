@@ -2,10 +2,11 @@
 	"name": "stellar_location.astralvoyage.sol",
 	"object_type": {
 		"type": "astralvoyage:star",
-		"star_data": {
+		"star_data":
+		{
 			"luminosity": 1,
 			"mass": 1,
-			"temperature": 5772
+			"surface_temperature": 5772
 		}
 	},
 	"size": 1400000,

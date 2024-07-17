@@ -183,20 +183,7 @@ public class DimensionHelper {
     {
         RegistryAccess registries = server.registryAccess();
 
-        Random random = new Random();
-        List<Holder<Biome>> holderList = new ArrayList<>();
-        planet.getSurface().getSecond().forEach(biome ->
-                holderList.add(registries.registryOrThrow(Registries.BIOME).getHolderOrThrow(biome)));
-
-        List<Pair<Climate.ParameterPoint, Holder<Biome>>> parameters = new ArrayList<>();
-        holderList.forEach(
-        biome -> parameters.add(new Pair<>(Climate.parameters(random.nextFloat(-2f, 2f),
-                random.nextFloat(-2f, 2f), random.nextFloat(-2f, 2f),
-                random.nextFloat(-2f, 2f), random.nextFloat(-2f, 2f),
-                random.nextFloat(-2f, 2f), random.nextFloat(-1f, 1f)), biome)));
-        Climate.ParameterList<Holder<Biome>> parameterList = new Climate.ParameterList<>(parameters);
-
-        MultiNoiseBiomeSource multiSource = MultiNoiseBiomeSource.createFromList(parameterList);
+        MultiNoiseBiomeSource multiSource = MultiNoiseBiomeSource.createFromList(planet.getSurface().getSecond());
 
         LevelStem stem =
                 new LevelStem(

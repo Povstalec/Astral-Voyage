@@ -3,11 +3,16 @@ package net.povstalec.astralvoyage.common.datapack;
 import java.util.*;
 import java.util.function.Function;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.povstalec.astralvoyage.common.data.SpaceObjects;
 import net.povstalec.astralvoyage.common.init.SpaceObjectTypeInit;
@@ -40,7 +45,7 @@ public class SpaceObject
 
 	private static final Codec<Vector3f> GALACTIC_POS = Codec.FLOAT.listOf().comapFlatMap(f -> Util.fixedSize(f, 3).map(vec -> new Vector3f(vec.get(0), vec.get(1), vec.get(2))), (element) -> List.of(element.get(0), element.get(1), element.get(2))).stable();
 	private static final Codec<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> PARENT = Codec.pair(RESOURCE_KEY_CODEC.fieldOf("parent_object").codec(), Codec.unboundedMap(Codec.STRING, Codec.DOUBLE).fieldOf("orbit").codec());
-	private static final Codec<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> SURFACE_CODEC = Codec.pair(ResourceKey.codec(Registries.NOISE_SETTINGS).fieldOf("noise_settings").codec(), Codec.list(ResourceKey.codec(Registries.BIOME)).fieldOf("biomes").codec());
+	private static final Codec<Pair<ResourceKey<NoiseGeneratorSettings>, Climate.ParameterList<Holder<Biome>>>> SURFACE_CODEC = Codec.pair(ResourceKey.codec(Registries.NOISE_SETTINGS).fieldOf("noise_settings").codec(), MultiNoiseBiomeSource.DIRECT_CODEC.codec());
 
 	public static final Codec<SpaceObject> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			// Dimension this Stellar Location is tied to
@@ -77,7 +82,7 @@ public class SpaceObject
     @Nullable private final SpaceObject.Generation generation;
     @Nullable private final Pair<ResourceKey<SpaceObject>, Map<String, Double>> parentOrbitMap;
 	private final List<TextureLayerData> textureLayers;
-    @Nullable private final Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> surface;
+    @Nullable private final Pair<ResourceKey<NoiseGeneratorSettings>, Climate.ParameterList<Holder<Biome>>> surface;
 
 	@Nullable private ResourceKey<SpaceObject> parent;
 	// Orbital characteristics
@@ -91,7 +96,7 @@ public class SpaceObject
                        float size,  Optional<SpaceObjectType> type, Optional<Vector3f> galactic_position, Optional<SpaceObject.Generation> generation,
                        Optional<Pair<ResourceKey<SpaceObject>, Map<String, Double>>> parentOrbitMap,
                        List<TextureLayerData> textureLayers,
-                       Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> surface)
+                       Optional<Pair<ResourceKey<NoiseGeneratorSettings>, Climate.ParameterList<Holder<Biome>>>> surface)
 	{
 		this.dimension = dimension.orElse(null);
 		this.translationName = translationName;
@@ -148,7 +153,7 @@ public class SpaceObject
 		return Optional.ofNullable(this.parentOrbitMap);
 	}
 
-	public Optional<Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>>> getSurface() {
+	public Optional<Pair<ResourceKey<NoiseGeneratorSettings>, Climate.ParameterList<Holder<Biome>>>> getSurface() {
 		return Optional.ofNullable(surface);
 	}
 
@@ -238,7 +243,7 @@ public class SpaceObject
         @Nullable private final Pair<ResourceKey<SpaceObject>, Map<String, Double>> parentOrbitMap;
 		private List<ResourceKey<SpaceObject>> childObjects = new ArrayList<>();
 		private final List<TextureLayerData> textureLayers;
-		@Nullable private final Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> surface;
+		@Nullable private final Pair<ResourceKey<NoiseGeneratorSettings>, Climate.ParameterList<Holder<Biome>>> surface;
 
 		public Serializable(@Nonnull ResourceKey<SpaceObject> objectKey, SpaceObject object)
 		{
@@ -260,7 +265,7 @@ public class SpaceObject
                             @Nullable Pair<ResourceKey<SpaceObject>, Map<String, Double>> parentOrbitMap,
                             @Nullable SpaceObject.Generation generation,
                             List<TextureLayerData> textureLayers,
-                            @Nullable Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> surface)
+                            @Nullable Pair<ResourceKey<NoiseGeneratorSettings>, Climate.ParameterList<Holder<Biome>>> surface)
 		{
 			this.objectKey = null;
 			this.dimension = dimension;
@@ -310,7 +315,7 @@ public class SpaceObject
 		}
 
         @Nullable
-		public Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> getSurface()
+		public Pair<ResourceKey<NoiseGeneratorSettings>, Climate.ParameterList<Holder<Biome>>> getSurface()
 		{
 			return surface;
 		}
@@ -355,8 +360,6 @@ public class SpaceObject
 			{
 				objectTag.putString(OBJECT_KEY, this.objectKey.location().toString());
 
-				if(this.type != null)
-					objectTag.put(TYPE, type.serializeNBT());
 			}
 			else
 			{
@@ -412,8 +415,31 @@ public class SpaceObject
 				CompoundTag surfaceTag = new CompoundTag();
                 surfaceTag.putString("noise_settings", this.getSurface().getFirst().location().toString());
                 ListTag biomeList = new ListTag();
-                this.getSurface().getSecond().forEach(biome -> biomeList.add(StringTag.valueOf(biome.location().toString())));
-                surfaceTag.put("biomes", biomeList);
+				this.getSurface().getSecond().values().forEach(
+				pair -> {
+					CompoundTag biomeParameterPair = new CompoundTag();
+					CompoundTag parameters = new CompoundTag();
+					biomeParameterPair.putString("biome", ForgeRegistries.BIOMES.getKey(pair.getSecond().get()) != null ? ForgeRegistries.BIOMES.getKey(pair.getSecond().get()).toString() : "minecraft:plains");
+
+					parameters.putFloat("temperature_min", pair.getFirst().temperature().min());
+					parameters.putFloat("temperature_max", pair.getFirst().temperature().max());
+					parameters.putFloat("humidity_min", pair.getFirst().humidity().min());
+					parameters.putFloat("humidity_max", pair.getFirst().humidity().max());
+					parameters.putFloat("continentalness_min", pair.getFirst().continentalness().min());
+					parameters.putFloat("continentalness_max", pair.getFirst().continentalness().max());
+					parameters.putFloat("erosion_min", pair.getFirst().erosion().min());
+					parameters.putFloat("erosion_max", pair.getFirst().erosion().max());
+					parameters.putFloat("weirdness_min", pair.getFirst().weirdness().min());
+					parameters.putFloat("weirdness_max", pair.getFirst().weirdness().max());
+					parameters.putFloat("depth_min", pair.getFirst().depth().min());
+					parameters.putFloat("depth_max", pair.getFirst().depth().max());
+					parameters.putFloat("offset", pair.getFirst().offset());
+
+					biomeParameterPair.put("parameters", parameters);
+
+					biomeList.add(biomeParameterPair);
+				});
+				surfaceTag.put("biomes", biomeList);
 				objectTag.put(SURFACE, surfaceTag);
 			}
 
@@ -493,20 +519,33 @@ public class SpaceObject
 				List<TextureLayerData> textureLayers = new ArrayList<>();
 				layersTag.forEach(layertag -> textureLayers.add(TextureLayerData.deserialize((CompoundTag) layertag)));
 
-				Pair<ResourceKey<NoiseGeneratorSettings>, List<ResourceKey<Biome>>> surface = null;
+				Pair<ResourceKey<NoiseGeneratorSettings>, Climate.ParameterList<Holder<Biome>>> surface = null;
 				if(objectTag.contains(SURFACE)) {
 					CompoundTag surfaceTag = objectTag.getCompound(SURFACE);
 					ResourceKey<NoiseGeneratorSettings> key = ResourceKey.create(Registries.NOISE_SETTINGS, ResourceLocation.tryParse(surfaceTag.getString("noise_settings")));
 
-					List<ResourceKey<Biome>> biomeList = new ArrayList<>();
-					ListTag biomesTag = surfaceTag.getList("biomes", Tag.TAG_STRING);
+					List<Pair<ResourceKey<Biome>, Climate.ParameterList<Holder<Biome>>>> biomeList = new ArrayList<>();
+					ListTag biomesTag = surfaceTag.getList("biomes", Tag.TAG_COMPOUND);
+                    List<Pair<Climate.ParameterPoint, Holder<Biome>>> parameters = new ArrayList<>();
+					Climate.ParameterList<Holder<Biome>> list;
 					biomesTag.forEach(
 							biome -> {
-								StringTag biomeTag = ((StringTag) biome);
-								biomeList.add(ResourceKey.create(Registries.BIOME, ResourceLocation.tryParse(biomeTag.getAsString())));
+								CompoundTag biomeParametersPair = ((CompoundTag) biome);
+								CompoundTag biomeParameters = biomeParametersPair.getCompound("parameters");
+								ResourceKey<Biome> biome_key = ResourceKey.create(Registries.BIOME, ResourceLocation.tryParse(biomeParametersPair.getString("biome")));
+								parameters.add(Pair.of(Climate.parameters(
+										new Climate.Parameter(biomeParameters.getLong("temperature_min"), biomeParameters.getLong("temperature_max")),
+										new Climate.Parameter(biomeParameters.getLong("humidity_min"), biomeParameters.getLong("humidity_max")),
+										new Climate.Parameter(biomeParameters.getLong("continentalness_min"), biomeParameters.getLong("continentalness_max")),
+										new Climate.Parameter(biomeParameters.getLong("erosion_min"), biomeParameters.getLong("erosion_max")),
+										new Climate.Parameter(biomeParameters.getLong("depth_min"), biomeParameters.getLong("depth_max")),
+										new Climate.Parameter(biomeParameters.getLong("weirdness_min"), biomeParameters.getLong("weirdness_max")),
+								        biomeParameters.getLong("offset")),
+								ForgeRegistries.BIOMES.getHolder(biome_key).orElse(null)));
 							});
 
-					surface = new Pair<>(key, biomeList);
+					list = new Climate.ParameterList<>(parameters);
+					surface = new Pair<>(key, list);
 				}
 				return new SpaceObject.Serializable(dimension, name, size, type, galactic_position, parentOrbitMap, generation, textureLayers, surface);
 			}
