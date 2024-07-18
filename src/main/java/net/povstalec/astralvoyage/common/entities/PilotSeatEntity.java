@@ -35,21 +35,20 @@ public class PilotSeatEntity extends Entity
         Direction direction = this.level().getBlockState(this.getOnPos().above()).getValue(PilotSeatBlock.FACING);
         Vec2 vec2 = player.getRotationVector();
         float rotX = vec2.x;
-        float rotY = vec2.y-direction.toYRot();
-        if(rotX*rotX+rotY*rotY < 200)
+        float rotY = vec2.y + 360 - direction.toYRot();
+        
+        if(rotX * rotX + rotY * rotY < 200)
             return;
 
-        this.level().getCapability(CapabilitiesInit.SPACESHIP).ifPresent(
-        cap -> {
-            cap.setRotation(cap.getRotation().x, cap.getRotation().y+rotationSpeed(rotY), cap.getRotation().z-rotationSpeed(rotX));
-            player.setXRot(0);
-            player.setYRot(direction.toYRot());
+        this.level().getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap ->
+        {
+            cap.rotate(0, rotationSpeed(rotY), 0);
         });
     }
 
     public float rotationSpeed(float rot)
     {
-        return rot/30;
+        return rot / 250;
     }
 
     @Override

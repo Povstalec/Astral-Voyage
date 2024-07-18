@@ -1,12 +1,15 @@
 package net.povstalec.astralvoyage.common.blocks;
 
+import java.util.List;
+
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -18,10 +21,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.povstalec.astralvoyage.common.entities.PilotSeatEntity;
 import net.povstalec.astralvoyage.common.init.EntitiesInit;
-import net.povstalec.astralvoyage.common.util.EnumMovementType;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class PilotSeatBlock extends Block
 {
