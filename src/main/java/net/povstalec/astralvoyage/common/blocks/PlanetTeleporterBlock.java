@@ -1,8 +1,13 @@
 package net.povstalec.astralvoyage.common.blocks;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.joml.Vector3f;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -16,11 +21,6 @@ import net.povstalec.astralvoyage.common.data.SpaceObjects;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 import net.povstalec.astralvoyage.common.util.DimensionHelper;
-import org.joml.Vector3f;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 public class PlanetTeleporterBlock extends Block {
     public PlanetTeleporterBlock(Properties prop) {

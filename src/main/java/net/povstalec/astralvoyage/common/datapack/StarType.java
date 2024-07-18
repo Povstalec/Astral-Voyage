@@ -1,18 +1,20 @@
 package net.povstalec.astralvoyage.common.datapack;
 
+import java.util.Optional;
+import java.util.Random;
+
+import javax.annotation.Nullable;
+
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.StringRepresentable;
 import net.povstalec.astralvoyage.common.init.SpaceObjectTypeInit;
 import net.povstalec.astralvoyage.common.util.DiskParameter;
 import net.povstalec.astralvoyage.common.util.SpectralClass;
 import net.povstalec.astralvoyage.common.util.StarProperties;
-
-import javax.annotation.Nullable;
-import java.util.Optional;
-import java.util.Random;
 
 public class StarType implements SpaceObjectType
 {

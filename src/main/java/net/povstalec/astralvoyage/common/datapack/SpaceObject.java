@@ -1,21 +1,14 @@
 package net.povstalec.astralvoyage.common.datapack;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Climate;
-import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
-import net.povstalec.astralvoyage.common.data.SpaceObjects;
-import net.povstalec.astralvoyage.common.init.SpaceObjectTypeInit;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.joml.Vector3f;
 
 import com.mojang.datafixers.util.Pair;
@@ -23,7 +16,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.Util;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -31,11 +26,15 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.povstalec.astralvoyage.AstralVoyage;
+import net.povstalec.astralvoyage.common.data.SpaceObjects;
+import net.povstalec.astralvoyage.common.init.SpaceObjectTypeInit;
 import net.povstalec.astralvoyage.common.util.TextureLayerData;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class SpaceObject
 {

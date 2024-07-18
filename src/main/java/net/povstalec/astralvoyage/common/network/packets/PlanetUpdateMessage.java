@@ -1,11 +1,11 @@
 package net.povstalec.astralvoyage.common.network.packets;
 
+import java.util.function.Supplier;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import net.povstalec.astralvoyage.common.network.ClientPacketHandler;
-
-import java.util.function.Supplier;
 
 public class PlanetUpdateMessage {
 

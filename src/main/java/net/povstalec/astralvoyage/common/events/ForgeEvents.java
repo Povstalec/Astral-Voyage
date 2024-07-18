@@ -1,13 +1,9 @@
 package net.povstalec.astralvoyage.common.events;
 
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.povstalec.astralvoyage.common.capability.PlanetCapability;
-import net.povstalec.astralvoyage.common.data.SpaceObjects;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -17,11 +13,15 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.povstalec.astralvoyage.AstralVoyage;
 import net.povstalec.astralvoyage.common.capability.GenericProvider;
+import net.povstalec.astralvoyage.common.capability.PlanetCapability;
 import net.povstalec.astralvoyage.common.capability.SpaceshipCapability;
+import net.povstalec.astralvoyage.common.data.SpaceObjects;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 import net.povstalec.astralvoyage.common.init.WorldGenInit;
 

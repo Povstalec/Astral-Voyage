@@ -1,16 +1,16 @@
 package net.povstalec.astralvoyage.client.render.level;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-import com.mojang.datafixers.util.Either;
-import net.povstalec.astralvoyage.common.capability.PlanetCapability;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import com.google.common.collect.Lists;
@@ -19,6 +19,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.datafixers.util.Either;
 import com.mojang.math.Axis;
 
 import net.minecraft.client.Camera;
@@ -32,6 +33,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.povstalec.astralvoyage.AstralVoyage;
+import net.povstalec.astralvoyage.common.capability.PlanetCapability;
 import net.povstalec.astralvoyage.common.capability.SpaceshipCapability;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;

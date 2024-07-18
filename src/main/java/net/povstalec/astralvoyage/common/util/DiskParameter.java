@@ -1,12 +1,14 @@
 package net.povstalec.astralvoyage.common.util;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.Util;
-import net.minecraft.nbt.CompoundTag;
+import java.util.List;
+
 import org.joml.Vector3f;
 
-import java.util.List;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import net.minecraft.Util;
+import net.minecraft.nbt.CompoundTag;
 
 public class DiskParameter
 {

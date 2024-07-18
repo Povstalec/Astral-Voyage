@@ -14,8 +14,8 @@ import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.resources.ResourceLocation;
 import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
-import net.povstalec.astralvoyage.common.util.TextureLayerData;
 import net.povstalec.astralvoyage.common.util.SphericalCoords;
+import net.povstalec.astralvoyage.common.util.TextureLayerData;
 
 public final class SpaceObjectRenderer
 {

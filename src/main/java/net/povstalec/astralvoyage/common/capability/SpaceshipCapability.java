@@ -1,7 +1,14 @@
 package net.povstalec.astralvoyage.common.capability;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.joml.Vector3f;
+
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -17,12 +24,6 @@ import net.povstalec.astralvoyage.common.network.AVNetwork;
 import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
 import net.povstalec.astralvoyage.common.util.TextureLayerData;
-import org.joml.Vector3f;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 public class SpaceshipCapability implements INBTSerializable<CompoundTag>
 {

@@ -2,19 +2,11 @@ package net.povstalec.astralvoyage;
 
 import java.util.Optional;
 
-import com.mojang.serialization.Codec;
-import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.RegistryObject;
-import net.povstalec.astralvoyage.client.render.entity.PilotSeatRenderer;
-import net.povstalec.astralvoyage.common.datapack.SpaceObjectType;
-import net.povstalec.astralvoyage.common.datapack.StarType;
-import net.povstalec.astralvoyage.common.init.*;
-import net.povstalec.astralvoyage.common.util.RegistryDispatcher;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -27,8 +19,16 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DataPackRegistryEvent;
+import net.povstalec.astralvoyage.client.render.entity.PilotSeatRenderer;
 import net.povstalec.astralvoyage.client.render.level.SpaceDimensionSpecialEffects;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
+import net.povstalec.astralvoyage.common.init.AdvancementInit;
+import net.povstalec.astralvoyage.common.init.BlockEntityInit;
+import net.povstalec.astralvoyage.common.init.BlockInit;
+import net.povstalec.astralvoyage.common.init.EntitiesInit;
+import net.povstalec.astralvoyage.common.init.ItemInit;
+import net.povstalec.astralvoyage.common.init.ItemTabsInit;
+import net.povstalec.astralvoyage.common.init.WorldGenInit;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -57,6 +57,8 @@ public class AstralVoyage
         ItemTabsInit.register(modEventBus);
         WorldGenInit.registerWorldgen(modEventBus);
         EntitiesInit.register(modEventBus);
+        
+        AdvancementInit.register();
 
         modEventBus.addListener((DataPackRegistryEvent.NewRegistry event) -> 
         {

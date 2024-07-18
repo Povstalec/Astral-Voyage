@@ -1,10 +1,11 @@
 package net.povstalec.astralvoyage.common.util;
 
-import com.mojang.datafixers.util.Pair;
-import net.minecraft.util.StringRepresentable;
-
 import java.util.List;
 import java.util.Random;
+
+import com.mojang.datafixers.util.Pair;
+
+import net.minecraft.util.StringRepresentable;
 
 public enum SpectralClass implements StringRepresentable
 {

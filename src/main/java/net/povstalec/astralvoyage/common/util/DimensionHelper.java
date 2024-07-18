@@ -1,31 +1,33 @@
 package net.povstalec.astralvoyage.common.util;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Lifecycle;
 
 import net.minecraft.Util;
-import net.minecraft.core.*;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.*;
+import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.border.BorderChangeListener;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
@@ -36,7 +38,6 @@ import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.init.WorldGenInit;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
 import net.povstalec.astralvoyage.common.network.packets.UpdateDimensionsPacket;
-import net.povstalec.astralvoyage.common.worldgen.dimension.PlanetChunkGenerator;
 import net.povstalec.astralvoyage.common.worldgen.dimension.SpaceChunkGenerator;
 
 public class DimensionHelper {

@@ -1,17 +1,17 @@
 package net.povstalec.astralvoyage.common.block_entities;
 
+import org.joml.Vector3f;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.povstalec.astralvoyage.common.blocks.SpaceshipMovementBlock;
 import net.povstalec.astralvoyage.common.init.BlockEntityInit;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 import net.povstalec.astralvoyage.common.util.EnumMovementType;
-import org.joml.Vector3f;
 
 public class SpaceshipMovementBlockEntity extends BlockEntity {
     public boolean movementType = false;

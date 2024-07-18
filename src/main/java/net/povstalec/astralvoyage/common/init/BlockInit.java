@@ -3,8 +3,6 @@ package net.povstalec.astralvoyage.common.init;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import net.minecraft.core.Direction;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -14,7 +12,11 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.blocks.*;
+import net.povstalec.astralvoyage.common.blocks.PilotSeatBlock;
+import net.povstalec.astralvoyage.common.blocks.PlanetTeleporterBlock;
+import net.povstalec.astralvoyage.common.blocks.ShipTeleporterBlock;
+import net.povstalec.astralvoyage.common.blocks.SpaceshipGeneratorBlock;
+import net.povstalec.astralvoyage.common.blocks.SpaceshipMovementBlock;
 
 public class BlockInit {
 

@@ -23,9 +23,23 @@ public class SphericalCoords
 		this.phi = sphericalPhi(cartesianCoords);
 	}
 	
+	public SphericalCoords(Vector3f cartesianCoords, float r)
+	{
+		this.r = r;
+		this.theta = sphericalTheta(cartesianCoords);
+		this.phi = sphericalPhi(cartesianCoords);
+	}
+	
 	public SphericalCoords(Vector3d cartesianCoords)
 	{
 		this.r = sphericalR(cartesianCoords);
+		this.theta = sphericalTheta(cartesianCoords);
+		this.phi = sphericalPhi(cartesianCoords);
+	}
+	
+	public SphericalCoords(Vector3d cartesianCoords, double r)
+	{
+		this.r = r;
 		this.theta = sphericalTheta(cartesianCoords);
 		this.phi = sphericalPhi(cartesianCoords);
 	}
@@ -112,12 +126,17 @@ public class SphericalCoords
 	{
 		return new Vector3d(cartesianX(sphericalCoords), cartesianY(sphericalCoords), cartesianZ(sphericalCoords));
 	}
-
-	public static double spiralR(double r, double phi, double beta) {
-		return r * (phi + beta);
+	
+	@Override
+	public String toString()
+	{
+		return "(r: " + r + ", theta: " + theta + ", phi: " + phi + ")";
 	}
-
-	public static double elipticalR(double a, double b, double phi) {
-		return a * b / Math.sqrt(b * Math.pow(Math.cos(phi), 2.0D) + a * Math.pow(Math.sin(phi), 2.0D));
+	
+	
+	
+	public static double spiralR(double r, double phi, double beta)
+	{
+		return r * (phi + beta);
 	}
 }

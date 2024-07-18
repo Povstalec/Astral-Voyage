@@ -10,7 +10,11 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.network.packets.*;
+import net.povstalec.astralvoyage.common.network.packets.PlanetRenderUpdateMessage;
+import net.povstalec.astralvoyage.common.network.packets.PlanetUpdateMessage;
+import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
+import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
+import net.povstalec.astralvoyage.common.network.packets.UpdateDimensionsPacket;
 
 public class AVNetwork {
     public static final String NET_VERSION = "1.0";

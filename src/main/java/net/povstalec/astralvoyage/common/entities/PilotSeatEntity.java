@@ -2,16 +2,13 @@ package net.povstalec.astralvoyage.common.entities;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.povstalec.astralvoyage.common.blocks.PilotSeatBlock;
-import net.povstalec.astralvoyage.common.init.BlockInit;
 import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
-import net.povstalec.astralvoyage.common.init.EntitiesInit;
 
 public class PilotSeatEntity extends Entity
 {
@@ -42,7 +39,7 @@ public class PilotSeatEntity extends Entity
 
         this.level().getCapability(CapabilitiesInit.SPACESHIP).ifPresent(cap ->
         {
-            cap.rotate(0, rotationSpeed(rotY), 0);
+            cap.rotate(0, rotationSpeed(rotY), 0); //TODO Handle pitch and roll
         });
     }
 

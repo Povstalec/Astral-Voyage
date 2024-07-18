@@ -11,7 +11,6 @@ import net.povstalec.astralvoyage.common.network.packets.PlanetRenderUpdateMessa
 import net.povstalec.astralvoyage.common.network.packets.PlanetUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
-import org.joml.Vector3f;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientPacketHandler {

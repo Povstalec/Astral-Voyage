@@ -1,7 +1,12 @@
 package net.povstalec.astralvoyage.common.init;
 
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -11,10 +16,6 @@ import net.povstalec.astralvoyage.common.datapack.SpaceObjectType;
 import net.povstalec.astralvoyage.common.datapack.StarType;
 import net.povstalec.astralvoyage.common.util.RegistryDispatcher;
 import net.povstalec.astralvoyage.common.util.SpectralClass;
-
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = AstralVoyage.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class SpaceObjectTypeInit {

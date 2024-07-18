@@ -1,8 +1,8 @@
 package net.povstalec.astralvoyage.common.datapack;
 
 import com.mojang.serialization.Codec;
+
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.common.util.INBTSerializable;
 
 public interface SpaceObjectType
 {

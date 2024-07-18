@@ -2,7 +2,6 @@ package net.povstalec.astralvoyage.client.render.level;
 
 import javax.annotation.Nullable;
 
-import net.povstalec.astralvoyage.common.util.SphericalCoords;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -22,7 +21,7 @@ import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.RandomSource;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.stellarview.client.render.level.misc.StellarCoordinates;
+import net.povstalec.astralvoyage.common.util.SphericalCoords;
 
 public abstract class GalaxyRenderer
 {

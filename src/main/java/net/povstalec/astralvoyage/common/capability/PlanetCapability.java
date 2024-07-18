@@ -1,5 +1,15 @@
 package net.povstalec.astralvoyage.common.capability;
 
+import static net.povstalec.astralvoyage.common.capability.SpaceshipCapability.serializeableToClient;
+import static net.povstalec.astralvoyage.common.capability.SpaceshipCapability.spaceshipToClient;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.joml.Vector3f;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -12,17 +22,6 @@ import net.povstalec.astralvoyage.common.init.CapabilitiesInit;
 import net.povstalec.astralvoyage.common.network.AVNetwork;
 import net.povstalec.astralvoyage.common.network.packets.PlanetRenderUpdateMessage;
 import net.povstalec.astralvoyage.common.network.packets.PlanetUpdateMessage;
-import net.povstalec.astralvoyage.common.network.packets.RenderObjectUpdateMessage;
-import net.povstalec.astralvoyage.common.network.packets.SpaceObjectUpdateMessage;
-import org.joml.Vector3f;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static net.povstalec.astralvoyage.common.capability.SpaceshipCapability.serializeableToClient;
-import static net.povstalec.astralvoyage.common.capability.SpaceshipCapability.spaceshipToClient;
 
 public class PlanetCapability implements INBTSerializable<CompoundTag>
 {

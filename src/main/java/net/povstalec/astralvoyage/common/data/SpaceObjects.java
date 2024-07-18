@@ -1,14 +1,23 @@
 package net.povstalec.astralvoyage.common.data;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+
 import javax.annotation.Nonnull;
 
-import com.mojang.datafixers.util.Either;
+import org.joml.Vector3f;
+
 import com.mojang.datafixers.util.Pair;
+
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -20,9 +29,6 @@ import net.povstalec.astralvoyage.common.util.RandomTextureLayers;
 import net.povstalec.astralvoyage.common.util.SpectralClass;
 import net.povstalec.astralvoyage.common.util.StarProperties;
 import net.povstalec.astralvoyage.common.util.TextureLayerData;
-import org.joml.Vector3f;
-
-import java.util.*;
 
 public class SpaceObjects extends SavedData
 {

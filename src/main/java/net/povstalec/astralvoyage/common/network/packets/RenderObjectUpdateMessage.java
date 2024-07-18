@@ -1,7 +1,14 @@
 package net.povstalec.astralvoyage.common.network.packets;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Supplier;
+
+import org.joml.Vector3f;
+
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.nbt.CompoundTag;
+
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -10,13 +17,6 @@ import net.povstalec.astralvoyage.common.datapack.ClientSpaceObject;
 import net.povstalec.astralvoyage.common.datapack.SpaceObject;
 import net.povstalec.astralvoyage.common.network.ClientPacketHandler;
 import net.povstalec.astralvoyage.common.util.TextureLayerData;
-import org.joml.Vector3f;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 public class RenderObjectUpdateMessage {
 

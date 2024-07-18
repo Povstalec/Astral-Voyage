@@ -1,10 +1,11 @@
 package net.povstalec.astralvoyage.common.util;
 
+import java.util.List;
+
 import com.mojang.datafixers.util.Pair;
+
 import net.minecraft.resources.ResourceLocation;
 import net.povstalec.astralvoyage.AstralVoyage;
-
-import java.util.List;
 
 public class RandomTextureLayers {
 
