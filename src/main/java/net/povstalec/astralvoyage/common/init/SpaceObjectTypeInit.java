@@ -7,8 +7,10 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegistryObject;
 import net.povstalec.astralvoyage.AstralVoyage;
+import net.povstalec.astralvoyage.common.datapack.PlanetType;
 import net.povstalec.astralvoyage.common.datapack.SpaceObjectType;
 import net.povstalec.astralvoyage.common.datapack.StarType;
+import net.povstalec.astralvoyage.common.util.PlanetClass;
 import net.povstalec.astralvoyage.common.util.RegistryDispatcher;
 import net.povstalec.astralvoyage.common.util.SpectralClass;
 
@@ -29,6 +31,9 @@ public class SpaceObjectTypeInit {
 
     public static final RegistryObject<Codec<StarType>> STAR = register("star",
             () -> StarType.CODEC, new StarType(Either.left(SpectralClass.M), Optional.empty()));
+
+    public static final RegistryObject<Codec<PlanetType>> PLANET = register("planet",
+            () -> PlanetType.CODEC, new PlanetType(Either.left(PlanetClass.GAIA), Optional.empty(), Optional.empty()));
 
     public static <S extends SpaceObjectType> RegistryObject<Codec<S>> register(String name, Supplier<Codec<S>> supplier, S type)
     {
