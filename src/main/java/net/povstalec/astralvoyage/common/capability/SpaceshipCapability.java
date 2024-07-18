@@ -140,9 +140,9 @@ public class SpaceshipCapability implements INBTSerializable<CompoundTag>
     
 	public void setRotation(float xAxisRotation, float yAxisRotation, float zAxisRotation)
 	{
-		this.rotation.x = xAxisRotation;
-		this.rotation.y = yAxisRotation;
-		this.rotation.z = zAxisRotation;
+		this.rotation.x = (xAxisRotation+360) % 360;
+		this.rotation.y = (yAxisRotation+360) % 360;
+		this.rotation.z = (zAxisRotation+360) % 360;
 	}
 
     public void setSolarPosition(float solarX, float solarY, float solarZ)

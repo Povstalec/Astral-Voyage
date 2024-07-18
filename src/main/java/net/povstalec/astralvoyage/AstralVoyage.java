@@ -3,8 +3,10 @@ package net.povstalec.astralvoyage;
 import java.util.Optional;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.RegistryObject;
+import net.povstalec.astralvoyage.client.render.entity.PilotSeatRenderer;
 import net.povstalec.astralvoyage.common.datapack.SpaceObjectType;
 import net.povstalec.astralvoyage.common.datapack.StarType;
 import net.povstalec.astralvoyage.common.init.*;
@@ -54,6 +56,7 @@ public class AstralVoyage
         ItemInit.register(modEventBus);
         ItemTabsInit.register(modEventBus);
         WorldGenInit.registerWorldgen(modEventBus);
+        EntitiesInit.register(modEventBus);
 
         modEventBus.addListener((DataPackRegistryEvent.NewRegistry event) -> 
         {
@@ -92,7 +95,10 @@ public class AstralVoyage
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-
+            event.enqueueWork(
+            () -> {
+                EntityRenderers.register(EntitiesInit.PILOT_SEAT.get(), PilotSeatRenderer::new);
+            });
         }
 
         @SubscribeEvent

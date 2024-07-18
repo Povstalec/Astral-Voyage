@@ -4,6 +4,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -13,10 +14,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.povstalec.astralvoyage.AstralVoyage;
-import net.povstalec.astralvoyage.common.blocks.PlanetTeleporterBlock;
-import net.povstalec.astralvoyage.common.blocks.ShipTeleporterBlock;
-import net.povstalec.astralvoyage.common.blocks.SpaceshipGeneratorBlock;
-import net.povstalec.astralvoyage.common.blocks.SpaceshipMovementBlock;
+import net.povstalec.astralvoyage.common.blocks.*;
 
 public class BlockInit {
 
@@ -28,6 +26,8 @@ public class BlockInit {
 
     public static final RegistryObject<PlanetTeleporterBlock> PLANET_TELEPORTER_BLOCK = registerWithItem("planet_teleporter_block", () -> new PlanetTeleporterBlock(BlockBehaviour.Properties.of().forceSolidOn()));
     public static final RegistryObject<ShipTeleporterBlock> SHIP_TELEPORTER_BLOCK = registerWithItem("ship_teleporter_block", () -> new ShipTeleporterBlock(BlockBehaviour.Properties.of().forceSolidOn()));
+
+    public static final RegistryObject<PilotSeatBlock> PILOT_SEAT_BLOCK = registerWithItem("pilot_seat_block", () -> new PilotSeatBlock(BlockBehaviour.Properties.of().forceSolidOn()));
 
     public static <T extends Block> RegistryObject<T> registerWithItem(String name, final Supplier<T> block, Function<Item.Properties, Item.Properties> properties){
         final RegistryObject<T> reg = BLOCKS.register(name, block);

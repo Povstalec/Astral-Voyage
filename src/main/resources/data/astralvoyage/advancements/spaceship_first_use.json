@@ -15,5 +15,11 @@
         "announce_to_chat": true,
         "hidden": true
     },
-    "criteria": {}
+    "criteria":
+    {
+        "impossible":
+        {
+            "trigger": "minecraft:impossible"
+        }
+    }
 }

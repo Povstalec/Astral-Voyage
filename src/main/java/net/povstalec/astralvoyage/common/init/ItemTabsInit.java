@@ -22,6 +22,7 @@ public class ItemTabsInit {
                         pOutput.accept(BlockInit.SPACESHIP_MOVEMENT_BLOCK.get());
                         pOutput.accept(BlockInit.PLANET_TELEPORTER_BLOCK.get());
                         pOutput.accept(BlockInit.SHIP_TELEPORTER_BLOCK.get());
+                        pOutput.accept(BlockInit.PILOT_SEAT_BLOCK.get());
                     }).build());
 
 
